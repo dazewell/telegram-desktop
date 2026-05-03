@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "mtproto/mtproto_response.h"
 
 #include <QtCore/QRegularExpression>
-#include <QtCore/QDebug>
 
 namespace MTP {
 namespace {

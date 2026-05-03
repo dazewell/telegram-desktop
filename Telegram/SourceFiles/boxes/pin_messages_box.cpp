@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "apiwrap.h"
 #include "data/data_chat.h"
-#include "data/data_user.h"
 #include "lang/lang_keys.h"
 #include "history/history.h"
 #include "history/history_item.h"

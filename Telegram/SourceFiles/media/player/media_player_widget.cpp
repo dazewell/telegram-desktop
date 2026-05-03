@@ -7,21 +7,15 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "media/player/media_player_widget.h"
 
-#include "platform/platform_specific.h"
 #include "data/data_document.h"
 #include "data/data_session.h"
-#include "data/data_peer.h"
 #include "core/application.h"
 #include "core/core_settings.h"
 #include "ui/widgets/labels.h"
 #include "ui/widgets/continuous_sliders.h"
 #include "ui/widgets/shadow.h"
 #include "ui/widgets/buttons.h"
-#include "ui/widgets/popup_menu.h"
-#include "ui/widgets/dropdown_menu.h"
-#include "ui/widgets/menu/menu_action.h"
 #include "ui/wrap/fade_wrap.h"
-#include "ui/effects/ripple_animation.h"
 #include "ui/text/format_values.h"
 #include "ui/text/format_song_document_name.h"
 #include "lang/lang_keys.h"
@@ -32,13 +26,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "media/player/media_player_dropdown.h"
 #include "media/player/media_player_volume_controller.h"
 #include "history/history_item.h"
-#include "history/history_item_helpers.h"
-#include "storage/storage_account.h"
 #include "main/main_session.h"
 #include "window/window_session_controller.h"
 #include "styles/style_media_player.h"
-#include "styles/style_media_view.h"
-#include "styles/style_chat.h" // expandedMenuSeparator.
 
 namespace Media {
 namespace Player {

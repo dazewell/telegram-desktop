@@ -9,14 +9,12 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "lang/lang_keys.h"
 #include "intro/intro_code_input.h"
-#include "intro/intro_signup.h"
 #include "intro/intro_password_check.h"
 #include "boxes/abstract_box.h"
 #include "core/file_utilities.h"
 #include "core/update_checker.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/labels.h"
-#include "ui/widgets/fields/masked_input_field.h"
 #include "ui/text/format_values.h" // Ui::FormatPhone
 #include "ui/text/text_utilities.h"
 #include "ui/boxes/confirm_box.h"

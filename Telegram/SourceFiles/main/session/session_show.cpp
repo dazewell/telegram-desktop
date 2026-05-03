@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "main/session/session_show.h"
 
 #include "chat_helpers/message_field.h"
-#include "lang/lang_keys.h"
 #include "main/main_session.h"
 #include "ui/layers/generic_box.h"
 

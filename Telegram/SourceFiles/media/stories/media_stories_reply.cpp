@@ -13,7 +13,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/call_delayed.h"
 #include "base/timer_rpl.h"
 #include "base/unixtime.h"
-#include "boxes/premium_limits_box.h"
 #include "boxes/send_files_box.h"
 #include "boxes/share_box.h" // ShareBoxStyleOverrides
 #include "calls/group/calls_group_call.h"
@@ -28,7 +27,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_document.h"
 #include "data/data_group_call.h"
 #include "data/data_message_reaction_id.h"
-#include "data/data_message_reactions.h"
 #include "data/data_peer_values.h"
 #include "data/data_session.h"
 #include "data/data_user.h"
@@ -39,13 +37,11 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history.h"
 #include "inline_bots/inline_bot_result.h"
 #include "lang/lang_keys.h"
-#include "main/session/send_as_peers.h"
 #include "main/main_session.h"
 #include "media/stories/media_stories_controller.h"
 #include "media/stories/media_stories_stealth.h"
 #include "media/view/media_view_video_stream.h"
 #include "menu/menu_send.h"
-#include "payments/ui/payments_reaction_box.h" // MaxTopPaidDonorsShown
 #include "settings/settings_credits_graphics.h" // DarkCreditsEntryBoxStyle
 #include "storage/localimageloader.h"
 #include "storage/storage_account.h"

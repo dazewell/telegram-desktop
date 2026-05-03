@@ -9,16 +9,12 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "api/api_text_entities.h"
 #include "ui/widgets/fields/input_field.h"
-#include "chat_helpers/message_field.h"
 #include "history/history.h"
-#include "history/history_widget.h"
 #include "history/history_item_components.h"
 #include "main/main_session.h"
 #include "data/data_changes.h"
 #include "data/data_session.h"
 #include "data/data_web_page.h"
-#include "mainwidget.h"
-#include "storage/localstorage.h"
 
 namespace Data {
 

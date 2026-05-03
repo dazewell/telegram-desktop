@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "ui/rp_widget.h"
 #include "ui/effects/animations.h"
-#include "ui/emoji_config.h"
 #include "ui/widgets/shadow.h"
 
 namespace Ui {

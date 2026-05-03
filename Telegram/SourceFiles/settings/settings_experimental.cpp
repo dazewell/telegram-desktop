@@ -7,8 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "settings/settings_experimental.h"
 
-#include "data/components/passkeys.h"
-#include "main/main_session.h"
 #include "ui/boxes/confirm_box.h"
 #include "ui/text/text_entity.h"
 #include "ui/widgets/menu/menu_add_action_callback.h"
@@ -17,7 +15,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/labels.h"
 #include "ui/vertical_list.h"
-#include "ui/gl/gl_detection.h"
 #include "ui/chat/chat_style_radius.h"
 #include "ui/controls/compose_ai_button_factory.h"
 #include "base/options.h"

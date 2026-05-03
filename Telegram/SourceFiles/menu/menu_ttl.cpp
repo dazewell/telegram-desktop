@@ -12,7 +12,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/boxes/time_picker_box.h"
 #include "ui/layers/generic_box.h"
 #include "ui/text/format_values.h"
-#include "ui/ui_utility.h"
 #include "ui/widgets/labels.h"
 #if 0
 #include "ui/boxes/choose_time.h"

@@ -10,7 +10,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "boxes/peer_list_box.h"
 #include "base/flat_map.h"
 #include "ui/effects/animations.h"
-#include "ui/unread_badge.h"
 
 namespace Ui {
 class ChatStyle;

@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include <QtCore/QThread>
-#include <QtCore/QTimer>
 
 namespace Media {
 namespace Capture {

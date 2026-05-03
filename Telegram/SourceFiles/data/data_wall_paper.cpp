@@ -13,7 +13,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "storage/serialize_common.h"
 #include "ui/chat/chat_theme.h"
 #include "ui/color_int_conversion.h"
-#include "core/application.h"
 #include "main/main_session.h"
 
 namespace Ui {

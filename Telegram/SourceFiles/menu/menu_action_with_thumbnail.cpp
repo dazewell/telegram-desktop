@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "menu/menu_action_with_thumbnail.h"
 
 #include "ui/dynamic_image.h"
-#include "ui/painter.h"
 
 namespace Menu {
 

@@ -10,14 +10,12 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "apiwrap.h"
 #include "api/api_credits.h" // InputSavedStarGiftId
 #include "api/api_premium.h"
-#include "base/unixtime.h"
 #include "boxes/gift_premium_box.h" // ResolveGiftCode
 #include "boxes/star_gift_box.h" // GiftReleasedByHandler
 #include "chat_helpers/stickers_gift_box_pack.h"
 #include "core/click_handler_types.h" // ClickHandlerContext
 #include "data/stickers/data_custom_emoji.h"
 #include "data/data_channel.h"
-#include "data/data_credits.h"
 #include "data/data_document.h"
 #include "data/data_session.h"
 #include "data/data_user.h"

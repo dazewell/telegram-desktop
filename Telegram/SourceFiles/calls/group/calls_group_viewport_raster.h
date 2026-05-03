@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/round_rect.h"
 #include "ui/effects/cross_line.h"
 #include "ui/gl/gl_surface.h"
-#include "ui/text/text.h"
 
 namespace Calls::Group {
 

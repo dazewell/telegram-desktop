@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "storage/storage_sparse_ids_list.h"
 #include "storage/storage_shared_media.h"
 #include "base/timer.h"
-#include "base/qt/qt_compare.h"
 
 namespace Main {
 class Session;

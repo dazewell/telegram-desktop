@@ -16,7 +16,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_session.h"
 #include "data/stickers/data_custom_emoji.h"
 #include "data/data_user.h"
-#include "history/history_item_components.h"
 #include "history/history_item.h"
 #include "history/history.h"
 #include "info/profile/info_profile_values.h"
@@ -33,10 +32,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/menu/menu_action.h"
 #include "ui/widgets/popup_menu.h"
 #include "ui/widgets/shadow.h"
-#include "styles/style_layers.h"
 #include "styles/style_boxes.h"
-#include "styles/style_settings.h"
-#include "styles/style_premium.h"
 #include "styles/style_window.h"
 
 namespace UrlAuthBox {

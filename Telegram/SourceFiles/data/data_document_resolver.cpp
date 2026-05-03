@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "data/data_document_resolver.h"
 
-#include "base/platform/base_platform_info.h"
 #include "boxes/abstract_box.h" // Ui::show().
 #include "chat_helpers/ttl_media_layer_widget.h"
 #include "core/application.h"
@@ -16,24 +15,19 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_document.h"
 #include "data/data_document_media.h"
 #include "data/data_file_click_handler.h"
-#include "data/data_session.h"
 #include "history/history.h"
 #include "history/history_item.h"
-#include "history/view/media/history_view_gif.h"
 #include "lang/lang_keys.h"
 #include "media/player/media_player_instance.h"
 #include "platform/platform_file_utilities.h"
 #include "ui/boxes/confirm_box.h"
 #include "ui/chat/chat_theme.h"
-#include "ui/text/text_utilities.h"
 #include "ui/widgets/checkbox.h"
 #include "ui/wrap/slide_wrap.h"
 #include "window/window_session_controller.h"
 #include "styles/style_layers.h"
 
 #include <QtCore/QBuffer>
-#include <QtCore/QMimeType>
-#include <QtCore/QMimeDatabase>
 
 namespace Data {
 namespace {

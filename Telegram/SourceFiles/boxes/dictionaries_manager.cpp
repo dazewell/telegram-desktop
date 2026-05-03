@@ -14,9 +14,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/application.h"
 #include "core/core_settings.h"
 #include "lang/lang_keys.h"
-#include "main/main_account.h"
 #include "main/main_session.h"
-#include "mainwidget.h"
 #include "mtproto/dedicated_file_loader.h"
 #include "spellcheck/spellcheck_utils.h"
 #include "ui/wrap/vertical_layout.h"
@@ -25,10 +23,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/multi_select.h"
 #include "ui/widgets/popup_menu.h"
 #include "ui/wrap/slide_wrap.h"
-#include "ui/effects/animations.h"
 #include "styles/style_layers.h"
 #include "styles/style_settings.h"
-#include "styles/style_boxes.h"
 #include "styles/style_menu_icons.h"
 
 namespace Ui {

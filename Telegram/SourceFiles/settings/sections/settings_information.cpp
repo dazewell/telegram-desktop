@@ -18,11 +18,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/fields/input_field.h"
 #include "ui/widgets/popup_menu.h"
-#include "ui/widgets/box_content_divider.h"
 #include "ui/widgets/menu/menu_add_action_callback_factory.h"
 #include "ui/boxes/confirm_box.h"
 #include "ui/controls/userpic_button.h"
-#include "ui/text/text_utilities.h"
 #include "ui/delayed_activation.h"
 #include "ui/painter.h"
 #include "ui/vertical_list.h"
@@ -57,11 +55,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "api/api_user_names.h"
 #include "api/api_user_privacy.h"
 #include "base/call_delayed.h"
-#include "base/options.h"
 #include "base/unixtime.h"
 #include "base/random.h"
 #include "styles/style_chat.h" // popupMenuExpandedSeparator
-#include "styles/style_dialogs.h" // dialogsPremiumIcon
 #include "styles/style_layers.h"
 #include "styles/style_settings.h"
 #include "styles/style_menu_icons.h"

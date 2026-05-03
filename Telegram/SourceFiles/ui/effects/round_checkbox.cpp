@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/effects/round_checkbox.h"
 
 #include "lang/lang_keys.h"
-#include "ui/rp_widget.h"
 #include "ui/ui_utility.h"
 #include "ui/painter.h"
 #include "ui/effects/outline_segments.h"

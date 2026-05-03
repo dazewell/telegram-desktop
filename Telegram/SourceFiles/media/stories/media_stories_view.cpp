@@ -11,9 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/view/controls/compose_controls_common.h"
 #include "media/stories/media_stories_controller.h"
 #include "media/stories/media_stories_delegate.h"
-#include "media/stories/media_stories_header.h"
-#include "media/stories/media_stories_slider.h"
-#include "media/stories/media_stories_reply.h"
 
 namespace Media::Stories {
 

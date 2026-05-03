@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "history/view/history_view_bottom_info.h"
 
-#include "ui/chat/message_bubble.h"
 #include "ui/chat/chat_style.h"
 #include "ui/effects/reaction_fly_animation.h"
 #include "ui/text/custom_emoji_helper.h"
@@ -24,17 +23,12 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/view/history_view_message.h"
 #include "history/view/history_view_cursor_state.h"
 #include "base/unixtime.h"
-#include "chat_helpers/emoji_interactions.h"
 #include "core/click_handler_types.h"
-#include "main/main_session.h"
-#include "lottie/lottie_icon.h"
 #include "data/data_channel.h"
-#include "data/data_session.h"
 #include "data/data_message_reactions.h"
 #include "window/window_session_controller.h"
 #include "styles/style_chat.h"
 #include "styles/style_credits.h"
-#include "styles/style_dialogs.h"
 
 namespace HistoryView {
 namespace {

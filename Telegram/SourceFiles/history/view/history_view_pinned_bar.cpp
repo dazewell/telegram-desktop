@@ -14,7 +14,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_changes.h"
 #include "data/data_poll.h"
 #include "data/data_web_page.h"
-#include "history/view/history_view_pinned_tracker.h"
 #include "history/history_item.h"
 #include "history/history_item_components.h"
 #include "history/history.h"
@@ -25,7 +24,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/labels.h"
 #include "ui/basic_click_handlers.h"
-#include "styles/style_chat.h"
 #include "styles/style_chat_helpers.h"
 
 namespace HistoryView {

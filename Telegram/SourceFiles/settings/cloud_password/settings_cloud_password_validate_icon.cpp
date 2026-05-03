@@ -7,12 +7,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "settings/cloud_password/settings_cloud_password_validate_icon.h"
 
-#include "apiwrap.h"
 #include "base/object_ptr.h"
 #include "chat_helpers/stickers_emoji_pack.h"
 #include "data/data_session.h"
 #include "data/stickers/data_custom_emoji.h"
-#include "data/stickers/data_stickers.h"
 #include "main/main_session.h"
 #include "ui/rect.h"
 #include "ui/rp_widget.h"

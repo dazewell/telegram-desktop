@@ -15,10 +15,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/effects/ttl_icon.h"
 #include "ui/effects/round_checkbox.h"
 #include "ui/image/image_prepare.h"
-#include "ui/text/custom_emoji_text_badge.h"
 #include "ui/text/format_values.h"
 #include "ui/text/text_options.h"
-#include "ui/text/text_utilities.h"
 #include "ui/painter.h"
 #include "dialogs/dialogs_entry.h"
 #include "dialogs/ui/dialogs_video_userpic.h"
@@ -31,9 +29,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_user.h"
 #include "history/history.h"
 #include "history/history_item.h"
-#include "lang/lang_keys.h"
 #include "base/unixtime.h"
-#include "styles/style_calls.h"
 #include "styles/style_dialogs.h"
 
 namespace Dialogs {

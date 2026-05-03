@@ -17,7 +17,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/buttons.h"
 #include "ui/wrap/vertical_layout.h"
 #include "ui/wrap/wrap.h"
-#include "storage/localstorage.h"
 #include "settings/settings_common.h"
 #include "export/view/export_view_settings.h"
 #include "styles/style_layers.h"

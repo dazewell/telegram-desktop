@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/chat/attach/attach_prepare.h"
 #include "ui/image/image_prepare.h"
 #include "ui/text/format_values.h"
-#include "ui/text/text_utilities.h"
 #include "ui/widgets/buttons.h"
 #include "ui/effects/spoiler_mess.h"
 #include "ui/ui_utility.h"

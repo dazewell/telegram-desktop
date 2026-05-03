@@ -8,32 +8,22 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "boxes/gift_premium_box.h"
 
 #include "api/api_premium.h"
-#include "api/api_premium_option.h"
 #include "apiwrap.h"
-#include "base/event_filter.h"
-#include "base/timer_rpl.h"
 #include "base/unixtime.h"
 #include "base/weak_ptr.h"
-#include "boxes/peer_list_controllers.h" // ContactsBoxController.
 #include "boxes/peers/prepare_short_info_box.h"
-#include "boxes/peers/replace_boost_box.h" // BoostsForGift.
-#include "boxes/premium_preview_box.h" // ShowPremiumPreviewBox.
 #include "boxes/star_gift_box.h" // ShowStarGiftBox.
 #include "boxes/star_gift_preview_box.h" // StarGiftPreviewBox.
 #include "core/ui_integration.h"
 #include "data/components/gift_auctions.h"
 #include "data/data_boosts.h"
-#include "data/data_changes.h"
 #include "data/data_channel.h"
 #include "data/data_credits.h"
 #include "data/data_document.h"
 #include "data/data_emoji_statuses.h"
 #include "data/data_media_types.h" // Data::GiveawayStart.
-#include "data/data_peer_values.h" // Data::PeerPremiumValue.
 #include "data/data_session.h"
-#include "data/data_premium_subscription_option.h"
 #include "data/data_user.h"
-#include "data/stickers/data_custom_emoji.h"
 //#include "info/channel_statistics/boosts/giveaway/boost_badge.h" // InfiniteRadialAnimationWidget.
 #include "info/channel_statistics/earn/earn_icons.h"
 //#include "info/profile/info_profile_badge.h"
@@ -42,22 +32,14 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "main/main_app_config.h"
 #include "main/main_session.h"
 #include "mainwidget.h"
-#include "payments/payments_checkout_process.h"
-#include "payments/payments_form.h"
 #include "settings/settings_credits_graphics.h"
 #include "settings/sections/settings_premium.h"
-#include "ui/basic_click_handlers.h" // UrlClickHandler::Open.
 #include "ui/boxes/boost_box.h" // StartFireworks.
 #include "ui/boxes/confirm_box.h"
-#include "ui/controls/userpic_button.h"
 #include "ui/controls/table_rows.h"
-#include "ui/effects/credits_graphics.h"
-#include "ui/effects/premium_graphics.h"
-#include "ui/effects/premium_stars_colored.h"
 #include "ui/effects/premium_top_bar.h"
 #include "ui/effects/spoiler_mess.h"
 #include "ui/layers/generic_box.h"
-#include "ui/painter.h"
 #include "ui/rect.h"
 #include "ui/ui_utility.h"
 #include "ui/vertical_list.h"
@@ -66,11 +48,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/text/text_utilities.h"
 #include "ui/toast/toast.h"
 #include "ui/widgets/buttons.h"
-#include "ui/widgets/checkbox.h"
-#include "ui/widgets/gradient_round_button.h"
 #include "ui/widgets/tooltip.h"
 #include "ui/wrap/padding_wrap.h"
-#include "ui/wrap/slide_wrap.h"
 #include "ui/wrap/table_layout.h"
 #include "window/window_peer_menu.h" // ShowChooseRecipientBox.
 #include "window/window_session_controller.h"
@@ -81,7 +60,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_layers.h"
 #include "styles/style_premium.h"
 
-#include <QtGui/QGuiApplication>
 
 namespace {
 

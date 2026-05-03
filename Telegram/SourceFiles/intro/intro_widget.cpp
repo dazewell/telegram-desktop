@@ -10,17 +10,13 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "intro/intro_start.h"
 #include "intro/intro_phone.h"
 #include "intro/intro_qr.h"
-#include "intro/intro_code.h"
 #include "intro/intro_signup.h"
-#include "intro/intro_password_check.h"
 #include "lang/lang_keys.h"
 #include "lang/lang_instance.h"
 #include "lang/lang_cloud_manager.h"
-#include "storage/localstorage.h"
 #include "main/main_account.h"
 #include "main/main_domain.h"
 #include "main/main_session.h"
-#include "mainwindow.h"
 #include "history/history.h"
 #include "history/history_item.h"
 #include "data/data_user.h"
@@ -28,7 +24,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "countries/countries_instance.h"
 #include "ui/boxes/confirm_box.h"
 #include "ui/text/format_values.h" // Ui::FormatPhone
-#include "ui/text/text_utilities.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/labels.h"
 #include "ui/wrap/fade_wrap.h"
@@ -46,7 +41,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "api/api_text_entities.h"
 #include "styles/style_layers.h"
 #include "styles/style_intro.h"
-#include "base/qt/qt_common_adapters.h"
 
 namespace Intro {
 namespace {

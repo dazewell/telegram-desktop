@@ -17,9 +17,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "api/api_updates.h"
 #include "apiwrap.h"
 #include "lang/lang_keys.h"
-#include "lang/lang_hardcoded.h"
 #include "boxes/peers/edit_participants_box.h" // SubscribeToMigration.
-#include "ui/text/text_utilities.h"
 #include "ui/toast/toast.h"
 #include "ui/ui_utility.h"
 #include "base/unixtime.h"
@@ -45,7 +43,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include <tgcalls/StaticThreads.h>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
 
 namespace Calls {
 namespace {

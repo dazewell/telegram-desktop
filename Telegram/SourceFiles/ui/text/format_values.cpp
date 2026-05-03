@@ -11,10 +11,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_keys.h"
 #include "countries/countries_instance.h"
 
-#include <QtCore/QLocale>
 #include <locale>
 #include <sstream>
-#include <iostream>
 
 namespace Ui {
 namespace {

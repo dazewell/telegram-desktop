@@ -18,7 +18,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_user.h"
 #include "history/history.h"
 #include "main/main_session.h"
-#include "main/main_session_settings.h"
 
 namespace Data {
 namespace {

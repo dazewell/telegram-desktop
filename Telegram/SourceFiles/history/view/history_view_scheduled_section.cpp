@@ -23,7 +23,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/scroll_area.h"
 #include "ui/widgets/shadow.h"
 #include "ui/chat/chat_style.h"
-#include "ui/text/text_utilities.h"
 #include "ui/toast/toast.h"
 #include "ui/dynamic_image.h"
 #include "ui/dynamic_thumbnails.h"
@@ -33,24 +32,20 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "apiwrap.h"
 #include "boxes/delete_messages_box.h"
 #include "boxes/send_files_box.h"
-#include "boxes/premium_limits_box.h"
 #include "window/window_session_controller.h"
 #include "window/window_peer_menu.h"
 #include "base/call_delayed.h"
-#include "base/qt/qt_key_modifiers.h"
 #include "core/mime_type.h"
 #include "chat_helpers/tabbed_selector.h"
 #include "main/main_session.h"
 #include "mainwindow.h"
 #include "data/components/scheduled_messages.h"
 #include "data/data_document.h"
-#include "data/data_file_origin.h"
 #include "data/data_forum.h"
 #include "data/data_forum_topic.h"
 #include "data/data_session.h"
 #include "data/data_changes.h"
 #include "data/data_user.h"
-#include "data/data_message_reactions.h"
 #include "data/data_peer_values.h"
 #include "data/data_premium_limits.h"
 #include "storage/storage_media_prepare.h"
@@ -62,7 +57,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_chat_helpers.h"
 #include "styles/style_boxes.h"
 
-#include <QtCore/QMimeData>
 
 namespace HistoryView {
 namespace {

@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/main_window.h"
 
 #include "api/api_updates.h"
-#include "storage/localstorage.h"
 #include "platform/platform_specific.h"
 #include "ui/platform/ui_platform_window.h"
 #include "platform/platform_window_title.h"
@@ -16,19 +15,14 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "info/media/info_media_widget.h" // SharedMediaTitle.
 #include "window/window_separate_id.h"
 #include "window/window_session_controller.h"
-#include "window/window_lock_widgets.h"
 #include "window/window_controller.h"
 #include "main/main_account.h" // Account::sessionValue.
 #include "main/main_domain.h"
 #include "core/application.h"
-#include "core/sandbox.h"
 #include "core/shortcuts.h"
 #include "lang/lang_keys.h"
-#include "data/data_session.h"
 #include "data/data_forum_topic.h"
-#include "data/data_user.h"
 #include "main/main_session.h"
-#include "main/main_session_settings.h"
 #include "base/options.h"
 #include "base/crc32hash.h"
 #include "ui/boxes/confirm_box.h"
@@ -39,7 +33,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/painter.h"
 #include "ui/screen_reader_mode.h"
 #include "ui/ui_utility.h"
-#include "apiwrap.h"
 #include "mainwidget.h" // session->content()->windowShown().
 #include "tray.h"
 #include "styles/style_window.h"
@@ -49,9 +42,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "platform/mac/global_menu_mac.h"
 #endif // Q_OS_MAC
 
-#include <QtCore/QMimeData>
 #include <QtGui/QWindow>
-#include <QtGui/QScreen>
 #include <QtGui/QDrag>
 
 #include <kurlmimedata.h>

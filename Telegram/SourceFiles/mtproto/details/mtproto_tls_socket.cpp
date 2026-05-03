@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "mtproto/details/mtproto_tls_socket.h"
 
-#include "mtproto/details/mtproto_tcp_socket.h"
 #include "base/openssl_help.h"
 #include "base/bytes.h"
 #include "base/invoke_queued.h"
@@ -15,7 +14,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/unixtime.h"
 
 #include <QtCore/QtEndian>
-#include <range/v3/algorithm/reverse.hpp>
 
 namespace MTP::details {
 namespace {

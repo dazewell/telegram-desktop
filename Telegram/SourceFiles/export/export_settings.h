@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include "base/flags.h"
-#include "base/flat_map.h"
 
 namespace Export {
 namespace Output {

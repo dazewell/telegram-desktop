@@ -9,8 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "core/credits_amount.h"
 #include "lang/lang_keys.h"
-#include "ui/text/text.h"
-#include "base/qt/qt_common_adapters.h"
 #include "base/qt/qt_string_view.h"
 
 #include <QtCore/QLocale>

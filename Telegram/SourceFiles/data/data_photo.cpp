@@ -18,7 +18,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "media/streaming/media_streaming_loader_mtproto.h"
 #include "storage/storage_account.h"
 #include "storage/file_download.h"
-#include "core/application.h"
 
 namespace {
 

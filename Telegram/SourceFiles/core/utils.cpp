@@ -7,19 +7,13 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "core/utils.h"
 
-#include "base/qthelp_url.h"
 #include "platform/platform_specific.h"
 
 extern "C" {
-#include <openssl/crypto.h>
 #include <openssl/sha.h>
-#include <openssl/err.h>
 #include <openssl/evp.h>
 #include <openssl/conf.h>
-#include <openssl/ssl.h>
 #include <openssl/rand.h>
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
 } // extern "C"
 
 #ifdef Q_OS_WIN

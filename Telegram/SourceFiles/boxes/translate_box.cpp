@@ -15,14 +15,11 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_peer.h"
 #include "data/data_session.h"
 #include "history/history.h"
-#include "lang/lang_instance.h"
 #include "lang/lang_keys.h"
 #include "main/main_session.h"
 #include "spellcheck/platform/platform_language.h"
 #include "ui/boxes/choose_language_box.h"
 #include "ui/layers/generic_box.h"
-#include "ui/widgets/multi_select.h"
-#include "ui/text/text_utilities.h"
 
 namespace Ui {
 namespace {

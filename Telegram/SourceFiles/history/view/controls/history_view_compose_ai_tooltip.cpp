@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "core/application.h"
 #include "core/core_settings.h"
-#include "lang/lang_keys.h"
 #include "ui/widgets/tooltip.h"
 #include "styles/style_chat_helpers.h"
 #include "styles/style_widgets.h"

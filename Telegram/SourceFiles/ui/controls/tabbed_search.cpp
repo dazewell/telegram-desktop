@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "ui/controls/tabbed_search.h"
 
-#include "base/qt_signal_producer.h"
 #include "lang/lang_keys.h"
 #include "ui/widgets/fields/input_field.h"
 #include "ui/wrap/fade_wrap.h"

@@ -14,19 +14,13 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/file_location.h"
 #include "base/random.h"
 #include "base/invoke_queued.h"
-#include "logs.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QAbstractEventDispatcher>
-#include <QtCore/QCoreApplication>
 #include <QtCore/QThread>
 #include <QtCore/QFileInfo>
 
 extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libavutil/opt.h>
-#include <libswscale/swscale.h>
 } // extern "C"
 
 namespace Media {

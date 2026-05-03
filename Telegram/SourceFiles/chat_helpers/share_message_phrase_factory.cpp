@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "data/data_peer.h"
 #include "lang/lang_keys.h"
-#include "ui/text/text_utilities.h"
 
 namespace ChatHelpers {
 

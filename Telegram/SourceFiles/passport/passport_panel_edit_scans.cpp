@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "passport/passport_panel_edit_scans.h"
 
 #include "passport/passport_panel_controller.h"
-#include "passport/ui/passport_details_row.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/labels.h"
 #include "ui/widgets/box_content_divider.h"
@@ -21,10 +20,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/painter.h"
 #include "core/file_utilities.h"
 #include "lang/lang_keys.h"
-#include "boxes/abstract_box.h"
-#include "storage/storage_media_prepare.h"
 #include "storage/file_upload.h" // For Storage::kUseBigFilesFrom.
-#include "styles/style_layers.h"
 #include "styles/style_passport.h"
 
 #include <QtCore/QBuffer>

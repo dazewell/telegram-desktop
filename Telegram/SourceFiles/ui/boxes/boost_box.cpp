@@ -14,7 +14,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/effects/premium_bubble.h"
 #include "ui/effects/premium_graphics.h"
 #include "ui/layers/generic_box.h"
-#include "ui/text/text_utilities.h"
 #include "ui/widgets/buttons.h"
 #include "ui/wrap/fade_wrap.h"
 #include "ui/painter.h"

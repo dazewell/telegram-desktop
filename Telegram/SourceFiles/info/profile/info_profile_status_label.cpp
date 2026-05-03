@@ -11,11 +11,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_channel.h"
 #include "data/data_chat.h"
 #include "data/data_peer.h"
-#include "data/data_user.h"
 #include "lang/lang_keys.h"
 #include "ui/widgets/labels.h"
 #include "ui/text/text_utilities.h"
-#include "ui/basic_click_handlers.h"
 #include "base/unixtime.h"
 
 namespace Info::Profile {

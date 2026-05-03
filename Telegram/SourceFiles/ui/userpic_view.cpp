@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/userpic_view.h"
 
 #include "ui/empty_userpic.h"
-#include "ui/painter.h"
 #include "ui/image/image_prepare.h"
 
 namespace Ui {

@@ -10,7 +10,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/invoke_queued.h"
 #include "base/timer.h"
 #include "lang/lang_keys.h"
-#include "media/player/media_player_button.h"
 #include "ui/cached_round_corners.h"
 #include "ui/widgets/menu/menu.h"
 #include "ui/widgets/menu/menu_action.h"

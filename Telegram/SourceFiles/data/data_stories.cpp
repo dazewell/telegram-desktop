@@ -25,7 +25,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "main/main_app_config.h"
 #include "main/main_session.h"
 #include "ui/layers/show.h"
-#include "ui/text/text_utilities.h"
 
 namespace Data {
 namespace {

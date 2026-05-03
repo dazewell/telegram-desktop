@@ -7,16 +7,13 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "ui/effects/premium_bubble.h"
 
-#include "base/debug_log.h"
 #include "base/object_ptr.h"
 #include "lang/lang_keys.h"
-#include "ui/effects/gradient.h"
 #include "ui/effects/ministar_particles.h"
 #include "ui/effects/premium_graphics.h"
 #include "ui/wrap/padding_wrap.h"
 #include "ui/wrap/vertical_layout.h"
 #include "ui/painter.h"
-#include "styles/style_info_levels.h"
 #include "styles/style_layers.h"
 #include "styles/style_premium.h"
 

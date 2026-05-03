@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "poll/poll_media_upload.h"
 
-#include "api/api_sending.h"
 #include "apiwrap.h"
 #include "base/event_filter.h"
 #include "core/file_utilities.h"
@@ -19,7 +18,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_keys.h"
 #include "layout/layout_document_generic_preview.h"
 #include "main/main_session.h"
-#include "platform/platform_file_utilities.h"
 #include "storage/file_upload.h"
 #include "storage/localimageloader.h"
 #include "storage/storage_media_prepare.h"
@@ -33,7 +31,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_overview.h"
 #include "styles/style_polls.h"
 
-#include <QtCore/QMimeData>
 
 namespace PollMediaUpload {
 

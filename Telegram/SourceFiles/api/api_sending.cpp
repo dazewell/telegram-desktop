@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "api/api_text_entities.h"
 #include "base/random.h"
-#include "base/unixtime.h"
 #include "data/business/data_shortcut_messages.h"
 #include "data/data_document.h"
 #include "data/data_photo.h"
@@ -23,7 +22,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history.h"
 #include "history/history_item.h"
 #include "history/history_item_helpers.h" // NewMessageFlags.
-#include "chat_helpers/message_field.h" // ConvertTextTagsToEntities.
 #include "chat_helpers/stickers_dice_pack.h" // DicePacks::kDiceString.
 #include "ui/text/text_entity.h" // TextWithEntities.
 #include "ui/item_text_options.h" // Ui::ItemTextOptions.
@@ -31,7 +29,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "main/main_app_config.h"
 #include "storage/localimageloader.h"
 #include "storage/file_upload.h"
-#include "mainwidget.h"
 #include "apiwrap.h"
 
 namespace Api {

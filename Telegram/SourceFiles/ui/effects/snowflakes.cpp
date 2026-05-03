@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/effects/animation_value_f.h"
 #include "ui/painter.h"
 
-#include <QtCore/QtMath>
 
 namespace Ui {
 namespace {

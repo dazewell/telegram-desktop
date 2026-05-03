@@ -8,21 +8,15 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "editor/scene/scene_item_text.h"
 
 #include "editor/scene/scene.h"
-#include "editor/scene/scene_emoji_document.h"
 #include "lang/lang_keys.h"
 #include "ui/emoji_config.h"
 #include "ui/painter.h"
 #include "ui/widgets/popup_menu.h"
-#include "styles/style_editor.h"
 #include "styles/style_media_view.h"
 #include "styles/style_menu_icons.h"
 
 #include <QGraphicsSceneMouseEvent>
-#include <QGraphicsSceneContextMenuEvent>
 #include <QtWidgets/QApplication>
-#include <QTextBlock>
-#include <QTextCursor>
-#include <QTextDocument>
 #include <QTextLayout>
 #include <QTextOption>
 

@@ -13,7 +13,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_media_player.h"
 #include "styles/style_media_view.h"
 
-#include <QtCore/QtMath>
 
 namespace Media::Player {
 namespace {

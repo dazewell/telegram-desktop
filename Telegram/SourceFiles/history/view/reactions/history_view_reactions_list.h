@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include "base/object_ptr.h"
 
 class HistoryItem;
 class PeerListController;

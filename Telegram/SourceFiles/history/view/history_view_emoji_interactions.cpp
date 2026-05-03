@@ -9,11 +9,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "history/view/history_view_element.h"
 #include "history/view/media/history_view_sticker.h"
-#include "history/history.h"
 #include "history/history_item.h"
 #include "chat_helpers/stickers_emoji_pack.h"
 #include "chat_helpers/emoji_interactions.h"
-#include "chat_helpers/stickers_lottie.h"
 #include "main/main_session.h"
 #include "data/data_session.h"
 #include "data/data_document.h"
@@ -24,7 +22,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/random.h"
 #include "ui/power_saving.h"
 #include "ui/ui_utility.h"
-#include "styles/style_chat.h"
 
 namespace HistoryView {
 namespace {

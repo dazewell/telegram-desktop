@@ -17,7 +17,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "info/profile/info_profile_values.h"
 #include "chat_helpers/stickers_lottie.h"
 #include "window/window_session_controller.h"
-#include "ui/painter.h"
 #include "styles/style_info.h"
 #include "styles/style_dialogs.h"
 

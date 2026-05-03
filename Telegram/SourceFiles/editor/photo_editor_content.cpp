@@ -13,8 +13,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "media/view/media_view_pip.h"
 #include "storage/storage_media_prepare.h"
 
-#include <QtGui/QMouseEvent>
-#include <QtGui/QWheelEvent>
 
 namespace Editor {
 

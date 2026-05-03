@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "api/api_reactions_notify_settings.h"
 
 #include "apiwrap.h"
-#include "main/main_session.h"
 
 namespace Api {
 namespace {

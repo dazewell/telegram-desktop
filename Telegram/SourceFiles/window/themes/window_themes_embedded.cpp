@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "window/themes/window_themes_embedded.h"
 
-#include "base/platform/base_platform_info.h"
 #include "lang/lang_keys.h"
 #include "storage/serialize_common.h"
 #include "core/application.h"
@@ -15,7 +14,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/style/style_palette_colorizer.h"
 #include "window/themes/window_theme.h"
 
-#include <QtGui/QGuiApplication>
 #include <QtGui/QPalette>
 
 namespace Window {

@@ -8,11 +8,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/effects/ministar_particles.h"
 
 #include "ui/painter.h"
-#include "ui/color_int_conversion.h"
 #include "base/random.h"
 
 #include <QtGui/QPainterPath>
-#include <QtMath>
 
 namespace Ui {
 

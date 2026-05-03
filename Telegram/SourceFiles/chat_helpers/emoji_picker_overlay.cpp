@@ -14,9 +14,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/scroll_area.h"
 #include "styles/style_chat_helpers.h"
 
-#include <QtCore/QEvent>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
 
 namespace ChatHelpers {
 namespace {

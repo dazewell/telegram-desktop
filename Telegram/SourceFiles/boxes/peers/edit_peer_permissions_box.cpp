@@ -9,13 +9,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "lang/lang_keys.h"
 #include "history/admin_log/history_admin_log_filter.h"
-#include "core/ui_integration.h"
-#include "data/stickers/data_custom_emoji.h"
 #include "data/business/data_business_chatbots.h"
 #include "data/data_channel.h"
 #include "data/data_chat.h"
-#include "data/data_session.h"
-#include "ui/effects/toggle_arrow.h"
 #include "ui/wrap/slide_wrap.h"
 #include "ui/wrap/vertical_layout.h"
 #include "ui/layers/generic_box.h"
@@ -28,7 +24,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/box_content_divider.h"
 #include "ui/text/text_utilities.h"
 #include "ui/toast/toast.h"
-#include "info/profile/info_profile_icon.h"
 #include "info/profile/info_profile_values.h"
 #include "boxes/peers/edit_participants_box.h"
 #include "boxes/peers/edit_peer_info_box.h"
@@ -45,7 +40,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_chat.h"
 #include "styles/style_info.h"
 #include "styles/style_menu_icons.h"
-#include "styles/style_window.h"
 #include "styles/style_settings.h"
 
 namespace {

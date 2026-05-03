@@ -9,10 +9,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "history/view/reactions/history_view_reactions_tabs.h"
 #include "boxes/peer_list_box.h"
-#include "boxes/peers/prepare_short_info_box.h"
 #include "window/window_session_controller.h"
 #include "history/history_item.h"
-#include "history/history.h"
 #include "api/api_who_reacted.h"
 #include "ui/controls/who_reacted_context_action.h"
 #include "ui/text/text_custom_emoji.h"

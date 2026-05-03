@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "info/settings/info_settings_widget.h"
 
-#include "info/info_memento.h"
 #include "settings/sections/settings_main.h"
 #include "settings/sections/settings_information.h"
 #include "settings/settings_common_session.h"

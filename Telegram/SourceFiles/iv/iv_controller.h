@@ -12,7 +12,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/unique_qptr.h"
 #include "iv/iv_delegate.h"
 #include "ui/effects/animations.h"
-#include "ui/text/text.h"
 #include "webview/webview_common.h"
 
 class Painter;

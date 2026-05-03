@@ -17,9 +17,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include <QGraphicsScene>
 #include <QGraphicsSceneHoverEvent>
-#include <QGraphicsSceneMouseEvent>
 #include <QStyleOptionGraphicsItem>
-#include <QtMath>
 
 namespace Editor {
 namespace {

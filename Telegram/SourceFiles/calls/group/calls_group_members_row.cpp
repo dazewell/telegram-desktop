@@ -13,11 +13,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_group_call.h"
 #include "ui/paint/arcs.h"
 #include "ui/paint/blobs.h"
-#include "ui/text/text_options.h"
 #include "ui/effects/ripple_animation.h"
 #include "ui/painter.h"
 #include "lang/lang_keys.h"
-#include "webrtc/webrtc_video_track.h"
 #include "styles/style_calls.h"
 
 namespace Calls::Group {

@@ -12,14 +12,11 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "apiwrap.h"
 #include "boxes/star_gift_box.h"
 #include "chat_helpers/compose/compose_show.h"
-#include "data/data_document.h"
 #include "data/data_peer.h"
 #include "data/data_session.h"
-#include "data/data_user.h"
 #include "lang/lang_keys.h"
 #include "main/main_app_config.h"
 #include "main/main_session.h"
-#include "ui/text/text_utilities.h"
 #include "ui/toast/toast.h"
 
 namespace Data {

@@ -10,7 +10,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "mtproto/connection_tcp.h"
 #include "mtproto/connection_http.h"
 #include "mtproto/connection_resolving.h"
-#include "mtproto/session.h"
 #include "base/unixtime.h"
 #include "base/random.h"
 

@@ -10,14 +10,12 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "api/api_updates.h"
 #include "core/application.h"
 #include "core/click_handler_types.h"
-#include "export/export_manager.h"
 #include "ui/platform/ui_platform_window.h"
 #include "platform/platform_window_title.h"
 #include "main/main_account.h"
 #include "main/main_domain.h"
 #include "main/main_session.h"
 #include "main/main_session_settings.h"
-#include "main/main_app_config.h"
 #include "media/view/media_view_open_common.h"
 #include "lang/lang_keys.h"
 #include "intro/intro_widget.h"
@@ -29,12 +27,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/themes/window_theme_editor.h"
 #include "ui/boxes/confirm_box.h"
 #include "data/components/promo_suggestions.h"
-#include "data/data_thread.h"
 #include "settings/settings_common.h"
 #include "apiwrap.h" // ApiWrap::acceptTerms.
 #include "styles/style_layers.h"
 
-#include <QtGui/QWindow>
 #include <QtGui/QScreen>
 
 namespace Window {

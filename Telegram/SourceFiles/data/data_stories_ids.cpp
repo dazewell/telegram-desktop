@@ -7,11 +7,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "data/data_stories_ids.h"
 
-#include "data/data_changes.h"
 #include "data/data_peer.h"
 #include "data/data_session.h"
 #include "data/data_stories.h"
-#include "main/main_session.h"
 #include "ui/ui_utility.h"
 
 namespace Data {

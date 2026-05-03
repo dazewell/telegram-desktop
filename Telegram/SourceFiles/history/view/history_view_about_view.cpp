@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "api/api_peer_colors.h"
 #include "api/api_premium.h"
-#include "api/api_sending.h"
 #include "apiwrap.h"
 #include "base/random.h"
 #include "base/unixtime.h"
@@ -30,8 +29,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/view/history_view_group_call_bar.h"
 #include "history/view/media/history_view_media_generic.h"
 #include "history/view/media/history_view_service_box.h"
-#include "history/view/media/history_view_sticker_player_abstract.h"
-#include "history/view/media/history_view_sticker.h"
 #include "history/view/media/history_view_unique_gift.h"
 #include "history/view/history_view_element.h"
 #include "history/history.h"

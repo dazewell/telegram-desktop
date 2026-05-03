@@ -28,7 +28,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "boxes/peers/replace_boost_box.h"
 #include "boxes/peers/toggle_topics_box.h"
 #include "boxes/peers/verify_peers_box.h"
-#include "boxes/peer_list_controllers.h"
 #include "boxes/edit_privacy_box.h" // EditDirectMessagesPriceBox
 #include "boxes/stickers_box.h"
 #include "boxes/username_box.h"
@@ -52,7 +51,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "info/bot/starref/info_bot_starref_join_widget.h"
 #include "info/bot/starref/info_bot_starref_setup_widget.h"
 #include "info/channel_statistics/boosts/info_boosts_widget.h"
-#include "info/channel_statistics/earn/earn_format.h"
 #include "info/channel_statistics/earn/earn_icons.h"
 #include "info/channel_statistics/earn/info_channel_earn_widget.h"
 #include "info/profile/info_profile_values.h"
@@ -64,14 +62,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/boxes/boost_box.h"
 #include "ui/controls/emoji_button.h"
 #include "ui/controls/userpic_button.h"
-#include "ui/effects/premium_graphics.h"
 #include "ui/new_badges.h"
-#include "ui/rect.h"
 #include "ui/rp_widget.h"
 #include "ui/vertical_list.h"
-#include "ui/toast/toast.h"
 #include "ui/text/text_utilities.h"
-#include "ui/widgets/checkbox.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/fields/input_field.h"
 #include "ui/widgets/labels.h"
@@ -89,7 +83,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_boxes.h"
 #include "styles/style_info.h"
 
-#include <QtSvg/QSvgRenderer>
 
 namespace {
 

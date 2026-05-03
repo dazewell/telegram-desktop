@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "info/bot/starref/info_bot_starref_setup_widget.h"
 
-#include "apiwrap.h"
 #include "base/timer_rpl.h"
 #include "base/unixtime.h"
 #include "core/click_handler_types.h"
@@ -20,9 +19,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_keys.h"
 #include "main/main_app_config.h"
 #include "main/main_session.h"
-#include "settings/settings_common.h"
 #include "ui/effects/premium_top_bar.h"
-#include "ui/text/text_utilities.h"
 #include "ui/toast/toast.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/continuous_sliders.h"

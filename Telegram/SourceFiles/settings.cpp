@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "settings.h"
 
-#include "ui/emoji_config.h"
 
 Qt::LayoutDirection gLangDir = Qt::LeftToRight;
 

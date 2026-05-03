@@ -18,7 +18,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_chat.h"
 #include "data/data_session.h"
 #include "data/data_stories.h"
-#include "data/data_folder.h"
 #include "data/data_forum.h"
 #include "data/data_forum_icons.h"
 #include "data/data_histories.h"
@@ -36,7 +35,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "api/api_chat_invite.h"
 #include "api/api_invite_links.h"
 #include "apiwrap.h"
-#include "storage/storage_account.h"
 #include "ui/unread_badge.h"
 #include "window/notifications_manager.h"
 

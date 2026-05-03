@@ -8,8 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_keys.h"
 
 #include "base/const_string.h"
-#include "lang/lang_file_parser.h"
-#include "ui/integration.h"
 
 #include <QtCore/QLocale>
 

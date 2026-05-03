@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "storage/serialize_common.h"
 #include "mtproto/type_utils.h"
-#include "logs.h"
 
 namespace MTP {
 namespace {

@@ -18,14 +18,12 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "storage/storage_account.h"
 #include "ui/chat/attach/attach_bot_downloads.h"
 #include "ui/layers/generic_box.h"
-#include "ui/text/text_utilities.h"
 #include "ui/widgets/labels.h"
 #include "styles/style_chat.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QDataStream>
 
-#include "base/call_delayed.h"
 
 namespace InlineBots {
 namespace {

@@ -31,10 +31,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/core_settings.h"
 #include "window/window_controller.h"
 #include "mainwindow.h"
-#include "main/main_domain.h" // Domain::activeSessionValue.
 #include "main/main_session.h"
 #include "main/main_account.h" // session->account().sessionChanges().
-#include "main/main_session_settings.h"
 #include "storage/storage_account.h"
 
 namespace Media {

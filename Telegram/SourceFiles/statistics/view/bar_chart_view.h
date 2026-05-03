@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "statistics/statistics_common.h"
 #include "statistics/statistics_types.h"
 #include "statistics/view/abstract_chart_view.h"
-#include "ui/effects/animation_value.h"
 
 namespace Data {
 struct StatisticalChart;

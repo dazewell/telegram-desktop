@@ -7,8 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include "ui/effects/animations.h"
-#include "ui/rp_widget.h"
 #include "base/unique_qptr.h"
 #include "base/timer.h"
 

@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include "base/optional.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QString>

@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/gl/gl_primitives.h"
 #include "ui/widgets/shadow.h"
 #include "media/streaming/media_streaming_common.h"
-#include "base/platform/base_platform_info.h"
 #include "styles/style_media_view.h"
 #include "styles/style_widgets.h"
 

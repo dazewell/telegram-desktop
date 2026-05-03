@@ -29,15 +29,12 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/image/image.h"
 #include "ui/text/format_values.h"
 #include "ui/text/text_entity.h"
-#include "apiwrap.h"
 #include "api/api_text_entities.h"
 #include "core/core_cloud_password.h"
 #include "window/themes/window_theme.h"
-#include "webview/webview_interface.h"
 #include "styles/style_payments.h" // paymentsThumbnailSize.
 
 #include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
 
 namespace Payments {

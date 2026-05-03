@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/view/history_view_sticker_toast.h"
 
 #include "ui/toast/toast.h"
-#include "ui/toast/toast_widget.h"
 #include "ui/widgets/buttons.h"
 #include "data/stickers/data_custom_emoji.h"
 #include "data/data_document.h"
@@ -16,7 +15,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_session.h"
 #include "main/main_session.h"
 #include "lang/lang_keys.h"
-#include "ui/text/text_utilities.h"
 #include "boxes/sticker_set_box.h"
 #include "boxes/premium_preview_box.h"
 #include "lottie/lottie_single_player.h"

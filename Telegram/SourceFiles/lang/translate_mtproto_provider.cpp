@@ -12,7 +12,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_session.h"
 #include "main/main_session.h"
 #include "mtproto/sender.h"
-#include "spellcheck/platform/platform_language.h"
 
 namespace Ui {
 namespace {

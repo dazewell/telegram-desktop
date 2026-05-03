@@ -9,19 +9,16 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "apiwrap.h"
 #include "base/openssl_help.h"
-#include "base/platform/base_platform_info.h"
 #include "base/random.h"
 #include "boxes/abstract_box.h"
 #include "calls/group/calls_group_common.h"
 #include "calls/calls_instance.h"
-#include "calls/calls_panel.h"
 #include "core/application.h"
 #include "core/core_settings.h"
 #include "data/data_group_call.h"
 #include "data/data_session.h"
 #include "data/data_user.h"
 #include "lang/lang_keys.h"
-#include "main/main_app_config.h"
 #include "main/main_session.h"
 #include "media/audio/media_audio_track.h"
 #include "mtproto/mtproto_config.h"
@@ -35,7 +32,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include <tgcalls/Instance.h>
 #include <tgcalls/VideoCaptureInterface.h>
-#include <tgcalls/StaticThreads.h>
 
 namespace tgcalls {
 class InstanceImpl;

@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "ui/chat/attach/attach_abstract_single_media_preview.h"
 
-#include "editor/photo_editor_common.h"
 #include "ui/chat/attach/attach_controls.h"
 #include "ui/chat/attach/attach_prepare.h"
 #include "ui/effects/spoiler_mess.h"

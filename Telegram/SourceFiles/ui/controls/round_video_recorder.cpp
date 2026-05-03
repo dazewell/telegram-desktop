@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/controls/round_video_recorder.h"
 
 #include "base/concurrent_timer.h"
-#include "base/debug_log.h"
 #include "ffmpeg/ffmpeg_bytes_io_wrap.h"
 #include "ffmpeg/ffmpeg_utility.h"
 #include "media/audio/media_audio_capture.h"

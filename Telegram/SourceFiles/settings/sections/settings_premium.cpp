@@ -42,13 +42,11 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/controls/swipe_handler_data.h"
 #include "ui/layers/generic_box.h"
 #include "ui/text/format_values.h"
-#include "ui/text/text_utilities.h"
 #include "ui/toast/toast.h"
 #include "ui/widgets/checkbox.h" // Ui::RadiobuttonGroup.
 #include "ui/widgets/gradient_round_button.h"
 #include "ui/widgets/labels.h"
 #include "ui/wrap/fade_wrap.h"
-#include "ui/wrap/padding_wrap.h"
 #include "ui/wrap/slide_wrap.h"
 #include "ui/wrap/vertical_layout.h"
 #include "ui/new_badges.h"

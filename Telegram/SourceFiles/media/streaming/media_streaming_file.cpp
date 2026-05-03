@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "media/streaming/media_streaming_file.h"
 
-#include "media/streaming/media_streaming_loader.h"
 #include "media/streaming/media_streaming_file_delegate.h"
 #include "ffmpeg/ffmpeg_utility.h"
 

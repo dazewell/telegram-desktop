@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include "base/flags.h"
 
 #include <rpl/producer.h>
 #include <rpl/map.h>

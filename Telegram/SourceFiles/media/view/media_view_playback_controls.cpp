@@ -16,10 +16,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/continuous_sliders.h"
 #include "ui/effects/fade_animation.h"
 #include "ui/widgets/buttons.h"
-#include "ui/widgets/menu/menu_item_base.h"
 #include "ui/text/format_values.h"
 #include "ui/cached_round_corners.h"
-#include "lang/lang_keys.h"
 #include "styles/style_media_view.h"
 
 namespace Media {

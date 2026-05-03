@@ -8,16 +8,13 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/controls/swipe_handler.h"
 
 #include "base/platform/base_platform_haptic.h"
-#include "base/platform/base_platform_info.h"
 #include "base/qt/qt_common_adapters.h"
 #include "base/event_filter.h"
-#include "ui/chat/chat_style.h"
 #include "ui/controls/swipe_handler_data.h"
 #include "ui/painter.h"
 #include "ui/rect.h"
 #include "ui/ui_utility.h"
 #include "ui/widgets/elastic_scroll.h"
-#include "ui/widgets/scroll_area.h"
 #include "styles/style_chat.h"
 
 #include <QtWidgets/QApplication>

@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "payments/ui/payments_reaction_box.h"
 
-#include "base/qt/qt_compare.h"
 #include "calls/group/ui/calls_group_stars_coloring.h"
 #include "lang/lang_keys.h"
 #include "ui/boxes/boost_box.h" // MakeBoostFeaturesBadge.
@@ -15,7 +14,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/effects/premium_bubble.h"
 #include "ui/effects/ministar_particles.h"
 #include "ui/layers/generic_box.h"
-#include "ui/text/text_utilities.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/checkbox.h"
 #include "ui/widgets/labels.h"
@@ -30,12 +28,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_chat.h"
 #include "styles/style_chat_helpers.h"
 #include "styles/style_credits.h"
-#include "styles/style_info.h"
 #include "styles/style_info_levels.h"
 #include "styles/style_layers.h"
-#include "styles/style_media_player.h"
 #include "styles/style_premium.h"
-#include "styles/style_settings.h"
 
 namespace Settings {
 [[nodiscard]] not_null<Ui::RpWidget*> AddBalanceWidget(

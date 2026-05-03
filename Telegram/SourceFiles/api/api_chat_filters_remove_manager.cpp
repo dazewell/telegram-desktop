@@ -15,7 +15,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_keys.h"
 #include "main/main_session.h"
 #include "ui/boxes/confirm_box.h"
-#include "ui/ui_utility.h"
 #include "window/window_controller.h"
 #include "window/window_session_controller.h"
 #include "styles/style_layers.h"

@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/controls/who_reacted_context_action.h"
 
 #include "base/call_delayed.h"
-#include "ui/widgets/menu/menu_action.h"
 #include "ui/widgets/popup_menu.h"
 #include "ui/effects/ripple_animation.h"
 #include "ui/chat/group_call_userpics.h"

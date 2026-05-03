@@ -15,7 +15,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history.h"
 #include "lang/lang_instance.h" // Instance::supportChoosingStickerReplacement
 #include "lang/lang_keys.h"
-#include "ui/effects/animations.h"
 #include "ui/text/text_options.h"
 #include "ui/painter.h"
 #include "styles/style_dialogs.h"

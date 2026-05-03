@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "base/unique_qptr.h"
 #include "ui/effects/animations.h"
-#include "ui/effects/cross_line.h"
 #include "ui/effects/gradient.h"
 #include "ui/effects/radial_animation.h"
 #include "ui/widgets/call_button.h"

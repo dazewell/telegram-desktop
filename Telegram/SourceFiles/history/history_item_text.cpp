@@ -12,8 +12,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_media_types.h"
 #include "data/data_web_page.h"
 #include "data/data_groups.h"
-#include "data/data_peer.h"
-#include "lang/lang_keys.h"
 #include "ui/text/text_options.h"
 
 TextForMimeData HistoryItemText(not_null<HistoryItem*> item) {

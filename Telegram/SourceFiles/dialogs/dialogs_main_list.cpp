@@ -8,11 +8,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "dialogs/dialogs_main_list.h"
 
 #include "data/data_changes.h"
-#include "data/data_session.h"
-#include "data/data_chat_filters.h"
 #include "main/main_session.h"
-#include "history/history_unread_things.h"
-#include "history/history.h"
 
 namespace Dialogs {
 

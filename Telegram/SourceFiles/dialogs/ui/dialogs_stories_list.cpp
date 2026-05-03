@@ -8,14 +8,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "dialogs/ui/dialogs_stories_list.h"
 
 #include "base/event_filter.h"
-#include "base/qt_signal_producer.h"
 #include "lang/lang_keys.h"
 #include "ui/effects/round_checkbox.h"
 #include "ui/effects/outline_segments.h"
-#include "ui/text/text_utilities.h"
 #include "ui/widgets/menu/menu_add_action_callback_factory.h"
-#include "ui/widgets/buttons.h"
-#include "ui/widgets/labels.h"
 #include "ui/widgets/popup_menu.h"
 #include "ui/widgets/tooltip.h"
 #include "ui/dynamic_image.h"
@@ -25,10 +21,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_dialogs.h"
 
 #include <QtWidgets/QApplication>
-#include <QtGui/QWindow>
-#include <QtGui/QPainter>
 
-#include "base/debug_log.h"
 
 namespace Dialogs::Stories {
 namespace {

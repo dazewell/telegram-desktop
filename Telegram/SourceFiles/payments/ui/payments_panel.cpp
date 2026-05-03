@@ -18,7 +18,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/boxes/single_choice_box.h"
 #include "ui/chat/attach/attach_bot_webview.h"
 #include "ui/text/format_values.h"
-#include "ui/text/text_utilities.h"
 #include "ui/effects/radial_animation.h"
 #include "ui/click_handler.h"
 #include "lang/lang_keys.h"

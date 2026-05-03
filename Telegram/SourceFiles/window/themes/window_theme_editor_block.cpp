@@ -15,7 +15,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/painter.h"
 #include "ui/widgets/color_editor.h"
 #include "ui/widgets/shadow.h"
-#include "styles/style_layers.h"
 #include "styles/style_window.h"
 
 namespace Window {

@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_media_types.h"
 #include "history/history_item_edition.h"
 
-#include <any>
 
 class HiddenSenderInfo;
 class History;

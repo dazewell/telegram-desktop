@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "ui/rp_widget.h"
 #include "ui/widgets/scroll_area.h"
-#include "base/unique_qptr.h"
 #include "info/media/info_media_widget.h"
 #include "info/media/info_media_list_widget.h"
 

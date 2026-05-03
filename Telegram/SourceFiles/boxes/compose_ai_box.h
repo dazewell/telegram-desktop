@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include "api/api_common.h"
-#include "base/object_ptr.h"
 #include "ui/text/text_entity.h"
 
 namespace Main {

@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "api/api_peer_search.h" // SponsoredSearchResult
 #include "apiwrap.h"
 #include "core/click_handler_types.h"
-#include "data/data_channel.h"
 #include "data/data_document.h"
 #include "data/data_file_origin.h"
 #include "data/data_media_preload.h"
@@ -24,7 +23,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_keys.h"
 #include "main/main_session.h"
 #include "ui/chat/sponsored_message_bar.h"
-#include "ui/text/text_utilities.h" // tr::rich.
 
 namespace Data {
 namespace {

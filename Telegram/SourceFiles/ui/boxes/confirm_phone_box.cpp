@@ -8,11 +8,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/boxes/confirm_phone_box.h"
 
 #include "core/file_utilities.h"
-#include "ui/boxes/confirm_box.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/labels.h"
 #include "ui/text/format_values.h" // Ui::FormatPhone
-#include "ui/text/text_utilities.h"
 #include "lang/lang_keys.h"
 #include "styles/style_layers.h"
 #include "styles/style_boxes.h"

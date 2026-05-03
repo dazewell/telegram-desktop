@@ -14,8 +14,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "api/api_text_entities.h"
 #include "base/timer_rpl.h"
 #include "core/application.h"
-#include "storage/localstorage.h"
-#include "storage/storage_account.h"
 #include "storage/storage_user_photos.h"
 #include "main/main_session.h"
 #include "data/business/data_business_common.h"
@@ -38,7 +36,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "apiwrap.h"
 #include "lang/lang_keys.h"
 #include "window/notifications_manager.h"
-#include "styles/style_chat.h"
 
 namespace {
 

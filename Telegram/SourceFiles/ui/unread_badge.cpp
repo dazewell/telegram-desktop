@@ -7,9 +7,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "ui/unread_badge.h"
 
-#include "data/data_emoji_statuses.h"
 #include "data/data_peer.h"
-#include "data/data_user.h"
 #include "data/data_session.h"
 #include "data/stickers/data_custom_emoji.h"
 #include "main/main_session.h"

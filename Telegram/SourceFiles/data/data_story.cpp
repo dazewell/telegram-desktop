@@ -11,11 +11,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "api/api_text_entities.h"
 #include "data/data_document.h"
 #include "data/data_changes.h"
-#include "data/data_channel.h"
-#include "data/data_file_origin.h"
 #include "data/data_media_preload.h"
 #include "data/data_photo.h"
-#include "data/data_photo_media.h"
 #include "data/data_user.h"
 #include "data/data_session.h"
 #include "data/data_stories.h"
@@ -23,9 +20,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history_item.h"
 #include "lang/lang_keys.h"
 #include "main/main_session.h"
-#include "media/streaming/media_streaming_reader.h"
-#include "storage/download_manager_mtproto.h"
-#include "storage/file_download.h" // kMaxFileInMemory
 #include "ui/text/text_utilities.h"
 #include "ui/color_int_conversion.h"
 

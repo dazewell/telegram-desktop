@@ -12,11 +12,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/timer.h"
 #include "data/raw/raw_countries_bounds.h"
 #include "platform/platform_current_geo_location.h"
-#include "ui/ui_utility.h"
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
-#include <QtCore/QCoreApplication>
 #include <QtCore/QPointer>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>

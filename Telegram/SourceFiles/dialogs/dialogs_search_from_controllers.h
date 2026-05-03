@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include "boxes/peer_list_box.h"
 #include "boxes/peers/add_participants_box.h"
 
 namespace Dialogs {

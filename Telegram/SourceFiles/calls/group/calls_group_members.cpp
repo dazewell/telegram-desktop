@@ -27,12 +27,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/scroll_area.h"
 #include "ui/widgets/popup_menu.h"
-#include "ui/effects/ripple_animation.h"
 #include "ui/effects/cross_line.h"
 #include "ui/painter.h"
 #include "ui/power_saving.h"
 #include "core/application.h" // Core::App().domain, .activeWindow.
-#include "main/main_domain.h" // Core::App().domain().activate.
 #include "main/main_session.h"
 #include "lang/lang_keys.h"
 #include "info/profile/info_profile_values.h" // Info::Profile::NameValue.
@@ -40,7 +38,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "boxes/peers/prepare_short_info_box.h" // PrepareShortInfo...
 #include "window/window_controller.h" // Controller::sessionController.
 #include "window/window_session_controller.h"
-#include "webrtc/webrtc_video_track.h"
 #include "styles/style_calls.h"
 
 namespace Calls::Group {

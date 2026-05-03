@@ -11,8 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/themes/window_themes_embedded.h"
 #include "window/themes/window_theme_editor.h"
 #include "window/window_controller.h"
-#include "platform/platform_specific.h"
-#include "mainwidget.h"
 #include "main/main_session.h"
 #include "apiwrap.h"
 #include "storage/localstorage.h"
@@ -26,20 +24,13 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/never_freed_pointer.h"
 #include "base/qt_signal_producer.h"
 #include "data/data_session.h"
-#include "data/data_document_resolver.h"
-#include "main/main_account.h" // Account::local.
 #include "main/main_domain.h" // Domain::activeSessionValue.
 #include "lang/lang_keys.h"
 #include "ui/chat/chat_theme.h"
-#include "ui/image/image.h"
 #include "ui/style/style_palette_colorizer.h"
-#include "ui/ui_utility.h"
 #include "ui/boxes/confirm_box.h"
-#include "boxes/background_box.h"
 #include "core/application.h"
 #include "webview/webview_common.h"
-#include "styles/style_widgets.h"
-#include "styles/style_chat.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QJsonDocument>

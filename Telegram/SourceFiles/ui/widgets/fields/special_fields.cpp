@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "countries/countries_instance.h" // Countries::ValidPhoneCode
 #include "styles/style_widgets.h"
 
-#include <QtCore/QRegularExpression>
 
 namespace Ui {
 namespace {

@@ -13,7 +13,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/effects/animations.h"
 #include "ui/effects/credits_graphics.h"
 #include "ui/effects/gradient.h"
-#include "ui/effects/numbers_animation.h"
 #include "ui/effects/premium_bubble.h"
 #include "ui/text/text_utilities.h"
 #include "ui/layers/generic_box.h"
@@ -30,7 +29,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_window.h"
 
 #include <QtCore/QFile>
-#include <QtGui/QBrush>
 #include <QtSvg/QSvgRenderer>
 
 namespace Ui {

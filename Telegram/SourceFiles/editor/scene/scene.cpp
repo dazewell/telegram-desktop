@@ -9,16 +9,12 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "editor/scene/scene_item_canvas.h"
 #include "editor/scene/scene_item_line.h"
-#include "editor/scene/scene_item_sticker.h"
 #include "editor/scene/scene_item_text.h"
 #include "editor/scene/scene_emoji_document.h"
 #include "ui/image/image_prepare.h"
-#include "ui/rp_widget.h"
 #include "styles/style_editor.h"
 
 #include <QGraphicsSceneContextMenuEvent>
-#include <QGraphicsSceneMouseEvent>
-#include <QGraphicsTextItem>
 #include <QGraphicsView>
 #include <QTextCursor>
 #include <QTextDocument>

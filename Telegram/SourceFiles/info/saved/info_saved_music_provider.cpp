@@ -7,10 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "info/saved/info_saved_music_provider.h"
 
-#include "base/unixtime.h"
-#include "core/application.h"
-#include "data/data_changes.h"
-#include "data/data_channel.h"
 #include "data/data_document.h"
 #include "data/data_media_types.h"
 #include "data/data_saved_music.h"
@@ -21,11 +17,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "info/media/info_media_widget.h"
 #include "info/media/info_media_list_section.h"
 #include "info/info_controller.h"
-#include "main/main_account.h"
 #include "main/main_session.h"
 #include "layout/layout_selection.h"
 #include "storage/storage_shared_media.h"
-#include "styles/style_info.h"
 #include "styles/style_overview.h"
 
 namespace Info::Saved {

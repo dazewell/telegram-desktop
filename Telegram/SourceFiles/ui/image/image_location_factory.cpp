@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "ui/image/image_location_factory.h"
 
-#include "ui/image/image.h"
 #include "main/main_session.h"
 
 #include <QtCore/QBuffer>

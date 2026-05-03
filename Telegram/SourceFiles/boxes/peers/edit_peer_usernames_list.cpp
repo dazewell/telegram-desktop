@@ -7,21 +7,17 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "boxes/peers/edit_peer_usernames_list.h"
 
-#include "api/api_filter_updates.h"
 #include "api/api_user_names.h"
 #include "apiwrap.h"
 #include "base/event_filter.h"
 #include "data/data_changes.h"
 #include "data/data_peer.h"
 #include "data/data_user.h"
-#include "info/profile/info_profile_values.h"
 #include "lang/lang_keys.h"
 #include "main/main_session.h"
 #include "ui/boxes/confirm_box.h"
 #include "ui/layers/show.h"
 #include "ui/painter.h"
-#include "ui/text/text_utilities.h" // tr::rich.
-#include "ui/toast/toast.h"
 #include "ui/ui_utility.h"
 #include "ui/vertical_list.h"
 #include "ui/widgets/buttons.h"

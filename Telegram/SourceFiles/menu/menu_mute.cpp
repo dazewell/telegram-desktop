@@ -22,13 +22,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/effects/animation_value.h"
 #include "ui/layers/generic_box.h"
 #include "ui/text/format_values.h"
-#include "ui/widgets/checkbox.h"
 #include "ui/widgets/menu/menu_action.h"
 #include "ui/widgets/popup_menu.h"
 #include "ui/painter.h"
-#include "styles/style_boxes.h"
 #include "styles/style_info.h" // infoTopBarMenu
-#include "styles/style_layers.h"
 #include "styles/style_menu_icons.h"
 
 namespace MuteMenu {

@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "export/output/export_output_result.h"
 #include "export/data/export_data_types.h"
-#include "core/utils.h"
 
 #include <QtCore/QDateTime>
 #include <QtCore/QJsonDocument>

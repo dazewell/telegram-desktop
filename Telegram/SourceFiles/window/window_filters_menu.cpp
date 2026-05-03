@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "mainwindow.h"
 #include "window/window_session_controller.h"
-#include "window/window_controller.h"
 #include "window/window_main_menu.h"
 #include "window/window_peer_menu.h"
 #include "main/main_session.h"
@@ -26,7 +25,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/wrap/vertical_layout_reorder.h"
 #include "ui/widgets/menu/menu_add_action_callback_factory.h"
 #include "ui/widgets/popup_menu.h"
-#include "ui/boxes/confirm_box.h"
 #include "ui/power_saving.h"
 #include "ui/ui_utility.h"
 #include "boxes/filters/edit_filter_box.h"
@@ -34,11 +32,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "boxes/premium_limits_box.h"
 #include "settings/sections/settings_folders.h"
 #include "storage/storage_media_prepare.h"
-#include "api/api_chat_filters.h"
-#include "apiwrap.h"
 #include "styles/style_widgets.h"
 #include "styles/style_window.h"
-#include "styles/style_layers.h" // attentionBoxButton
 #include "styles/style_menu_icons.h"
 
 namespace Window {

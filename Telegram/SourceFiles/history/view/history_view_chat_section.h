@@ -14,7 +14,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history_item_helpers.h"
 #include "data/data_messages.h"
 #include "ui/controls/swipe_handler_data.h"
-#include "base/timer.h"
 
 class History;
 enum class SendMediaType;

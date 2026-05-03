@@ -14,7 +14,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/fields/password_input.h"
 #include "ui/wrap/vertical_layout.h"
 #include "ui/wrap/padding_wrap.h"
-#include "boxes/passcode_box.h"
 #include "data/data_user.h"
 #include "lang/lang_keys.h"
 #include "info/profile/info_profile_icon.h"

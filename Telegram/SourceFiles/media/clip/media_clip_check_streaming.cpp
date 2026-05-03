@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "core/file_location.h"
 #include "base/bytes.h"
-#include "logs.h"
 
 #include <QtCore/QtEndian>
 #include <QtCore/QBuffer>

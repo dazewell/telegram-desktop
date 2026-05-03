@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include "ui/countryinput.h"
 #include "intro/intro_step.h"
 #include "base/timer.h"
 

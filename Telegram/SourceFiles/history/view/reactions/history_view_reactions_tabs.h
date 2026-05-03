@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include "ui/text/text_custom_emoji.h" // Ui::Text::CustomEmojiFactory.
 
 namespace Ui {
 enum class WhoReadType;

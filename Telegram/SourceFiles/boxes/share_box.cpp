@@ -10,9 +10,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "api/api_premium.h"
 #include "base/random.h"
 #include "lang/lang_keys.h"
-#include "base/qthelp_url.h"
-#include "storage/storage_account.h"
-#include "ui/boxes/confirm_box.h"
 #include "apiwrap.h"
 #include "ui/widgets/chat_filters_tabs_strip.h"
 #include "ui/widgets/checkbox.h"
@@ -22,7 +19,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/popup_menu.h"
 #include "ui/wrap/slide_wrap.h"
 #include "ui/text/text_options.h"
-#include "ui/text/text_utilities.h"
 #include "ui/painter.h"
 #include "ui/ui_utility.h"
 #include "chat_helpers/message_field.h"
@@ -39,7 +35,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "chat_helpers/emoji_suggestions_widget.h"
 #include "chat_helpers/share_message_phrase_factory.h"
 #include "data/business/data_shortcut_messages.h"
-#include "data/data_channel.h"
 #include "data/data_chat_filters.h"
 #include "data/data_game.h"
 #include "data/data_histories.h"
@@ -58,7 +53,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_calls.h"
 #include "styles/style_layers.h"
 #include "styles/style_boxes.h"
-#include "styles/style_menu_icons.h"
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QClipboard>

@@ -12,7 +12,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 extern "C" {
 #include <libswscale/swscale.h>
-#include <libavutil/opt.h>
 } // extern "C"
 #include <deque>
 

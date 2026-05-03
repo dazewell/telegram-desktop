@@ -9,12 +9,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "media/audio/media_audio.h"
 #include "media/audio/media_audio_loader.h"
-#include "media/streaming/media_streaming_utility.h"
 
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
-#include <libavutil/opt.h>
 #include <libswresample/swresample.h>
 #include <libavfilter/avfilter.h>
 } // extern "C"

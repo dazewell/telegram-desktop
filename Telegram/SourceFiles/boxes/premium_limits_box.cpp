@@ -12,8 +12,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/effects/premium_bubble.h"
 #include "ui/effects/premium_graphics.h"
 #include "ui/widgets/checkbox.h"
-#include "ui/wrap/padding_wrap.h"
-#include "ui/text/text_utilities.h"
 #include "ui/vertical_list.h"
 #include "main/main_session.h"
 #include "main/main_account.h"
@@ -36,7 +34,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_premium.h"
 #include "styles/style_boxes.h"
 #include "styles/style_layers.h"
-#include "styles/style_info.h"
 #include "styles/style_settings.h"
 
 namespace {

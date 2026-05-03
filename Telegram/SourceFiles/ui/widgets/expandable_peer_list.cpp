@@ -12,7 +12,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_text_entity.h"
 #include "ui/controls/userpic_button.h"
 #include "ui/rect.h"
-#include "ui/text/text_utilities.h"
 #include "ui/vertical_list.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/participants_check_view.h"

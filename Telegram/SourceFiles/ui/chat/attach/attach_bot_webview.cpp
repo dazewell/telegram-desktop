@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/chat/attach/attach_bot_webview.h"
 
 #include "core/file_utilities.h"
-#include "ui/boxes/confirm_box.h"
 #include "ui/chat/attach/attach_bot_downloads.h"
 #include "ui/effects/radial_animation.h"
 #include "ui/effects/ripple_animation.h"
@@ -19,7 +18,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/labels.h"
 #include "ui/widgets/menu/menu_add_action_callback.h"
-#include "ui/wrap/fade_wrap.h"
 #include "ui/integration.h"
 #include "ui/painter.h"
 #include "ui/rect.h"

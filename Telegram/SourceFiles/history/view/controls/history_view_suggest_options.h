@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include "api/api_common.h"
 
 namespace ChatHelpers {
 class Show;

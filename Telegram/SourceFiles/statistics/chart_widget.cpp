@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "statistics/chart_widget.h"
 
-#include "base/qt/qt_key_modifiers.h"
 #include "lang/lang_keys.h"
 #include "statistics/chart_lines_filter_controller.h"
 #include "statistics/statistics_format_values.h"
@@ -21,7 +20,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/effects/animation_value_f.h"
 #include "ui/effects/ripple_animation.h"
 #include "ui/effects/show_animation.h"
-#include "ui/image/image_prepare.h"
 #include "ui/painter.h"
 #include "ui/rect.h"
 #include "ui/widgets/buttons.h"

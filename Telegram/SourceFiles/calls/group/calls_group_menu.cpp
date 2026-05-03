@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "calls/group/calls_group_call.h"
 #include "calls/group/calls_group_settings.h"
-#include "calls/group/calls_group_panel.h"
 #include "calls/group/ui/calls_group_recording_box.h"
 #include "data/data_peer.h"
 #include "data/data_group_call.h"
@@ -19,16 +18,13 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/menu/menu_action.h"
 #include "ui/widgets/labels.h"
 #include "ui/widgets/checkbox.h"
-#include "ui/widgets/fields/input_field.h"
 #include "ui/effects/ripple_animation.h"
 #include "ui/layers/generic_box.h"
 #include "ui/painter.h"
 #include "lang/lang_keys.h"
 #include "base/unixtime.h"
-#include "base/timer_rpl.h"
 #include "styles/style_calls.h"
 #include "styles/style_layers.h"
-#include "styles/style_boxes.h"
 
 namespace Calls::Group {
 namespace {

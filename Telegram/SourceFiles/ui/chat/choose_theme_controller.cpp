@@ -16,7 +16,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/chat/chat_theme.h"
 #include "ui/chat/message_bubble.h"
 #include "ui/layers/generic_box.h"
-#include "ui/text/text_utilities.h"
 #include "ui/widgets/shadow.h"
 #include "ui/widgets/labels.h"
 #include "ui/widgets/buttons.h"
@@ -29,10 +28,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_session.h"
 #include "data/data_peer.h"
 #include "data/data_cloud_themes.h"
-#include "data/data_document.h"
 #include "data/data_document_media.h"
 #include "lang/lang_keys.h"
-#include "apiwrap.h"
 #include "styles/style_widgets.h"
 #include "styles/style_layers.h" // boxTitle.
 #include "styles/style_settings.h"

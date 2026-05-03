@@ -8,17 +8,12 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "info/profile/info_profile_members_controllers.h"
 
 #include "boxes/peers/edit_participants_box.h"
-#include "info/profile/info_profile_values.h"
-#include "data/data_chat.h"
 #include "data/data_user.h"
-#include "ui/unread_badge.h"
 #include "lang/lang_keys.h"
 #include "ui/effects/ripple_animation.h"
 #include "ui/painter.h"
 #include "styles/style_info.h"
 #include "styles/style_boxes.h"
-#include "styles/style_chat.h"
-#include "styles/style_dialogs.h"
 #include "styles/style_widgets.h"
 
 namespace Info {

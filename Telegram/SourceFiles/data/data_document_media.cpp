@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_document_media.h"
 
 #include "data/data_document.h"
-#include "data/data_document_resolver.h"
 #include "data/data_session.h"
 #include "data/data_file_origin.h"
 #include "media/clip/media_clip_reader.h"
@@ -20,7 +19,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history_item.h"
 #include "history/history.h"
 #include "window/themes/window_theme_preview.h"
-#include "core/core_settings.h"
 #include "core/application.h"
 #include "core/mime_type.h"
 #include "storage/file_download.h"

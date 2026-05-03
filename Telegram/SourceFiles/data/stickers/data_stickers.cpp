@@ -13,7 +13,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_session.h"
 #include "data/data_user.h"
 #include "ui/boxes/confirm_box.h"
-#include "ui/text/text_utilities.h"
 #include "lang/lang_keys.h"
 #include "data/data_premium_limits.h"
 #include "boxes/premium_limits_box.h"
@@ -30,9 +29,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "mtproto/mtproto_config.h"
 #include "ui/toast/toast.h"
 #include "ui/image/image_location_factory.h"
-#include "window/window_controller.h"
-#include "window/window_session_controller.h"
-#include "mainwindow.h"
 #include "base/unixtime.h"
 #include "boxes/abstract_box.h" // Ui::show().
 #include "styles/style_chat_helpers.h"

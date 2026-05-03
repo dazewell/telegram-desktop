@@ -8,11 +8,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/boxes/choose_time.h"
 
 #include "base/qt_signal_producer.h"
-#include "ui/ui_utility.h"
 #include "ui/widgets/fields/time_part_input_with_placeholder.h"
 #include "ui/wrap/padding_wrap.h"
 #include "styles/style_boxes.h"
-#include "styles/style_layers.h"
 
 namespace Ui {
 

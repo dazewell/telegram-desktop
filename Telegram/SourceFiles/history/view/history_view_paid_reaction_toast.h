@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include "styles/style_widgets.h"
 
 namespace Calls {
 class GroupCall;

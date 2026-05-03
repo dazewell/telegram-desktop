@@ -16,7 +16,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "main/main_session.h"
 #include "media/audio/media_audio.h"
 #include "media/player/media_player_instance.h"
-#include "ui/text/text_utilities.h"
 
 #include <QtWidgets/QMenu>
 

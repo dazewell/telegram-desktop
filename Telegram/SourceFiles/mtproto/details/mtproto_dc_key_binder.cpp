@@ -14,7 +14,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/random.h"
 #include "scheme.h"
 
-#include <QtCore/QPointer>
 
 namespace MTP::details {
 namespace {

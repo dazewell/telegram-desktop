@@ -10,7 +10,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "apiwrap.h"
 #include "boxes/peers/edit_peer_permissions_box.h"
 #include "data/business/data_business_common.h"
-#include "data/business/data_business_info.h"
 #include "data/data_session.h"
 #include "data/data_user.h"
 #include "lang/lang_keys.h"

@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include <rpl/producer.h>
 #include "info/info_content_widget.h"
 
 struct PeerListState;

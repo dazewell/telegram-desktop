@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "intro/intro_step.h"
 #include "intro/intro_widget.h"
-#include "ui/widgets/fields/masked_input_field.h"
 #include "base/timer.h"
 
 namespace Ui {

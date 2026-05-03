@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "info/info_controller.h"
 #include "info/info_memento.h"
 #include "ui/boxes/confirm_box.h"
-#include "ui/search_field_controller.h"
 #include "ui/widgets/menu/menu_add_action_callback.h"
 #include "ui/widgets/scroll_area.h"
 #include "ui/ui_utility.h"
@@ -19,7 +18,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_user.h"
 #include "core/application.h"
 #include "lang/lang_keys.h"
-#include "styles/style_info.h"
 #include "styles/style_layers.h"
 #include "styles/style_menu_icons.h"
 

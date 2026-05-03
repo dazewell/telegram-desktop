@@ -10,11 +10,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_keys.h"
 #include "ui/text/format_values.h"
 #include "history/history_item.h"
-#include "history/history.h"
 #include "history/view/history_view_element.h"
 #include "data/data_document.h"
 #include "data/data_file_click_handler.h"
-#include "data/data_session.h"
 #include "styles/style_chat.h"
 
 namespace HistoryView {

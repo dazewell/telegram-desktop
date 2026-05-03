@@ -19,7 +19,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/style/style_core_palette.h"
 #include "ui/style/style_palette_colorizer.h"
 
-#include <crl/crl_async.h>
 #include <QtGui/QGuiApplication>
 
 namespace Ui {

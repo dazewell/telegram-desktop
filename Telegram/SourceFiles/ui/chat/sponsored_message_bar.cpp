@@ -24,7 +24,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/effects/ripple_animation.h"
 #include "ui/image/image_prepare.h"
 #include "ui/power_saving.h"
-#include "ui/rect.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/shadow.h"
 #include "window/section_widget.h"

@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include <QtCore/QJsonObject>
-#include <vector>
 
 namespace Stripe {
 

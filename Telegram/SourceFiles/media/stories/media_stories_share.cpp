@@ -15,7 +15,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/business/data_shortcut_messages.h"
 #include "data/data_channel.h"
 #include "data/data_chat_participant_status.h"
-#include "data/data_forum_topic.h"
 #include "data/data_histories.h"
 #include "data/data_peer.h"
 #include "data/data_session.h"
@@ -28,9 +27,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_keys.h"
 #include "main/main_session.h"
 #include "settings/settings_credits_graphics.h"
-#include "ui/boxes/confirm_box.h"
-#include "ui/text/text_utilities.h"
-#include "styles/style_calls.h"
 
 namespace Media::Stories {
 

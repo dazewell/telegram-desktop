@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "base/platform/base_platform_info.h"
 #include "base/power_save_blocker.h"
-#include "base/qt_signal_producer.h"
 #include "base/unixtime.h"
 #include "boxes/peers/prepare_short_info_box.h"
 #include "boxes/report_messages_box.h"
@@ -46,13 +45,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "media/stories/media_stories_stealth.h"
 #include "media/stories/media_stories_view.h"
 #include "media/audio/media_audio.h"
-#include "info/stories/info_stories_common.h"
 #include "payments/payments_reaction_process.h"
 #include "settings/settings_credits_graphics.h"
 #include "ui/boxes/confirm_box.h"
-#include "ui/boxes/report_box_graphics.h"
 #include "ui/controls/send_button.h"
-#include "ui/text/text_utilities.h"
 #include "ui/toast/toast.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/labels.h"
@@ -63,7 +59,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_media_view.h"
 #include "styles/style_boxes.h" // UserpicButton
 
-#include <QtGui/QWindow>
 
 namespace Media::Stories {
 namespace {

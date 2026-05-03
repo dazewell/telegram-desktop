@@ -14,7 +14,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "info/userpic/info_userpic_emoji_builder_common.h"
 #include "ui/wrap/vertical_layout.h"
 #include "ui/widgets/color_editor.h"
-#include "ui/wrap/padding_wrap.h"
 #include "ui/widgets/buttons.h"
 #include "ui/vertical_list.h"
 #include "ui/rect.h"

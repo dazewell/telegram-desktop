@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/chat/attach/attach_send_files_way.h"
 #include "ui/rect_part.h"
 
-#include <QtCore/QSemaphore>
 #include <deque>
 
 class QPainter;

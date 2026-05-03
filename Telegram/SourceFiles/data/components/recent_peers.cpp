@@ -8,8 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/components/recent_peers.h"
 
 #include "data/data_peer.h"
-#include "data/data_session.h"
-#include "history/history.h"
 #include "main/main_session.h"
 #include "storage/serialize_common.h"
 #include "storage/serialize_peer.h"

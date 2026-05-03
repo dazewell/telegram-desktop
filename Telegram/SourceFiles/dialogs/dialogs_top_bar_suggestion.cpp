@@ -33,17 +33,11 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "settings/sections/settings_active_sessions.h"
 #include "settings/settings_credits_graphics.h"
 #include "settings/sections/settings_premium.h"
-#include "ui/boxes/confirm_box.h"
 #include "ui/controls/userpic_button.h"
 #include "ui/effects/credits_graphics.h"
 #include "ui/layers/generic_box.h"
-#include "ui/rect.h"
-#include "ui/text/format_values.h"
-#include "ui/text/text_utilities.h"
 #include "ui/toast/toast.h"
 #include "ui/ui_utility.h"
-#include "ui/vertical_list.h"
-#include "ui/wrap/fade_wrap.h"
 #include "ui/wrap/slide_wrap.h"
 #include "window/window_controller.h"
 #include "window/window_session_controller.h"
@@ -51,7 +45,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_chat.h"
 #include "styles/style_chat_helpers.h"
 #include "styles/style_dialogs.h"
-#include "styles/style_layers.h"
 
 namespace Dialogs {
 namespace {

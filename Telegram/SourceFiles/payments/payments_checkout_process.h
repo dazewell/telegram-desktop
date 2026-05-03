@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "base/weak_ptr.h"
 #include "payments/ui/payments_panel_delegate.h"
-#include "webview/webview_common.h"
 
 class HistoryItem;
 class PasscodeBox;

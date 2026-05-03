@@ -8,10 +8,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include "ui/wrap/slide_wrap.h"
-#include "ui/effects/animations.h"
 #include "ui/text/text.h"
-#include "base/object_ptr.h"
-#include "base/timer.h"
 
 class Painter;
 

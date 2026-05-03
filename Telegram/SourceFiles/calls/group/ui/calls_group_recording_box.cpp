@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "lang/lang_keys.h"
 #include "ui/effects/animations.h"
-#include "ui/image/image_prepare.h"
 #include "ui/layers/generic_box.h"
 #include "ui/widgets/checkbox.h"
 #include "ui/widgets/fields/input_field.h"
@@ -17,7 +16,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_basic.h"
 #include "styles/style_calls.h"
 #include "styles/style_layers.h"
-#include "styles/style_boxes.h"
 
 #include <QSvgRenderer>
 

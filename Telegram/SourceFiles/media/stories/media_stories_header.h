@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include "base/timer.h"
-#include "ui/userpic_view.h"
 
 namespace Data {
 enum class StoryPrivacy : uchar;

@@ -12,8 +12,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/view/history_view_list_widget.h"
 #include "history/view/history_view_corner_buttons.h"
 #include "data/data_messages.h"
-#include "base/weak_ptr.h"
-#include "base/timer.h"
 
 class History;
 

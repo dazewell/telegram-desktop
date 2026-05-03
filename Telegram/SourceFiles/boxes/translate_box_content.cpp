@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/boxes/choose_language_box.h"
 #include "ui/effects/loading_element.h"
 #include "ui/layers/generic_box.h"
-#include "ui/painter.h"
 #include "ui/rect.h"
 #include "ui/power_saving.h"
 #include "ui/vertical_list.h"

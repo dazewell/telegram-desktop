@@ -16,7 +16,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/dragging_scroll_manager.h"
 #include "ui/effects/animations.h"
 #include "ui/rp_widget.h"
-#include "ui/userpic_view.h"
 
 namespace style {
 struct DialogRow;

@@ -8,13 +8,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include "ui/rp_widget.h"
-#include "ui/abstract_button.h"
 #include "ui/widgets/tooltip.h"
-#include "ui/effects/animations.h"
-#include "ui/effects/panel_animation.h"
 #include "dialogs/dialogs_key.h"
 #include "base/timer.h"
-#include "mtproto/sender.h"
 #include "inline_bots/inline_bot_layout_item.h"
 #include "layout/layout_mosaic.h"
 

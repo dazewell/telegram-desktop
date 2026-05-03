@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include "base/unique_qptr.h"
-#include "data/data_messages.h"
 
 namespace Ui {
 class RpWidget;

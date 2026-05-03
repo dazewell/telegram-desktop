@@ -14,11 +14,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_file_origin.h"
 #include "media/streaming/media_streaming_instance.h"
 #include "media/streaming/media_streaming_player.h"
-#include "media/streaming/media_streaming_document.h"
 #include "ui/image/image_prepare.h"
 #include "ui/empty_userpic.h"
-#include "ui/painter.h"
-#include "styles/style_widgets.h"
 
 namespace Ui {
 

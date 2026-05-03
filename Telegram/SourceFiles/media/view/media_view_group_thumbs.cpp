@@ -20,11 +20,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_web_page.h"
 #include "data/data_file_origin.h"
 #include "history/history.h"
-#include "history/view/media/history_view_media.h"
 #include "ui/image/image.h"
 #include "ui/ui_utility.h"
 #include "main/main_session.h"
-#include "core/crash_reports.h"
 #include "styles/style_media_view.h"
 
 namespace Media {

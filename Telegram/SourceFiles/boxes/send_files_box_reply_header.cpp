@@ -17,7 +17,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/view/history_view_reply.h"
 #include "lang/lang_keys.h"
 #include "main/main_session.h"
-#include "ui/chat/chat_style.h"
 #include "ui/effects/spoiler_mess.h"
 #include "ui/image/image.h"
 #include "ui/painter.h"
@@ -29,7 +28,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_boxes.h"
 #include "styles/style_chat.h"
 #include "styles/style_chat_helpers.h"
-#include "styles/style_dialogs.h"
 
 namespace SendFiles {
 namespace {

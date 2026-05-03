@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "data/data_abstract_sparse_ids.h"
 #include "storage/storage_user_photos.h"
-#include "base/weak_ptr.h"
 
 class UserData;
 

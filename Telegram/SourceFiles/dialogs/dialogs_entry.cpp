@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "dialogs/dialogs_entry.h"
 
-#include "dialogs/dialogs_key.h"
 #include "dialogs/dialogs_indexed_list.h"
 #include "base/unixtime.h"
 #include "data/data_changes.h"
@@ -18,14 +17,12 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_saved_sublist.h"
 #include "core/application.h"
 #include "core/core_settings.h"
-#include "mainwidget.h"
 #include "main/main_session.h"
 #include "main/main_session_settings.h"
 #include "ui/text/format_values.h"
 #include "ui/text/text_options.h"
 #include "ui/ui_utility.h"
 #include "history/history.h"
-#include "history/history_item.h"
 #include "styles/style_dialogs.h" // st::dialogsTextWidthMin
 
 namespace Dialogs {

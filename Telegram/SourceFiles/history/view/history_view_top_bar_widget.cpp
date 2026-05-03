@@ -9,19 +9,15 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "history/history.h"
 #include "history/view/history_view_send_action.h"
-#include "boxes/add_contact_box.h"
-#include "ui/boxes/confirm_box.h"
 #include "info/info_memento.h"
 #include "info/info_controller.h"
 #include "info/profile/info_profile_values.h"
 #include "storage/storage_media_prepare.h"
 #include "storage/storage_shared_media.h"
 #include "mainwidget.h"
-#include "mainwindow.h"
 #include "main/main_session.h"
 #include "mtproto/mtproto_config.h"
 #include "lang/lang_keys.h"
-#include "core/shortcuts.h"
 #include "core/application.h"
 #include "core/core_settings.h"
 #include "ui/controls/userpic_button.h"
@@ -32,12 +28,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/shadow.h"
 #include "ui/widgets/menu/menu_add_action_callback_factory.h"
 #include "ui/effects/radial_animation.h"
-#include "ui/boxes/report_box_graphics.h" // Ui::ReportReason
 #include "ui/text/text.h"
 #include "ui/text/text_options.h"
 #include "ui/painter.h"
 #include "ui/unread_badge.h"
-#include "ui/ui_utility.h"
 #include "window/window_adaptive.h"
 #include "window/window_session_controller.h"
 #include "window/window_peer_menu.h"
@@ -68,7 +62,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_dialogs.h"
 #include "styles/style_chat.h"
 #include "styles/style_info.h"
-#include "styles/style_menu_icons.h"
 
 #include <QtGui/QWindow>
 

@@ -9,8 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "base/timer.h"
 #include "history/history_item.h"
-#include "ui/image/image_location.h"
-#include "window/window_session_controller_link_info.h"
 
 class History;
 

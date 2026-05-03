@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "menu/gift_resale_filter.h"
 
-#include "ui/effects/ripple_animation.h"
 #include "ui/text/text_custom_emoji.h"
 #include "ui/painter.h"
 #include "styles/style_credits.h" // giftBoxResaleColorSize

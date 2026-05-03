@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "base/unique_qptr.h"
 #include "data/data_stories.h"
-#include "info/stories/info_stories_common.h"
 #include "ui/rp_widget.h"
 #include "ui/widgets/scroll_area.h"
 

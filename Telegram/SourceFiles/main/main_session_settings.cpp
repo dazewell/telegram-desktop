@@ -13,7 +13,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/section_widget.h"
 #include "support/support_common.h"
 #include "storage/serialize_common.h"
-#include "boxes/send_files_box.h"
 #include "core/application.h"
 #include "core/core_settings.h"
 #include "data/components/promo_suggestions.h"

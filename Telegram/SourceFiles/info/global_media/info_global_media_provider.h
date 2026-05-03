@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "data/data_messages.h"
 #include "info/media/info_media_common.h"
-#include "base/weak_ptr.h"
 
 namespace Info {
 class AbstractController;

@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "lang/lang_keys.h"
 #include "ui/effects/credits_graphics.h"
-#include "ui/effects/premium_graphics.h"
 #include "ui/painter.h"
 #include "ui/rect.h"
 #include "ui/text/text_options.h"

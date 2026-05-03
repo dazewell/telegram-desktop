@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include "ui/rp_widget.h"
 #include "ui/widgets/menu/menu_item_base.h"
 #include "boxes/peers/peer_short_info_box.h"
 

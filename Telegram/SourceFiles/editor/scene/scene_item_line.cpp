@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "editor/scene/scene_item_line.h"
 
-#include <QGraphicsScene>
 #include <QtGui/QPainter>
 
 namespace Editor {

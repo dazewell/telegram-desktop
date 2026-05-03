@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "media/streaming/media_streaming_player.h"
 
 #include "media/streaming/media_streaming_file.h"
-#include "media/streaming/media_streaming_loader.h"
 #include "media/streaming/media_streaming_audio_track.h"
 #include "media/streaming/media_streaming_video_track.h"
 #include "media/audio/media_audio.h" // for SupportsSpeedControl()

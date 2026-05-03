@@ -13,21 +13,14 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "calls/group/calls_group_common.h"
 #include "calls/group/calls_group_call.h"
 #include "calls/group/calls_group_members_row.h"
-#include "media/view/media_view_pip.h"
-#include "base/platform/base_platform_info.h"
 #include "webrtc/webrtc_video_track.h"
 #include "ui/integration.h"
 #include "ui/painter.h"
-#include "ui/abstract_button.h"
 #include "ui/gl/gl_surface.h"
 #include "ui/effects/animations.h"
-#include "ui/effects/cross_line.h"
-#include "data/data_group_call.h" // MuteButtonTooltip.
 #include "lang/lang_keys.h"
 #include "styles/style_calls.h"
 
-#include <QOpenGLShader>
-#include <QtGui/QtEvents>
 #include <QOpenGLWidget>
 
 namespace Calls::Group {

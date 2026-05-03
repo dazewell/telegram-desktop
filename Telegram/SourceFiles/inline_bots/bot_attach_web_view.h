@@ -12,7 +12,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/timer.h"
 #include "base/weak_ptr.h"
 #include "dialogs/dialogs_key.h"
-#include "mtproto/sender.h"
 #include "ui/chat/attach/attach_bot_webview.h"
 #include "ui/rp_widget.h"
 

@@ -14,7 +14,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/file_location.h"
 
 #include <al.h>
-#include <alc.h>
 
 namespace Media {
 namespace Audio {

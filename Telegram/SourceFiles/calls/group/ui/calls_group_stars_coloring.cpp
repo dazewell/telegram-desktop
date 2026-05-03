@@ -10,13 +10,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/object_ptr.h"
 #include "lang/lang_keys.h"
 #include "payments/ui/payments_reaction_box.h"
-#include "ui/widgets/labels.h"
 #include "ui/emoji_config.h"
-#include "ui/painter.h"
 #include "ui/rp_widget.h"
-#include "styles/style_credits.h"
-#include "styles/style_layers.h"
-#include "styles/style_premium.h"
 
 namespace Calls::Group::Ui {
 

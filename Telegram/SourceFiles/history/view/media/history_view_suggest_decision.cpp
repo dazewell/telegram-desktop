@@ -18,10 +18,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history_item_components.h"
 #include "lang/lang_keys.h"
 #include "ui/chat/chat_style.h"
-#include "ui/text/text_utilities.h"
 #include "ui/text/format_values.h"
 #include "styles/style_chat.h"
-#include "styles/style_credits.h"
 
 namespace HistoryView {
 namespace {

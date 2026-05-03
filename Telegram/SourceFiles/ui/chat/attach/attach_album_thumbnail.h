@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/chat/attach/attach_send_files_way.h"
 #include "ui/effects/animations.h"
 #include "ui/grouped_layout.h"
-#include "ui/round_rect.h"
 #include "base/object_ptr.h"
 
 namespace style {

@@ -21,12 +21,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history_item_reply_markup.h"
 #include "inline_bots/inline_bot_layout_item.h"
 #include "inline_bots/inline_bot_send_data.h"
-#include "storage/file_download.h"
 #include "core/file_utilities.h"
 #include "core/mime_type.h"
-#include "ui/image/image.h"
 #include "ui/image/image_location_factory.h"
-#include "mainwidget.h"
 #include "main/main_session.h"
 #include "styles/style_chat_helpers.h"
 

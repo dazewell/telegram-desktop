@@ -9,9 +9,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "ui/text/text_isolated_emoji.h"
 #include "ui/image/image.h"
-#include "base/timer.h"
 
-#include <crl/crl_object_on_queue.h>
 
 class HistoryItem;
 class DocumentData;

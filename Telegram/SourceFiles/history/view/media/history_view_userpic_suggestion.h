@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include "history/view/media/history_view_media.h"
-#include "history/view/media/history_view_media_unwrapped.h"
 #include "history/view/media/history_view_photo.h"
 #include "history/view/media/history_view_service_box.h"
 

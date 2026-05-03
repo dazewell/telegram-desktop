@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "core/mime_type.h"
 
-#include "core/utils.h"
 #include "ui/image/image_prepare.h"
 
 #include <QtCore/QMimeDatabase>

@@ -8,9 +8,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/notifications_utilities.h"
 
 #include "window/main_window.h"
-#include "base/platform/base_platform_file_utilities.h"
 #include "base/random.h"
-#include "core/application.h"
 #include "data/data_peer.h"
 #include "ui/empty_userpic.h"
 #include "styles/style_window.h"

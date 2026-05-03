@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "calls/group/calls_group_viewport_raster.h"
 
-#include "calls/group/calls_group_common.h"
 #include "calls/group/calls_group_viewport_tile.h"
 #include "calls/group/calls_group_members_row.h"
 #include "data/data_peer.h"

@@ -16,7 +16,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/rect.h"
 #include "styles/style_statistics.h"
 
-#include <QtCore/QtMath>
 
 namespace Statistic {
 namespace {

@@ -10,7 +10,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "chat_helpers/stickers_lottie.h"
 #include "data/data_document.h"
 #include "data/data_document_media.h"
-#include "data/data_session.h"
 #include "history/view/media/history_view_sticker_player.h"
 #include "info/userpic/info_userpic_emoji_builder_common.h"
 #include "main/main_app_config.h"

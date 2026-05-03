@@ -13,12 +13,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "intro/intro_qr.h"
 #include "styles/style_intro.h"
 #include "ui/widgets/buttons.h"
-#include "ui/widgets/labels.h"
-#include "ui/wrap/fade_wrap.h"
 #include "ui/widgets/fields/special_fields.h"
 #include "main/main_account.h"
 #include "main/main_domain.h"
-#include "main/main_app_config.h"
 #include "main/main_session.h"
 #include "data/data_user.h"
 #include "ui/boxes/confirm_box.h"
@@ -26,7 +23,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "boxes/phone_banned_box.h"
 #include "core/application.h"
 #include "window/window_controller.h"
-#include "window/window_session_controller.h"
 #include "countries/countries_instance.h" // Countries::Groups
 
 namespace Intro {

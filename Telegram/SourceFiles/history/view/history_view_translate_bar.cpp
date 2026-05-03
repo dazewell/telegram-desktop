@@ -15,11 +15,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/ui_integration.h"
 #include "data/stickers/data_custom_emoji.h"
 #include "data/data_changes.h"
-#include "data/data_document.h"
 #include "history/history.h"
 #include "lang/lang_keys.h"
 #include "main/main_session.h"
-#include "settings/settings_credits_graphics.h" // CreditsEntryBoxStyleOverrides
 #include "ui/widgets/labels.h"
 #include "ui/widgets/shadow.h"
 #include "ui/effects/ripple_animation.h"
@@ -27,7 +25,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/layers/box_content.h"
 #include "ui/layers/generic_box.h"
 #include "ui/widgets/menu/menu_item_base.h"
-#include "ui/text/text_utilities.h"
 #include "ui/toast/toast.h"
 #include "ui/widgets/menu/menu_multiline_action.h"
 #include "ui/widgets/buttons.h"
@@ -35,7 +32,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/painter.h"
 #include "window/window_session_controller.h"
 #include "styles/style_chat.h"
-#include "styles/style_layers.h"
 #include "styles/style_menu_icons.h"
 
 #include <QtGui/QtEvents>

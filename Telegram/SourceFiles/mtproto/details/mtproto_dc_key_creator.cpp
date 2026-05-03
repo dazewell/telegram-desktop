@@ -16,7 +16,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "scheme.h"
 #include "logs.h"
 
-#include <cmath>
 
 namespace MTP::details {
 namespace {

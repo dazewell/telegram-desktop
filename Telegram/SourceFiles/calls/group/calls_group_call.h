@@ -9,9 +9,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "base/weak_ptr.h"
 #include "base/timer.h"
-#include "base/bytes.h"
 #include "mtproto/sender.h"
-#include "mtproto/mtproto_auth_key.h"
 #include "webrtc/webrtc_device_common.h"
 #include "webrtc/webrtc_device_resolver.h"
 

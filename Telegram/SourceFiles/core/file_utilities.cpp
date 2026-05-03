@@ -16,7 +16,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/delayed_activation.h"
 #include "ui/chat/attach/attach_extensions.h"
 #include "main/main_session.h"
-#include "mainwindow.h"
 
 #include <QtWidgets/QFileDialog>
 #include <QtCore/QCoreApplication>

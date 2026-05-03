@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "history/view/history_view_element.h"
 
-#include "apiwrap.h"
 #include "api/api_transcribes.h"
 #include "history/view/history_view_service_message.h"
 #include "history/view/history_view_message.h"
@@ -43,13 +42,11 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/effects/glare.h"
 #include "ui/effects/path_shift_gradient.h"
 #include "ui/effects/reaction_fly_animation.h"
-#include "ui/toast/toast.h"
 #include "ui/text/text_utilities.h"
 #include "ui/item_text_options.h"
 #include "ui/painter.h"
 #include "ui/rect.h"
 #include "ui/round_rect.h"
-#include "data/components/sponsored_messages.h"
 #include "data/data_channel.h"
 #include "data/data_saved_sublist.h"
 #include "data/data_session.h"

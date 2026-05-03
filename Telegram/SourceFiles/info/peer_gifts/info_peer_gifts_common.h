@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include "base/qt/qt_compare.h"
 #include "base/timer.h"
 #include "data/data_star_gift.h"
 #include "ui/abstract_button.h"

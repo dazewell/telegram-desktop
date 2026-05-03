@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include "statistics/segment_tree.h"
 #include "statistics/statistics_common.h"
 #include "statistics/view/abstract_chart_view.h"
 #include "statistics/view/stack_linear_chart_common.h"

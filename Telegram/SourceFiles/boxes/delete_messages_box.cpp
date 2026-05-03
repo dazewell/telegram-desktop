@@ -15,7 +15,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/application.h"
 #include "core/core_settings.h"
 #include "data/data_channel.h"
-#include "data/data_chat.h"
 #include "data/data_histories.h"
 #include "data/data_session.h"
 #include "data/data_user.h"
@@ -27,14 +26,12 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "menu/menu_ttl_validator.h"
 #include "ui/boxes/confirm_box.h"
 #include "ui/layers/generic_box.h"
-#include "ui/text/text_utilities.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/checkbox.h"
 #include "ui/widgets/labels.h"
 #include "ui/rect.h"
 #include "ui/wrap/slide_wrap.h"
 #include "styles/style_layers.h"
-#include "styles/style_boxes.h"
 
 DeleteMessagesBox::DeleteMessagesBox(
 	QWidget*,

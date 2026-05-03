@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include "history/view/media/history_view_media.h"
-#include "ui/userpic_view.h"
 
 namespace Data {
 class DocumentMedia;

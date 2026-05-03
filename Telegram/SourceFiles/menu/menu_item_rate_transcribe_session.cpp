@@ -10,18 +10,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "api/api_transcribes.h"
 #include "apiwrap.h"
 #include "data/data_peer.h"
-#include "data/data_session.h"
 #include "history/history.h"
 #include "history/history_item.h"
-#include "lang/lang_keys.h"
 #include "main/main_session.h"
-#include "ui/rect.h"
-#include "ui/vertical_list.h"
-#include "ui/widgets/buttons.h"
-#include "ui/widgets/labels.h"
-#include "ui/wrap/vertical_layout.h"
-#include "styles/style_chat_helpers.h"
-#include "styles/style_layers.h"
 
 namespace Menu {
 

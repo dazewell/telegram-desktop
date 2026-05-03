@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "data/data_search_calendar.h"
 
-#include "apiwrap.h"
 #include "base/unixtime.h"
 #include "data/data_document.h"
 #include "data/data_media_types.h"

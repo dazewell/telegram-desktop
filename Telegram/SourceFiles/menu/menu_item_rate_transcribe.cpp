@@ -11,14 +11,12 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_keys.h"
 #include "ui/rect.h"
 #include "ui/toast/toast.h"
-#include "ui/ui_utility.h"
 #include "ui/vertical_list.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/labels.h"
 #include "ui/widgets/popup_menu.h"
 #include "ui/wrap/vertical_layout.h"
 #include "styles/style_chat_helpers.h"
-#include "styles/style_layers.h"
 
 namespace Menu {
 namespace {

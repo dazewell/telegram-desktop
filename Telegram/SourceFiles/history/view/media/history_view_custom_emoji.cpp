@@ -10,7 +10,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/view/media/history_view_sticker.h"
 #include "history/view/history_view_element.h"
 #include "history/history.h"
-#include "history/history_item.h"
 #include "data/data_session.h"
 #include "data/data_document.h"
 #include "data/stickers/data_custom_emoji.h"
@@ -21,7 +20,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/text/text_isolated_emoji.h"
 #include "ui/painter.h"
 #include "ui/power_saving.h"
-#include "styles/style_chat.h"
 
 namespace HistoryView {
 namespace {

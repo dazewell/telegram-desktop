@@ -16,7 +16,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "storage/serialize_common.h"
 #include "ui/gl/gl_detection.h"
 #include "ui/widgets/fields/input_field.h"
-#include "webrtc/webrtc_create_adm.h"
 #include "webrtc/webrtc_device_common.h"
 #include "window/section_widget.h"
 

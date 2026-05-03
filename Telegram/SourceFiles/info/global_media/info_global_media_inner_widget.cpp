@@ -7,15 +7,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "info/global_media/info_global_media_inner_widget.h"
 
-#include "info/global_media/info_global_media_provider.h"
 #include "info/global_media/info_global_media_widget.h"
 #include "info/media/info_media_empty_widget.h"
 #include "info/media/info_media_list_widget.h"
 #include "info/info_controller.h"
-#include "ui/widgets/labels.h"
-#include "ui/search_field_controller.h"
-#include "lang/lang_keys.h"
-#include "styles/style_info.h"
 
 namespace Info::GlobalMedia {
 

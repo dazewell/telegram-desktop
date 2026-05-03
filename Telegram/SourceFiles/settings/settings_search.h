@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include <any>
 
 #include "base/flat_map.h"
 #include "settings/settings_builder.h"

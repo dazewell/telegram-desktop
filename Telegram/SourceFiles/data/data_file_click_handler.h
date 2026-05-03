@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include "data/data_file_origin.h"
-#include "ui/basic_click_handlers.h"
 
 class DocumentData;
 class HistoryItem;

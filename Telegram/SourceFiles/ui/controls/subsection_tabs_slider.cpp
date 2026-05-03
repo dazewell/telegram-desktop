@@ -7,8 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "ui/controls/subsection_tabs_slider.h"
 
-#include "dialogs/dialogs_three_state_icon.h"
-#include "ui/effects/ripple_animation.h"
 #include "ui/widgets/scroll_area.h"
 #include "ui/dynamic_image.h"
 #include "ui/unread_badge_paint.h"

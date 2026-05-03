@@ -40,7 +40,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/text/custom_emoji_text_badge.h"
 #include "ui/text/text_extended_data.h"
 #include "ui/text/text_utilities.h"
-#include "ui/vertical_list.h"
 #include "ui/wrap/slide_wrap.h"
 #include "ui/wrap/vertical_layout.h"
 #include "ui/widgets/buttons.h"

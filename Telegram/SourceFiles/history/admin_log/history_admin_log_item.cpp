@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "history/admin_log/history_admin_log_item.h"
 
-#include "history/admin_log/history_admin_log_inner.h"
 #include "history/view/history_view_element.h"
 #include "history/history.h"
 #include "history/history_item.h"
@@ -28,7 +27,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/basic_click_handlers.h"
 #include "boxes/sticker_set_box.h"
 #include "base/unixtime.h"
-#include "core/application.h"
 #include "core/click_handler_types.h"
 #include "main/main_session.h"
 #include "window/notifications_manager.h"

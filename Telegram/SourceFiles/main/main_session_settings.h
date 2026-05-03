@@ -10,7 +10,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_auto_download.h"
 #include "data/notify/data_peer_notify_settings.h"
 #include "data/data_authorization.h"
-#include "ui/rect_part.h"
 
 namespace Support {
 enum class SwitchSettings;

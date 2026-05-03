@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "base/openssl_help.h"
 
-#include <QtCore/QDataStream>
 
 namespace MTP {
 

@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/invoke_queued.h"
 #include "countries/countries_instance.h"
 #include "lang/lang_keys.h"
-#include "ui/accessible/ui_accessible_item.h"
 #include "ui/effects/ripple_animation.h"
 #include "ui/widgets/multi_select.h"
 #include "ui/widgets/scroll_area.h"

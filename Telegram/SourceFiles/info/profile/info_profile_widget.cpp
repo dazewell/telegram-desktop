@@ -21,10 +21,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_user.h"
 #include "lang/lang_keys.h"
 #include "info/info_controller.h"
-#include "styles/style_info.h"
 
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QScrollBar>
 
 namespace Info::Settings {
 struct SectionCustomTopBarData;

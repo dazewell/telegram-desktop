@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/timer.h"
 #include "base/weak_ptr.h"
 
-#include <QtNetwork/QAuthenticator>
 
 namespace {
 

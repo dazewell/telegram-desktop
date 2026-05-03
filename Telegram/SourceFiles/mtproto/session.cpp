@@ -9,10 +9,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "mtproto/details/mtproto_dcenter.h"
 #include "mtproto/session_private.h"
-#include "mtproto/mtproto_auth_key.h"
 #include "core/application.h"
 #include "core/core_settings.h"
-#include "base/unixtime.h"
 
 namespace MTP {
 namespace details {

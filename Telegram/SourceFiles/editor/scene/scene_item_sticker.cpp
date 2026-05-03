@@ -10,12 +10,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "chat_helpers/stickers_lottie.h"
 #include "data/data_document.h"
 #include "data/data_document_media.h"
-#include "data/data_session.h"
 #include "lottie/lottie_common.h"
 #include "lottie/lottie_single_player.h"
 #include "main/main_session.h"
-#include "ui/ui_utility.h"
-#include "styles/style_editor.h"
 
 namespace Editor {
 namespace {

@@ -13,8 +13,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "chat_helpers/compose/compose_show.h"
 #include "data/data_peer.h"
 #include "data/data_group_call.h"
-#include "ui/layers/show.h"
-#include "ui/text/text_utilities.h"
 #include "ui/toast/toast.h"
 #include "lang/lang_keys.h"
 

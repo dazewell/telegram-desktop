@@ -21,7 +21,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/controls/userpic_button.h"
 #include "ui/widgets/checkbox.h"
 #include "ui/wrap/slide_wrap.h"
-#include "ui/wrap/padding_wrap.h"
 #include "ui/wrap/vertical_layout.h"
 #include "ui/layers/generic_box.h"
 #include "ui/painter.h"

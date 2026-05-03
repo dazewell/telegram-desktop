@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "core/click_handler_types.h"
 #include "core/ui_integration.h" // TextContext
-#include "data/data_cloud_file.h"
 #include "data/data_location.h"
 #include "lang/lang_keys.h"
 #include "lang/lang_tag.h"
@@ -21,9 +20,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/view/history_view_reaction_preview.h"
 #include "history/view/history_view_text_helper.h"
 #include "history/view/media/menu/history_view_poll_menu.h"
-#include "calls/calls_instance.h"
 #include "ui/widgets/dropdown_menu.h"
-#include "ui/widgets/menu/menu_action.h"
 #include "ui/chat/message_bubble.h"
 #include "ui/chat/chat_style.h"
 #include "ui/image/image.h"
@@ -49,7 +46,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_photo_media.h"
 #include "data/data_file_origin.h"
 #include "data/data_poll.h"
-#include "data/data_user.h"
 #include "data/data_session.h"
 #include "data/stickers/data_custom_emoji.h"
 #include "base/crc32hash.h"
@@ -66,7 +62,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_dialogs.h"
 #include "styles/style_polls.h"
 #include "styles/style_widgets.h"
-#include "styles/style_window.h"
 
 
 namespace HistoryView {

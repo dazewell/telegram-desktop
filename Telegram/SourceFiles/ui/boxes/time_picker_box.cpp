@@ -8,13 +8,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/boxes/time_picker_box.h"
 
 #include "base/event_filter.h"
-#include "lang/lang_keys.h"
 #include "ui/layers/generic_box.h"
-#include "ui/effects/animation_value.h"
-#include "ui/ui_utility.h"
 #include "ui/widgets/vertical_drum_picker.h"
 #include "styles/style_chat_helpers.h"
-#include "styles/style_layers.h"
 
 namespace Ui {
 

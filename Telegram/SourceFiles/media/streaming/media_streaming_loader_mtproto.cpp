@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "media/streaming/media_streaming_loader_mtproto.h"
 
 #include "apiwrap.h"
-#include "main/main_session.h"
 #include "storage/streamed_file_downloader.h"
 #include "storage/cache/storage_cache_types.h"
 

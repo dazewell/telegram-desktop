@@ -12,8 +12,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include <QtCore/QReadWriteLock>
 #include <string>
 #include <vector>
-#include <map>
-#include <set>
 
 namespace MTP {
 namespace details {

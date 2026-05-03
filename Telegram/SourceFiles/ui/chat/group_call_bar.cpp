@@ -20,7 +20,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_window.h" // st::columnMinimalWidthLeft
 #include "styles/palette.h"
 
-#include <QtGui/QtEvents>
 #include <QtCore/QLocale>
 
 namespace Ui {

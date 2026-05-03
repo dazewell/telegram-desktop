@@ -8,23 +8,14 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "info/info_content_widget.h"
 
 #include "api/api_who_reacted.h"
-#include "boxes/peer_list_box.h"
 #include "data/data_chat.h"
-#include "data/data_channel.h"
 #include "data/data_session.h"
 #include "data/data_forum_topic.h"
 #include "data/data_forum.h"
-#include "info/profile/info_profile_widget.h"
-#include "info/media/info_media_widget.h"
-#include "info/common_groups/info_common_groups_widget.h"
 #include "info/peer_gifts/info_peer_gifts_common.h"
 #include "info/saved/info_saved_music_common.h"
 #include "info/stories/info_stories_common.h"
-#include "info/info_layer_widget.h"
-#include "info/info_section_widget.h"
 #include "info/info_controller.h"
-#include "lang/lang_keys.h"
-#include "main/main_session.h"
 #include "menu/menu_send.h"
 #include "ui/controls/swipe_handler.h"
 #include "ui/widgets/scroll_area.h"
@@ -36,7 +27,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/window_session_controller.h"
 #include "styles/style_info.h"
 #include "styles/style_profile.h"
-#include "styles/style_layers.h"
 
 #include <QtCore/QCoreApplication>
 

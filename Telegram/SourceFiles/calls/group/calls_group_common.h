@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include "base/object_ptr.h"
-#include "base/weak_ptr.h"
 
 class UserData;
 struct ShareBoxStyleOverrides;

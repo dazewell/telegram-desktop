@@ -11,7 +11,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_keys.h"
 #include "ui/boxes/confirm_box.h"
 #include "base/unixtime.h"
-#include "mainwindow.h"
 #include "apiwrap.h"
 #include "api/api_cloud_password.h"
 #include "main/main_session.h"
@@ -24,16 +23,13 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/fields/input_field.h"
 #include "ui/widgets/fields/password_input.h"
 #include "ui/widgets/labels.h"
-#include "ui/wrap/fade_wrap.h"
 #include "ui/painter.h"
 #include "ui/rect.h"
 #include "passport/passport_encryption.h"
 #include "passport/passport_panel_edit_contact.h"
 #include "settings/sections/settings_privacy_security.h"
 #include "styles/style_layers.h"
-#include "styles/style_passport.h"
 #include "styles/style_boxes.h"
-#include "base/qt/qt_common_adapters.h"
 
 namespace {
 

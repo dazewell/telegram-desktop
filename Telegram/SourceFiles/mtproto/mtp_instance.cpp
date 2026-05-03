@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "mtproto/mtp_instance.h"
 
 #include "mtproto/details/mtproto_dcenter.h"
-#include "mtproto/details/mtproto_rsa_public_key.h"
 #include "mtproto/special_config_request.h"
 #include "mtproto/session.h"
 #include "mtproto/mtproto_config.h"
@@ -16,8 +15,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "mtproto/config_loader.h"
 #include "mtproto/sender.h"
 #include "storage/localstorage.h"
-#include "calls/calls_instance.h"
-#include "main/main_account.h" // Account::configUpdated.
 #include "core/application.h"
 #include "core/core_settings.h"
 #include "lang/lang_instance.h"

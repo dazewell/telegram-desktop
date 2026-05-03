@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/controls/labeled_emoji_tabs.h"
 
 #include "base/object_ptr.h"
-#include "ui/abstract_button.h"
 #include "ui/effects/ripple_animation.h"
 #include "ui/painter.h"
 #include "ui/widgets/buttons.h"
@@ -19,7 +18,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include <algorithm>
 #include <cmath>
 
-#include <QtGui/QMouseEvent>
 #include <QtWidgets/QApplication>
 
 namespace Ui {

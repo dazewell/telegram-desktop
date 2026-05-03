@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "info/polls/info_polls_list_widget.h"
 
 #include "data/data_poll_messages.h"
-#include "data/data_shared_media.h"
 #include "data/data_chat_participant_status.h"
 #include "data/data_peer.h"
 #include "data/data_session.h"
@@ -35,10 +34,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/ui_utility.h"
 #include "window/section_widget.h"
 #include "window/themes/window_theme.h"
-#include "window/main_window.h"
 #include "window/window_session_controller.h"
 #include "ui/widgets/buttons.h"
-#include "ui/widgets/menu/menu_add_action_callback.h"
 #include "info/info_wrap_widget.h"
 #include "window/window_peer_menu.h"
 #include "styles/style_chat.h"

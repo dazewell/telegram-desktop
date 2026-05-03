@@ -7,8 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "export/output/export_output_html_and_json.h"
 
-#include "export/output/export_output_html.h"
-#include "export/output/export_output_json.h"
 #include "export/output/export_output_result.h"
 
 namespace Export::Output {

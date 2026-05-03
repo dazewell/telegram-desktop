@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/view/history_view_group_call_bar.h"
 
 #include "data/data_channel.h"
-#include "data/data_user.h"
 #include "data/data_changes.h"
 #include "data/data_group_call.h"
 #include "data/data_peer_values.h"
@@ -19,7 +18,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "calls/group/calls_group_call.h"
 #include "calls/calls_instance.h"
 #include "core/application.h"
-#include "styles/style_chat.h"
 #include "styles/style_chat_helpers.h"
 
 namespace HistoryView {

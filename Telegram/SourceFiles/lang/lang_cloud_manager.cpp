@@ -18,9 +18,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/boxes/confirm_box.h"
 #include "ui/wrap/padding_wrap.h"
 #include "ui/widgets/labels.h"
-#include "ui/text/text_utilities.h"
 #include "core/file_utilities.h"
-#include "core/click_handler_types.h"
 #include "boxes/abstract_box.h" // Ui::hideLayer().
 #include "styles/style_layers.h"
 

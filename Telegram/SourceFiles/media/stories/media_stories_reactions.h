@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include "data/data_message_reaction_id.h"
-#include "ui/effects/animations.h"
 
 namespace Data {
 class DocumentMedia;

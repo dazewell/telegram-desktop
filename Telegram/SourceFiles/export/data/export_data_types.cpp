@@ -12,10 +12,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/base_file_utilities.h"
 #include "ui/text/format_values.h"
 #include "core/mime_type.h"
-#include "core/utils.h"
 #include <QtCore/QDateTime>
 #include <QtCore/QTimeZone>
-#include <QtCore/QRegularExpression>
 #include <QtGui/QImageReader>
 #include <range/v3/algorithm/max_element.hpp>
 #include <range/v3/view/all.hpp>

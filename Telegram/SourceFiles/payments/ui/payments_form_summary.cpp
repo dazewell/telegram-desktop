@@ -16,7 +16,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/vertical_list.h"
 #include "ui/wrap/fade_wrap.h"
 #include "ui/text/format_values.h"
-#include "ui/text/text_utilities.h"
 #include "countries/countries_instance.h"
 #include "lang/lang_keys.h"
 #include "base/unixtime.h"

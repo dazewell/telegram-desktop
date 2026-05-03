@@ -9,9 +9,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "base/timer.h"
 #include "base/object_ptr.h"
-#include "base/binary_guard.h"
 #include "ui/rp_widget.h"
-#include "ui/unread_badge.h"
 #include "ui/controls/swipe_handler_data.h"
 #include "ui/layers/layer_widget.h"
 

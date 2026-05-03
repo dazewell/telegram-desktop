@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "ui/boxes/auto_delete_settings.h"
 
-#include "ui/widgets/checkbox.h"
 #include "ui/painter.h"
 #include "lang/lang_keys.h"
 #include "styles/style_chat.h"

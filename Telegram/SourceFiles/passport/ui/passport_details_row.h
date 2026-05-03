@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "ui/rp_widget.h"
 #include "ui/effects/animations.h"
-#include "ui/wrap/padding_wrap.h"
 #include "ui/widgets/labels.h"
 
 namespace Ui {

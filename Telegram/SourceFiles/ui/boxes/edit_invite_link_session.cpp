@@ -7,11 +7,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "ui/boxes/edit_invite_link_session.h"
 
-#include "core/ui_integration.h" // TextContext
 #include "data/components/credits.h"
 #include "data/data_peer.h"
-#include "data/data_session.h"
-#include "data/stickers/data_custom_emoji.h"
 #include "lang/lang_keys.h"
 #include "main/main_app_config.h"
 #include "main/main_session.h"
@@ -27,7 +24,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/labels.h"
 #include "ui/wrap/slide_wrap.h"
 #include "ui/wrap/vertical_layout.h"
-#include "styles/style_channel_earn.h"
 #include "styles/style_chat.h"
 #include "styles/style_settings.h"
 #include "styles/style_layers.h"

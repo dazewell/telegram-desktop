@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/admin_log/history_admin_log_section.h"
 
 #include "history/admin_log/history_admin_log_inner.h"
-#include "history/admin_log/history_admin_log_filter.h"
 #include "profile/profile_back_button.h"
 #include "core/shortcuts.h"
 #include "info/profile/info_profile_values.h"
@@ -21,8 +20,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/controls/userpic_button.h"
 #include "ui/widgets/fields/input_field.h"
 #include "ui/ui_utility.h"
-#include "apiwrap.h"
-#include "window/themes/window_theme.h"
 #include "window/window_session_controller.h"
 #include "ui/boxes/confirm_box.h"
 #include "base/timer.h"
@@ -31,7 +28,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_keys.h"
 #include "styles/style_chat.h"
 #include "styles/style_chat_helpers.h"
-#include "styles/style_window.h"
 #include "styles/style_info.h"
 
 namespace AdminLog {

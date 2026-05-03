@@ -25,7 +25,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "mainwindow.h"
 #include "main/main_session.h"
 #include "window/window_session_controller.h"
-#include "ui/text/text_utilities.h"
 #include "ui/widgets/popup_menu.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/labels.h"
@@ -33,9 +32,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/painter.h"
 #include "ui/ui_utility.h"
 #include "history/view/history_view_cursor_state.h"
-#include "history/history.h"
 #include "styles/style_chat_helpers.h"
-#include "styles/style_menu_icons.h"
 
 #include <QtWidgets/QApplication>
 

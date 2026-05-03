@@ -7,15 +7,12 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "history/view/media/history_view_photo.h"
 
-#include "boxes/send_credits_box.h"
-#include "history/history_item_components.h"
 #include "history/history_item.h"
 #include "history/history.h"
 #include "history/view/history_view_element.h"
 #include "history/view/history_view_cursor_state.h"
 #include "history/view/media/history_view_media_common.h"
 #include "history/view/media/history_view_media_spoiler.h"
-#include "lang/lang_keys.h"
 #include "media/streaming/media_streaming_instance.h"
 #include "media/streaming/media_streaming_player.h"
 #include "media/streaming/media_streaming_document.h"
@@ -25,11 +22,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/image/image.h"
 #include "ui/effects/spoiler_mess.h"
 #include "ui/chat/chat_style.h"
-#include "ui/text/text_utilities.h"
 #include "ui/grouped_layout.h"
-#include "ui/cached_round_corners.h"
 #include "ui/painter.h"
-#include "ui/power_saving.h"
 #include "ui/ui_utility.h"
 #include "data/data_session.h"
 #include "data/data_stories.h"
@@ -40,10 +34,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_file_origin.h"
 #include "data/data_auto_download.h"
 #include "data/data_web_page.h"
-#include "core/application.h"
-#include "core/ui_integration.h"
 #include "styles/style_chat.h"
-#include "styles/style_chat_helpers.h"
 
 namespace HistoryView {
 namespace {

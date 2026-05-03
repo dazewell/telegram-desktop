@@ -9,8 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "apiwrap.h"
 #include "api/api_transcribes.h"
-#include "lang/lang_keys.h"
-#include "mainwindow.h"
 #include "main/main_session.h"
 #include "main/main_session_settings.h"
 #include "media/audio/media_audio.h"
@@ -22,7 +20,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "media/streaming/media_streaming_utility.h"
 #include "media/view/media_view_open_common.h"
 #include "media/view/media_view_playback_progress.h"
-#include "ui/boxes/confirm_box.h"
 #include "ui/painter.h"
 #include "ui/rect.h"
 #include "history/history_item_components.h"
@@ -35,7 +32,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/view/media/history_view_document.h" // TTLVoiceStops
 #include "history/view/media/history_view_media_common.h"
 #include "history/view/media/history_view_media_spoiler.h"
-#include "window/window_session_controller.h"
 #include "core/application.h" // Application::showDocument.
 #include "core/core_settings.h"
 #include "ui/chat/attach/attach_prepare.h"
@@ -44,9 +40,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/text/format_values.h"
 #include "ui/grouped_layout.h"
 #include "ui/cached_round_corners.h"
-#include "ui/power_saving.h"
 #include "ui/ui_utility.h"
-#include "ui/effects/path_shift_gradient.h"
 #include "ui/effects/spoiler_mess.h"
 #include "data/data_photo.h"
 #include "data/data_photo_media.h"
@@ -57,7 +51,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_file_click_handler.h"
 #include "data/data_file_origin.h"
 #include "data/data_document_media.h"
-#include "data/data_web_page.h"
 #include "storage/storage_account.h"
 #include "styles/style_chat.h"
 

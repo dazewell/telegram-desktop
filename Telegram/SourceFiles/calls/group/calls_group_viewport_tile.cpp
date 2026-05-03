@@ -15,7 +15,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/effects/cross_line.h"
 #include "styles/style_calls.h"
 
-#include <QtGui/QOpenGLFunctions>
 
 namespace Calls::Group {
 namespace {

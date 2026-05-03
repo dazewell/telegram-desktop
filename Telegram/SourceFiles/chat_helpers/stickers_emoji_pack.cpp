@@ -10,17 +10,14 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "chat_helpers/stickers_emoji_image_loader.h"
 #include "history/view/history_view_element.h"
 #include "history/history_item.h"
-#include "history/history.h"
 #include "lottie/lottie_common.h"
 #include "ui/emoji_config.h"
 #include "ui/text/text_isolated_emoji.h"
 #include "ui/image/image.h"
 #include "ui/rect.h"
 #include "main/main_session.h"
-#include "data/data_file_origin.h"
 #include "data/data_session.h"
 #include "data/data_document.h"
-#include "data/stickers/data_custom_emoji.h"
 #include "core/core_settings.h"
 #include "core/application.h"
 #include "base/call_delayed.h"
@@ -30,7 +27,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "apiwrap.h"
 #include "styles/style_chat.h"
 
-#include <QtCore/QBuffer>
 
 namespace Stickers {
 namespace {

@@ -10,11 +10,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "countries/countries_instance.h"
 #include "export/output/export_output_result.h"
 #include "export/data/export_data_types.h"
-#include "core/utils.h"
 #include "ui/text/format_values.h"
 
 #include <QtCore/QSize>
-#include <QtCore/QFile>
 #include <QtCore/QDateTime>
 
 namespace Export {

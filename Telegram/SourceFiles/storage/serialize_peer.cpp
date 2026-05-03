@@ -13,7 +13,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_chat.h"
 #include "data/data_user.h"
 #include "data/data_session.h"
-#include "ui/image/image.h"
 #include "ui/text/format_values.h" // Ui::FormatPhone
 
 namespace Serialize {

@@ -10,7 +10,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/call_delayed.h"
 #include "base/qthelp_regex.h"
 #include "base/qthelp_url.h"
-#include "base/weak_ptr.h"
 #include "core/application.h"
 #include "core/core_settings.h"
 #include "core/local_url_handlers.h"
@@ -31,7 +30,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/painter.h"
 #include "ui/text/text_options.h"
 #include "ui/text/text_utilities.h"
-#include "ui/toast/toast.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/checkbox.h"
 #include "ui/widgets/dropdown_menu.h"
@@ -46,7 +44,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/wrap/slide_wrap.h"
 #include "ui/wrap/table_layout.h"
 #include "ui/wrap/vertical_layout.h"
-#include "ui/vertical_list.h"
 #include "ui/ui_utility.h"
 #include "boxes/abstract_box.h" // Ui::show().
 #include "window/window_session_controller.h"

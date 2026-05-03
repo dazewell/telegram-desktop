@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "data/data_forum_topic.h"
 #include "data/data_histories.h"
-#include "data/data_peer.h"
 #include "data/data_session.h"
 #include "history/history.h"
 #include "history/view/history_view_chat_preview.h"

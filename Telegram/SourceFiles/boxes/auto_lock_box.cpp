@@ -12,7 +12,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_keys.h"
 #include "ui/widgets/checkbox.h"
 #include "ui/widgets/time_input.h"
-#include "ui/ui_utility.h"
 #include "styles/style_layers.h"
 #include "styles/style_boxes.h"
 

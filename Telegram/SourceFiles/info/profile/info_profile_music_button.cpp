@@ -7,9 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "info/profile/info_profile_music_button.h"
 
-#include "ui/effects/animation_value.h"
-#include "ui/text/text_utilities.h"
-#include "ui/painter.h"
 #include "ui/rect.h"
 #include "ui/ui_utility.h"
 #include "styles/style_chat.h"

@@ -12,7 +12,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_document.h"
 #include "data/data_document_media.h"
 #include "main/main_session.h"
-#include "ui/effects/frame_generator.h"
 #include "ui/animated_icon.h"
 #include "ui/painter.h"
 #include "styles/style_chat.h"

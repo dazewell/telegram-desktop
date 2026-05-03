@@ -8,10 +8,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include "ui/layers/box_content.h"
-#include "base/timer.h"
 #include "mtproto/sender.h"
 #include "data/stickers/data_stickers_set.h"
-#include "ui/effects/animations.h"
 
 namespace style {
 struct RippleAnimation;

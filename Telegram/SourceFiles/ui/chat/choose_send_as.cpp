@@ -14,7 +14,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_peer_values.h"
 #include "history/history.h"
 #include "ui/controls/send_as_button.h"
-#include "ui/text/text_utilities.h"
 #include "ui/painter.h"
 #include "window/window_session_controller.h"
 #include "main/main_session.h"
@@ -22,7 +21,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_keys.h"
 #include "settings/sections/settings_premium.h"
 #include "styles/style_calls.h"
-#include "styles/style_chat.h"
 #include "styles/style_chat_helpers.h"
 
 namespace Ui {

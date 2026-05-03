@@ -10,7 +10,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/random.h"
 #include "ui/effects/animation_value_f.h"
 
-#include <QtCore/QtMath>
 
 namespace Ui {
 namespace Premium {

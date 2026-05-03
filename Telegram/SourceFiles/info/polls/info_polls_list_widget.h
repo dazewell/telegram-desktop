@@ -8,7 +8,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include "info/info_content_widget.h"
-#include "storage/storage_shared_media.h"
 
 namespace Ui {
 class ElasticScroll;

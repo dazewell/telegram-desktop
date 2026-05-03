@@ -12,7 +12,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_chat.h"
 #include "data/data_channel.h"
 #include "data/data_session.h"
-#include "data/data_histories.h"
 #include "history/history.h"
 #include "main/main_session.h"
 #include "boxes/peers/edit_participant_box.h"
@@ -22,12 +21,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/wrap/vertical_layout.h"
 #include "ui/wrap/slide_wrap.h"
 #include "ui/ui_utility.h"
-#include "base/random.h"
 #include "base/weak_ptr.h"
 #include "api/api_chat_participants.h"
 #include "window/window_session_controller.h"
 #include "apiwrap.h"
-#include "styles/style_boxes.h"
 
 namespace {
 

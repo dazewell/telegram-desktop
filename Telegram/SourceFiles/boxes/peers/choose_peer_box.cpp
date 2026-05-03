@@ -10,7 +10,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "apiwrap.h" // ApiWrap::botCommonGroups / requestBotCommonGroups.
 #include "boxes/add_contact_box.h"
 #include "boxes/peer_list_controllers.h"
-#include "boxes/premium_limits_box.h"
 #include "chat_helpers/compose/compose_show.h"
 #include "data/data_chat.h"
 #include "data/data_channel.h"
@@ -22,7 +21,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_keys.h"
 #include "main/main_session.h" // Session::api().
 #include "ui/boxes/confirm_box.h"
-#include "ui/text/text_utilities.h"
 #include "ui/widgets/buttons.h"
 #include "ui/wrap/vertical_layout.h"
 #include "ui/vertical_list.h"

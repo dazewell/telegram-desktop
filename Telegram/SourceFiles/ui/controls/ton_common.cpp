@@ -7,10 +7,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "ui/controls/ton_common.h"
 
-#include "base/qthelp_url.h"
 #include "ui/widgets/fields/input_field.h"
 #include "ui/ui_utility.h"
-#include "styles/style_chat.h"
 #include "styles/style_chat_helpers.h"
 //#include "styles/style_wallet.h"
 

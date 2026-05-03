@@ -10,7 +10,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "mtproto/facade.h"
 #include "main/main_account.h" // Account::sessionChanges.
 #include "main/main_session.h" // Session::account.
-#include "core/application.h"
 #include "base/call_delayed.h"
 
 namespace MTP {

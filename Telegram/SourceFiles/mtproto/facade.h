@@ -7,7 +7,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include "mtproto/type_utils.h"
 #include "mtproto/mtp_instance.h"
 
 namespace MTP {

@@ -9,7 +9,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "base/call_delayed.h"
 #include "base/event_filter.h"
-#include "base/random.h"
 #include "base/unique_qptr.h"
 #include "chat_helpers/emoji_suggestions_widget.h"
 #include "chat_helpers/message_field.h"
@@ -23,7 +22,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_todo_list.h"
 #include "data/data_user.h"
 #include "data/stickers/data_custom_emoji.h"
-#include "history/view/history_view_schedule_box.h"
 #include "history/history_item.h"
 #include "lang/lang_keys.h"
 #include "main/main_app_config.h"
@@ -31,25 +29,20 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "menu/menu_send.h"
 #include "ui/controls/emoji_button.h"
 #include "ui/controls/emoji_button_factory.h"
-#include "ui/rect.h"
 #include "ui/text/text_utilities.h"
-#include "ui/toast/toast.h"
 #include "ui/vertical_list.h"
 #include "ui/widgets/fields/input_field.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/checkbox.h"
 #include "ui/widgets/labels.h"
 #include "ui/widgets/shadow.h"
-#include "ui/wrap/fade_wrap.h"
 #include "ui/wrap/slide_wrap.h"
 #include "ui/wrap/vertical_layout.h"
 #include "ui/ui_utility.h"
 #include "window/window_session_controller.h"
-#include "styles/style_boxes.h"
 #include "styles/style_chat_helpers.h" // defaultComposeFiles.
 #include "styles/style_layers.h"
 #include "styles/style_polls.h"
-#include "styles/style_settings.h"
 
 namespace {
 
