@@ -834,6 +834,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_settings_privacy_premium_link" = "Telegram Premium";
 "lng_settings_passcode_disable" = "Disable passcode";
 "lng_settings_passcode_disable_sure" = "Are you sure you want to disable passcode?";
+"lng_settings_quick_unlock" = "Quick unlock";
+"lng_settings_quick_unlock_about" = "Unlock automatically as soon as you type a 4-digit passcode. Only works if your passcode is exactly 4 characters long.";
 "lng_settings_use_winhello" = "Unlock with Windows Hello";
 "lng_settings_use_winhello_about" = "You need to enter your passcode once before unlocking Telegram with Windows Hello.";
 "lng_settings_use_touchid" = "Unlock with Touch ID";

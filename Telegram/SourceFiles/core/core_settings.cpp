@@ -346,7 +346,8 @@ size += sizeof(qint32) // _audioPlaybackSpeed
 	+ sizeof(qint32) // _mediaGridZoomStep
 	+ sizeof(qint32) // _pullToNextChannel
 	+ sizeof(qint32) // _chatFiltersTabsMode
-	+ sizeof(qint32); // _defaultScheduleTime
+	+ sizeof(qint32) // _defaultScheduleTime
+	+ sizeof(qint32); // _quickUnlockEnabled
 
 	auto result = QByteArray();
 	result.reserve(size);
@@ -525,6 +526,7 @@ size += sizeof(qint32) // _audioPlaybackSpeed
 		stream << qint32(_pullToNextChannel.current() ? 1 : 0);
 		stream << qint32(_chatFiltersTabsMode.current());
 		stream << qint32(_defaultScheduleTime);
+		stream << qint32(_quickUnlockEnabled ? 1 : 0);
 	}
 
 	Ensures(result.size() == size);
@@ -1059,6 +1061,13 @@ void Settings::addFromSerialized(const QByteArray &serialized) {
 		stream >> defaultScheduleTime;
 		if (stream.status() == QDataStream::Ok) {
 			_defaultScheduleTime = defaultScheduleTime;
+		}
+	}
+	if (!stream.atEnd()) {
+		auto quickUnlockEnabled = qint32();
+		stream >> quickUnlockEnabled;
+		if (stream.status() == QDataStream::Ok) {
+			_quickUnlockEnabled = (quickUnlockEnabled == 1);
 		}
 	}
 	if (stream.status() != QDataStream::Ok) {

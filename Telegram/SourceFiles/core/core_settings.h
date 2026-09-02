@@ -981,6 +981,13 @@ public:
 		_systemUnlockEnabled = enabled;
 	}
 
+	[[nodiscard]] bool quickUnlockEnabled() const {
+		return _quickUnlockEnabled;
+	}
+	void setQuickUnlockEnabled(bool enabled) {
+		_quickUnlockEnabled = enabled;
+	}
+
 	[[nodiscard]] std::optional<bool> weatherInCelsius() const {
 		return _weatherInCelsius;
 	}
@@ -1206,6 +1213,7 @@ private:
 	WindowPosition _callPanelPosition;
 	QString _customFontFamily;
 	bool _systemUnlockEnabled = false;
+	bool _quickUnlockEnabled = false;
 	std::optional<bool> _weatherInCelsius;
 	QByteArray _tonsiteStorageToken;
 	rpl::variable<int> _ivZoom = 0;

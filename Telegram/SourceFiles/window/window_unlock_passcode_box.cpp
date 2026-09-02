@@ -16,6 +16,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/layers/show.h"
 #include "ui/widgets/fields/password_input.h"
 #include "ui/widgets/labels.h"
+#include "ui/ui_utility.h"
 #include "ui/vertical_list.h"
 #include "window/window_lock_widgets.h"
 
@@ -135,6 +136,18 @@ void UnlockPasscodeBox(
 
 	const auto submit = [=] { Submit(box, field, error, finish); };
 	QObject::connect(field, &Ui::MaskedInputField::submitted, submit);
+
+	const auto quickUnlockLength = box->lifetime().make_state<int>(0);
+	QObject::connect(field, &Ui::MaskedInputField::changed, [=] {
+		const auto length = int(field->text().size());
+		if (!QuickUnlockTriggered(*quickUnlockLength, length)) {
+			return;
+		}
+		// A successful Submit() closes this box, destroying the field. Never
+		// do that from inside the field's own changed() signal.
+		InvokeQueued(box, submit);
+	});
+
 	box->addButton(tr::lng_passcode_submit(), submit);
 	box->setFocusCallback([=] { field->setFocusFast(); });
 }

@@ -45,6 +45,18 @@ enum class PasscodeAttempt : uchar {
 // the caller runs it as its own last statement.
 [[nodiscard]] PasscodeAttempt TryPasscode(const QString &passcode);
 
+// Quick unlock submits the passcode automatically once the required number of
+// characters was typed. Shared by every unlock surface so they can't drift.
+//
+// Returns true only when quick unlock is enabled and the text just *grew* to
+// the required length: deleting a character back down to it must not spend a
+// passcode attempt. `lastLength` holds the caller's per-field state and is
+// updated in place on every call.
+//
+// The caller must defer the actual submit (InvokeQueued or similar): unlocking
+// destroys the field that emitted the change signal.
+[[nodiscard]] bool QuickUnlockTriggered(int &lastLength, int nowLength);
+
 class LockWidget : public Ui::RpWidget {
 public:
 	LockWidget(QWidget *parent, not_null<Controller*> window);
@@ -91,6 +103,7 @@ private:
 	void suggestSystemUnlock();
 	void systemUnlockDone(base::SystemUnlockResult result);
 	void changed();
+	void checkQuickUnlock();
 	void submit();
 	void error();
 
@@ -100,6 +113,7 @@ private:
 	object_ptr<Ui::RoundButton> _submit;
 	object_ptr<Ui::LinkButton> _logout;
 	QString _error;
+	int _quickUnlockLength = 0;
 
 	rpl::lifetime _systemUnlockSuggested;
 	base::Timer _systemUnlockCooldown;

@@ -14,6 +14,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "storage/storage_domain.h"
 #include "mainwindow.h"
 #include "core/application.h"
+#include "core/core_settings.h"
 #include "api/api_text_entities.h"
 #include "ui/text/text.h"
 #include "ui/widgets/buttons.h"
@@ -36,7 +37,20 @@ namespace {
 
 constexpr auto kSystemUnlockDelay = crl::time(1000);
 
+// Quick unlock submits the passcode automatically once this many characters
+// were typed. Only a passcode of exactly this length can be unlocked this way.
+constexpr auto kQuickUnlockLength = 4;
+
 } // namespace
+
+bool QuickUnlockTriggered(int &lastLength, int nowLength) {
+	const auto previous = lastLength;
+	lastLength = nowLength;
+
+	return Core::App().settings().quickUnlockEnabled()
+		&& (nowLength == kQuickUnlockLength)
+		&& (previous < nowLength);
+}
 
 PasscodeAttempt TryPasscode(const QString &passcode) {
 	if (passcode.isEmpty()) {
@@ -307,6 +321,20 @@ void PasscodeLockWidget::changed() {
 		_error = QString();
 		update();
 	}
+	checkQuickUnlock();
+}
+
+void PasscodeLockWidget::checkQuickUnlock() {
+	const auto length = int(_passcode->text().size());
+	if (!QuickUnlockTriggered(_quickUnlockLength, length)) {
+		return;
+	}
+
+	// submit() may call Core::App().unlockPasscode(), which destroys this
+	// widget. Never do that from inside the input field's changed() signal.
+	InvokeQueued(this, [=] {
+		submit();
+	});
 }
 
 void PasscodeLockWidget::resizeEvent(QResizeEvent *e) {
