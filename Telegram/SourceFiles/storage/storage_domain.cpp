@@ -8,6 +8,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "storage/storage_domain.h"
 
 #include "core/version.h"
+#include "core/application.h"
+#include "core/core_settings.h"
 #include "storage/details/storage_file_utilities.h"
 #include "storage/serialize_common.h"
 #include "mtproto/mtproto_config.h"
@@ -257,6 +259,14 @@ void Domain::setPasscode(const QByteArray &passcode) {
 
 	encryptLocalKey(passcode);
 	writeAccounts();
+
+	// Quick unlock needs the length to know when the passcode was fully
+	// typed. This is the single chokepoint for setting, changing and
+	// clearing it, so recording here covers every case. The character count
+	// is what the input fields report, not the utf8 byte count.
+	Core::App().settings().setLocalPasscodeLength(
+		QString::fromUtf8(passcode).size());
+	Core::App().saveSettingsDelayed();
 
 	_passcodeKeyChanged.fire({});
 }

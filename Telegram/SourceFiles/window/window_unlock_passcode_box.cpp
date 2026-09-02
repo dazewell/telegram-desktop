@@ -16,6 +16,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/layers/show.h"
 #include "ui/widgets/fields/password_input.h"
 #include "ui/widgets/labels.h"
+#include "ui/ui_utility.h"
 #include "ui/vertical_list.h"
 #include "window/window_lock_widgets.h"
 
@@ -135,6 +136,37 @@ void UnlockPasscodeBox(
 
 	const auto submit = [=] { Submit(box, field, error, finish); };
 	QObject::connect(field, &Ui::MaskedInputField::submitted, submit);
+
+	const auto quickUnlockLength = box->lifetime().make_state<int>(0);
+	QObject::connect(field, &Ui::MaskedInputField::changed, [=] {
+		const auto length = int(field->text().size());
+		if (!QuickUnlockTriggered(*quickUnlockLength, length)) {
+			return;
+		}
+		// Deriving the key blocks this thread for a noticeable time, so the
+		// indication has to be painted synchronously before starting it - a
+		// queued update or any animation would only run once the check is
+		// already done. AddError() hides the label on every text change, so
+		// this shows itself again on the next attempt.
+		error->setTextColorOverride(st::windowSubTextFg->c);
+		error->setText(tr::lng_passcode_checking(tr::now));
+		error->show();
+		error->repaint();
+
+		// Unlocking closes this box, destroying the field, so never do it from
+		// inside the field's own changed() signal. On success the box's
+		// passcodeLockChanges() subscription runs the pending action.
+		InvokeQueued(box, [=] {
+			if (TryQuickUnlock(field->text())) {
+				return; // This box is closing.
+			}
+			// Leave no trace of the failed attempt: a wrong quick unlock is
+			// silent, and the real errors below must stay error-coloured.
+			error->hide();
+			error->setTextColorOverride(std::nullopt);
+		});
+	});
+
 	box->addButton(tr::lng_passcode_submit(), submit);
 	box->setFocusCallback([=] { field->setFocusFast(); });
 }

@@ -14,6 +14,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "storage/storage_domain.h"
 #include "mainwindow.h"
 #include "core/application.h"
+#include "core/core_settings.h"
 #include "api/api_text_entities.h"
 #include "ui/text/text.h"
 #include "ui/widgets/buttons.h"
@@ -38,6 +39,27 @@ constexpr auto kSystemUnlockDelay = crl::time(1000);
 
 } // namespace
 
+bool QuickUnlockTriggered(int &lastLength, int nowLength) {
+	const auto previous = lastLength;
+	lastLength = nowLength;
+
+	const auto &settings = Core::App().settings();
+	const auto required = settings.localPasscodeLength();
+
+	return settings.quickUnlockEnabled()
+		&& (required > 0)
+		&& (nowLength == required)
+		&& (previous < nowLength);
+}
+
+bool TryQuickUnlock(const QString &passcode) {
+	if (TryPasscode(passcode) != PasscodeAttempt::Correct) {
+		return false;
+	}
+	Core::App().unlockPasscode();
+	return true;
+}
+
 PasscodeAttempt TryPasscode(const QString &passcode) {
 	if (passcode.isEmpty()) {
 		return PasscodeAttempt::Empty;
@@ -53,6 +75,15 @@ PasscodeAttempt TryPasscode(const QString &passcode) {
 		cSetPasscodeBadTries(cPasscodeBadTries() + 1);
 		cSetPasscodeLastTry(crl::now());
 		return PasscodeAttempt::Wrong;
+	}
+
+	// A correct passcode is authoritative about its own length, so record it
+	// here too. Domain::setPasscode() covers passcodes set by this build;
+	// this covers ones that were already set before quick unlock existed.
+	const auto length = passcode.size();
+	if (Core::App().settings().localPasscodeLength() != length) {
+		Core::App().settings().setLocalPasscodeLength(length);
+		Core::App().saveSettingsDelayed();
 	}
 	return PasscodeAttempt::Correct;
 }
@@ -269,7 +300,11 @@ void PasscodeLockWidget::paintContent(QPainter &p) {
 	p.setPen(st::windowFg);
 	p.drawText(QRect(0, _passcode->y() - st::passcodeHeaderHeight, width(), st::passcodeHeaderHeight), tr::lng_passcode_enter(tr::now), style::al_center);
 
-	if (!_error.isEmpty()) {
+	if (_checking) {
+		p.setFont(st::boxTextFont);
+		p.setPen(st::windowSubTextFg);
+		p.drawText(QRect(0, _passcode->y() + _passcode->height(), width(), st::passcodeSubmitSkip), tr::lng_passcode_checking(tr::now), style::al_center);
+	} else if (!_error.isEmpty()) {
 		p.setFont(st::boxTextFont);
 		p.setPen(st::boxTextFgError);
 		p.drawText(QRect(0, _passcode->y() + _passcode->height(), width(), st::passcodeSubmitSkip), _error, style::al_center);
@@ -303,10 +338,36 @@ void PasscodeLockWidget::error() {
 }
 
 void PasscodeLockWidget::changed() {
-	if (!_error.isEmpty()) {
+	if (!_error.isEmpty() || _checking) {
 		_error = QString();
+		_checking = false;
 		update();
 	}
+	checkQuickUnlock();
+}
+
+void PasscodeLockWidget::checkQuickUnlock() {
+	const auto length = int(_passcode->text().size());
+	if (!QuickUnlockTriggered(_quickUnlockLength, length)) {
+		return;
+	}
+
+	// Deriving the key blocks this thread for a noticeable time, so the
+	// indication has to be painted synchronously before starting it - a queued
+	// update() or any animation would only run once the check is already done.
+	_checking = true;
+	_error = QString();
+	repaint();
+
+	// Unlocking destroys this widget, so never do it from inside the input
+	// field's changed() signal.
+	InvokeQueued(this, [=] {
+		if (TryQuickUnlock(_passcode->text())) {
+			return; // This widget is destroyed.
+		}
+		_checking = false;
+		update();
+	});
 }
 
 void PasscodeLockWidget::resizeEvent(QResizeEvent *e) {

@@ -45,6 +45,33 @@ enum class PasscodeAttempt : uchar {
 // the caller runs it as its own last statement.
 [[nodiscard]] PasscodeAttempt TryPasscode(const QString &passcode);
 
+// Quick unlock submits the passcode automatically once it has been fully
+// typed. Shared by every unlock surface so they can't drift.
+//
+// Returns true only when quick unlock is enabled, the local passcode length is
+// known, and the text just *grew* to that length: deleting a character back
+// down to it must not spend a passcode attempt. `lastLength` holds the caller's
+// per-field state and is updated in place on every call.
+//
+// The caller must defer the actual submit (InvokeQueued or similar): unlocking
+// destroys the field that emitted the change signal.
+[[nodiscard]] bool QuickUnlockTriggered(int &lastLength, int nowLength);
+
+// Performs a quick unlock attempt and unlocks on success. Returns true if it
+// unlocked, in which case the calling widget may already be destroyed.
+//
+// A failed attempt is deliberately silent and leaves the field untouched. The
+// stored length can be stale - a passcode set by an older build was never
+// recorded - so reaching it does not guarantee a match. Showing an error and
+// selecting the text, as the manual submit does, would replace what the user
+// typed on the next keystroke.
+//
+// The attempt still bumps the bad tries counter on failure. That is deliberate:
+// skipping it would let quick unlock brute-force passcodes without ever
+// tripping the flood limit. A successful unlock resets the counter anyway, so
+// at most one attempt per entry is spent.
+bool TryQuickUnlock(const QString &passcode);
+
 class LockWidget : public Ui::RpWidget {
 public:
 	LockWidget(QWidget *parent, not_null<Controller*> window);
@@ -91,6 +118,7 @@ private:
 	void suggestSystemUnlock();
 	void systemUnlockDone(base::SystemUnlockResult result);
 	void changed();
+	void checkQuickUnlock();
 	void submit();
 	void error();
 
@@ -100,6 +128,8 @@ private:
 	object_ptr<Ui::RoundButton> _submit;
 	object_ptr<Ui::LinkButton> _logout;
 	QString _error;
+	bool _checking = false;
+	int _quickUnlockLength = 0;
 
 	rpl::lifetime _systemUnlockSuggested;
 	base::Timer _systemUnlockCooldown;

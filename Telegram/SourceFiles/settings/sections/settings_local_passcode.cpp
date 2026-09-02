@@ -549,6 +549,27 @@ void BuildManageContent(SectionBuilder &builder) {
 		};
 	});
 
+	const auto quickUnlockButton = builder.addButton({
+		.id = u"passcode/quick-unlock"_q,
+		.title = tr::lng_settings_quick_unlock(),
+		.icon = { &st::menuIconLock },
+		.toggled = rpl::single(
+			Core::App().settings().quickUnlockEnabled()),
+		.keywords = { u"quick"_q, u"unlock"_q, u"pin"_q, u"automatic"_q },
+	});
+	if (quickUnlockButton) {
+		quickUnlockButton->toggledChanges(
+		) | rpl::filter([=](bool value) {
+			return value != Core::App().settings().quickUnlockEnabled();
+		}) | rpl::on_next([=](bool value) {
+			Core::App().settings().setQuickUnlockEnabled(value);
+			Core::App().saveSettingsDelayed();
+		}, quickUnlockButton->lifetime());
+	}
+
+	builder.addSkip();
+	builder.addDividerText(tr::lng_settings_quick_unlock_about());
+
 	builder.add(nullptr, [] {
 		return SearchEntry{
 			.id = u"passcode/disable"_q,
