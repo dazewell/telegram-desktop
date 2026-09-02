@@ -143,9 +143,12 @@ void UnlockPasscodeBox(
 		if (!QuickUnlockTriggered(*quickUnlockLength, length)) {
 			return;
 		}
-		// A successful Submit() closes this box, destroying the field. Never
-		// do that from inside the field's own changed() signal.
-		InvokeQueued(box, submit);
+		// Unlocking closes this box, destroying the field, so never do it from
+		// inside the field's own changed() signal. On success the box's
+		// passcodeLockChanges() subscription runs the pending action.
+		InvokeQueued(box, [=] {
+			TryQuickUnlock(field->text());
+		});
 	});
 
 	box->addButton(tr::lng_passcode_submit(), submit);

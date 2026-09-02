@@ -52,6 +52,14 @@ bool QuickUnlockTriggered(int &lastLength, int nowLength) {
 		&& (previous < nowLength);
 }
 
+bool TryQuickUnlock(const QString &passcode) {
+	if (TryPasscode(passcode) != PasscodeAttempt::Correct) {
+		return false;
+	}
+	Core::App().unlockPasscode();
+	return true;
+}
+
 PasscodeAttempt TryPasscode(const QString &passcode) {
 	if (passcode.isEmpty()) {
 		return PasscodeAttempt::Empty;
@@ -330,10 +338,10 @@ void PasscodeLockWidget::checkQuickUnlock() {
 		return;
 	}
 
-	// submit() may call Core::App().unlockPasscode(), which destroys this
-	// widget. Never do that from inside the input field's changed() signal.
+	// Unlocking destroys this widget, so never do it from inside the input
+	// field's changed() signal.
 	InvokeQueued(this, [=] {
-		submit();
+		TryQuickUnlock(_passcode->text());
 	});
 }
 

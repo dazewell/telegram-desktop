@@ -342,12 +342,12 @@ QByteArray Settings::serialize() const {
 		size += Serialize::bytearraySize(key)
 			+ Serialize::bytearraySize(value);
 	}
-size += sizeof(qint32) // _audioPlaybackSpeed
-	+ sizeof(qint32) // _mediaGridZoomStep
-	+ sizeof(qint32) // _pullToNextChannel
-	+ sizeof(qint32) // _chatFiltersTabsMode
-	+ sizeof(qint32) // _defaultScheduleTime
-	+ sizeof(qint32); // _quickUnlockEnabled
+	size += sizeof(qint32) // _audioPlaybackSpeed
+		+ sizeof(qint32) // _mediaGridZoomStep
+		+ sizeof(qint32) // _pullToNextChannel
+		+ sizeof(qint32) // _chatFiltersTabsMode
+		+ sizeof(qint32) // _defaultScheduleTime
+		+ sizeof(qint32); // _quickUnlockEnabled
 
 	auto result = QByteArray();
 	result.reserve(size);

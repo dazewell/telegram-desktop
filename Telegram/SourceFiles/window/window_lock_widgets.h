@@ -57,6 +57,21 @@ enum class PasscodeAttempt : uchar {
 // destroys the field that emitted the change signal.
 [[nodiscard]] bool QuickUnlockTriggered(int &lastLength, int nowLength);
 
+// Performs a quick unlock attempt and unlocks on success. Returns true if it
+// unlocked, in which case the calling widget may already be destroyed.
+//
+// A failed attempt is deliberately silent and leaves the field untouched: the
+// passcode is not restricted to kQuickUnlockLength characters, so reaching that
+// length may just mean the user is still typing a longer one. Showing an error
+// and selecting the text - as the manual submit does - would replace what they
+// typed on the next keystroke and make a longer passcode impossible to enter.
+//
+// The attempt still bumps the bad tries counter on failure. That is deliberate:
+// skipping it would let quick unlock brute-force short passcodes without ever
+// tripping the flood limit. A successful unlock resets the counter anyway, so
+// at most one attempt per entry is spent.
+bool TryQuickUnlock(const QString &passcode);
+
 class LockWidget : public Ui::RpWidget {
 public:
 	LockWidget(QWidget *parent, not_null<Controller*> window);
