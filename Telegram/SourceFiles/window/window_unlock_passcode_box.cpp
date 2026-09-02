@@ -143,11 +143,27 @@ void UnlockPasscodeBox(
 		if (!QuickUnlockTriggered(*quickUnlockLength, length)) {
 			return;
 		}
+		// Deriving the key blocks this thread for a noticeable time, so the
+		// indication has to be painted synchronously before starting it - a
+		// queued update or any animation would only run once the check is
+		// already done. AddError() hides the label on every text change, so
+		// this shows itself again on the next attempt.
+		error->setTextColorOverride(st::windowSubTextFg->c);
+		error->setText(tr::lng_passcode_checking(tr::now));
+		error->show();
+		error->repaint();
+
 		// Unlocking closes this box, destroying the field, so never do it from
 		// inside the field's own changed() signal. On success the box's
 		// passcodeLockChanges() subscription runs the pending action.
 		InvokeQueued(box, [=] {
-			TryQuickUnlock(field->text());
+			if (TryQuickUnlock(field->text())) {
+				return; // This box is closing.
+			}
+			// Leave no trace of the failed attempt: a wrong quick unlock is
+			// silent, and the real errors below must stay error-coloured.
+			error->hide();
+			error->setTextColorOverride(std::nullopt);
 		});
 	});
 

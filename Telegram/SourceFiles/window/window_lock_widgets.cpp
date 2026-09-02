@@ -300,7 +300,11 @@ void PasscodeLockWidget::paintContent(QPainter &p) {
 	p.setPen(st::windowFg);
 	p.drawText(QRect(0, _passcode->y() - st::passcodeHeaderHeight, width(), st::passcodeHeaderHeight), tr::lng_passcode_enter(tr::now), style::al_center);
 
-	if (!_error.isEmpty()) {
+	if (_checking) {
+		p.setFont(st::boxTextFont);
+		p.setPen(st::windowSubTextFg);
+		p.drawText(QRect(0, _passcode->y() + _passcode->height(), width(), st::passcodeSubmitSkip), tr::lng_passcode_checking(tr::now), style::al_center);
+	} else if (!_error.isEmpty()) {
 		p.setFont(st::boxTextFont);
 		p.setPen(st::boxTextFgError);
 		p.drawText(QRect(0, _passcode->y() + _passcode->height(), width(), st::passcodeSubmitSkip), _error, style::al_center);
@@ -334,8 +338,9 @@ void PasscodeLockWidget::error() {
 }
 
 void PasscodeLockWidget::changed() {
-	if (!_error.isEmpty()) {
+	if (!_error.isEmpty() || _checking) {
 		_error = QString();
+		_checking = false;
 		update();
 	}
 	checkQuickUnlock();
@@ -347,10 +352,21 @@ void PasscodeLockWidget::checkQuickUnlock() {
 		return;
 	}
 
+	// Deriving the key blocks this thread for a noticeable time, so the
+	// indication has to be painted synchronously before starting it - a queued
+	// update() or any animation would only run once the check is already done.
+	_checking = true;
+	_error = QString();
+	repaint();
+
 	// Unlocking destroys this widget, so never do it from inside the input
 	// field's changed() signal.
 	InvokeQueued(this, [=] {
-		TryQuickUnlock(_passcode->text());
+		if (TryQuickUnlock(_passcode->text())) {
+			return; // This widget is destroyed.
+		}
+		_checking = false;
+		update();
 	});
 }
 

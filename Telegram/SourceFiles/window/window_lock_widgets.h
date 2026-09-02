@@ -128,6 +128,7 @@ private:
 	object_ptr<Ui::RoundButton> _submit;
 	object_ptr<Ui::LinkButton> _logout;
 	QString _error;
+	bool _checking = false;
 	int _quickUnlockLength = 0;
 
 	rpl::lifetime _systemUnlockSuggested;

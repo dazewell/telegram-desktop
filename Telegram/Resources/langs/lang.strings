@@ -1216,6 +1216,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_passcode_wrong" = "Wrong passcode";
 "lng_passcode_is_same" = "Passcode was not changed";
 "lng_passcode_enter" = "Enter your local passcode";
+"lng_passcode_checking" = "Checking...";
 "lng_passcode_ph" = "Your passcode";
 "lng_passcode_submit" = "Submit";
 "lng_passcode_logout" = "Log out";
