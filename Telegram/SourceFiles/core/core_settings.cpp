@@ -347,7 +347,8 @@ QByteArray Settings::serialize() const {
 		+ sizeof(qint32) // _pullToNextChannel
 		+ sizeof(qint32) // _chatFiltersTabsMode
 		+ sizeof(qint32) // _defaultScheduleTime
-		+ sizeof(qint32); // _quickUnlockEnabled
+		+ sizeof(qint32) // _quickUnlockEnabled
+		+ sizeof(qint32); // _localPasscodeLength
 
 	auto result = QByteArray();
 	result.reserve(size);
@@ -527,6 +528,7 @@ QByteArray Settings::serialize() const {
 		stream << qint32(_chatFiltersTabsMode.current());
 		stream << qint32(_defaultScheduleTime);
 		stream << qint32(_quickUnlockEnabled ? 1 : 0);
+		stream << qint32(_localPasscodeLength);
 	}
 
 	Ensures(result.size() == size);
@@ -1068,6 +1070,13 @@ void Settings::addFromSerialized(const QByteArray &serialized) {
 		stream >> quickUnlockEnabled;
 		if (stream.status() == QDataStream::Ok) {
 			_quickUnlockEnabled = (quickUnlockEnabled == 1);
+		}
+	}
+	if (!stream.atEnd()) {
+		auto localPasscodeLength = qint32();
+		stream >> localPasscodeLength;
+		if (stream.status() == QDataStream::Ok) {
+			_localPasscodeLength = localPasscodeLength;
 		}
 	}
 	if (stream.status() != QDataStream::Ok) {

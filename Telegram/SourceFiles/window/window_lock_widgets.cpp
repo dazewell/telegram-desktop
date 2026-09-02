@@ -37,18 +37,18 @@ namespace {
 
 constexpr auto kSystemUnlockDelay = crl::time(1000);
 
-// Quick unlock submits the passcode automatically once this many characters
-// were typed. Only a passcode of exactly this length can be unlocked this way.
-constexpr auto kQuickUnlockLength = 4;
-
 } // namespace
 
 bool QuickUnlockTriggered(int &lastLength, int nowLength) {
 	const auto previous = lastLength;
 	lastLength = nowLength;
 
-	return Core::App().settings().quickUnlockEnabled()
-		&& (nowLength == kQuickUnlockLength)
+	const auto &settings = Core::App().settings();
+	const auto required = settings.localPasscodeLength();
+
+	return settings.quickUnlockEnabled()
+		&& (required > 0)
+		&& (nowLength == required)
 		&& (previous < nowLength);
 }
 
@@ -75,6 +75,15 @@ PasscodeAttempt TryPasscode(const QString &passcode) {
 		cSetPasscodeBadTries(cPasscodeBadTries() + 1);
 		cSetPasscodeLastTry(crl::now());
 		return PasscodeAttempt::Wrong;
+	}
+
+	// A correct passcode is authoritative about its own length, so record it
+	// here too. Domain::setPasscode() covers passcodes set by this build;
+	// this covers ones that were already set before quick unlock existed.
+	const auto length = passcode.size();
+	if (Core::App().settings().localPasscodeLength() != length) {
+		Core::App().settings().setLocalPasscodeLength(length);
+		Core::App().saveSettingsDelayed();
 	}
 	return PasscodeAttempt::Correct;
 }

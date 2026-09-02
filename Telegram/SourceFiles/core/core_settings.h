@@ -988,6 +988,16 @@ public:
 		_quickUnlockEnabled = enabled;
 	}
 
+	// Character count of the local passcode, or 0 when none is set. Quick
+	// unlock needs it to know when the passcode has been fully typed. Only
+	// the length is stored, never the passcode itself.
+	[[nodiscard]] int localPasscodeLength() const {
+		return _localPasscodeLength;
+	}
+	void setLocalPasscodeLength(int length) {
+		_localPasscodeLength = length;
+	}
+
 	[[nodiscard]] std::optional<bool> weatherInCelsius() const {
 		return _weatherInCelsius;
 	}
@@ -1214,6 +1224,7 @@ private:
 	QString _customFontFamily;
 	bool _systemUnlockEnabled = false;
 	bool _quickUnlockEnabled = false;
+	int _localPasscodeLength = 0;
 	std::optional<bool> _weatherInCelsius;
 	QByteArray _tonsiteStorageToken;
 	rpl::variable<int> _ivZoom = 0;

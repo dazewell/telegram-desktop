@@ -45,13 +45,13 @@ enum class PasscodeAttempt : uchar {
 // the caller runs it as its own last statement.
 [[nodiscard]] PasscodeAttempt TryPasscode(const QString &passcode);
 
-// Quick unlock submits the passcode automatically once the required number of
-// characters was typed. Shared by every unlock surface so they can't drift.
+// Quick unlock submits the passcode automatically once it has been fully
+// typed. Shared by every unlock surface so they can't drift.
 //
-// Returns true only when quick unlock is enabled and the text just *grew* to
-// the required length: deleting a character back down to it must not spend a
-// passcode attempt. `lastLength` holds the caller's per-field state and is
-// updated in place on every call.
+// Returns true only when quick unlock is enabled, the local passcode length is
+// known, and the text just *grew* to that length: deleting a character back
+// down to it must not spend a passcode attempt. `lastLength` holds the caller's
+// per-field state and is updated in place on every call.
 //
 // The caller must defer the actual submit (InvokeQueued or similar): unlocking
 // destroys the field that emitted the change signal.
@@ -60,14 +60,14 @@ enum class PasscodeAttempt : uchar {
 // Performs a quick unlock attempt and unlocks on success. Returns true if it
 // unlocked, in which case the calling widget may already be destroyed.
 //
-// A failed attempt is deliberately silent and leaves the field untouched: the
-// passcode is not restricted to kQuickUnlockLength characters, so reaching that
-// length may just mean the user is still typing a longer one. Showing an error
-// and selecting the text - as the manual submit does - would replace what they
-// typed on the next keystroke and make a longer passcode impossible to enter.
+// A failed attempt is deliberately silent and leaves the field untouched. The
+// stored length can be stale - a passcode set by an older build was never
+// recorded - so reaching it does not guarantee a match. Showing an error and
+// selecting the text, as the manual submit does, would replace what the user
+// typed on the next keystroke.
 //
 // The attempt still bumps the bad tries counter on failure. That is deliberate:
-// skipping it would let quick unlock brute-force short passcodes without ever
+// skipping it would let quick unlock brute-force passcodes without ever
 // tripping the flood limit. A successful unlock resets the counter anyway, so
 // at most one attempt per entry is spent.
 bool TryQuickUnlock(const QString &passcode);
