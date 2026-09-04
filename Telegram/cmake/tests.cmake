@@ -4,6 +4,29 @@
 # For license and copyright information please follow this link:
 # https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
+add_executable(test_contact_time_zone)
+init_target(test_contact_time_zone "(tests)")
+
+target_include_directories(test_contact_time_zone PRIVATE ${src_loc})
+
+nice_target_sources(test_contact_time_zone ${src_loc}
+PRIVATE
+    data/data_contact_time_zone.cpp
+    data/data_contact_time_zone.h
+    tests/test_contact_time_zone.cpp
+)
+
+target_link_libraries(test_contact_time_zone
+PRIVATE
+    desktop-app::lib_base
+    desktop-app::lib_ui
+    desktop-app::external_qt
+)
+
+set_target_properties(test_contact_time_zone PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+
 add_executable(test_text WIN32)
 init_target(test_text "(tests)")
 
@@ -39,7 +62,7 @@ PRIVATE
 
 set_target_properties(test_text PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-add_dependencies(Telegram test_text)
+add_dependencies(Telegram test_contact_time_zone test_text)
 
 target_prepare_qrc(test_text)
 
