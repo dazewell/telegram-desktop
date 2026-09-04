@@ -322,6 +322,32 @@ QString FormatContactTimeZoneTime(
 		QLocale::ShortFormat);
 }
 
+bool ContactTimeZoneContextEligible(
+		bool personalUser,
+		bool self,
+		bool repliesPeer,
+		ContactTimeZoneContext context) {
+	return personalUser
+		&& !self
+		&& !repliesPeer
+		&& !context.secret
+		&& !context.topic
+		&& !context.replies
+		&& !context.scheduled;
+}
+
+QString FormatContactTimeZoneHistoricalMetadata(
+		QString localText,
+		TimeId timestamp,
+		const ContactTimeZone *zone,
+		const QLocale &locale) {
+	return (!zone || !timestamp)
+		? localText
+		: localText
+			+ QString::fromUtf8(" \xc2\xb7 ")
+			+ FormatContactTimeZoneTime(timestamp, *zone, locale);
+}
+
 bool ContactTimeZonesEquivalent(
 		const ContactTimeZone &peerZone,
 		const QTimeZone &systemZone,

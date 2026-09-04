@@ -110,6 +110,13 @@ enum class TextBadgeType : uchar {
 
 QSize TextBadgeSize(TextBadgeType type);
 void DrawTextBadge(
+	Painter &p,
+	QRect rect,
+	int outerWidth,
+	const style::color &color,
+	const QString &phrase,
+	int phraseWidth);
+void DrawTextBadge(
 	TextBadgeType,
 	Painter &p,
 	QRect rect,

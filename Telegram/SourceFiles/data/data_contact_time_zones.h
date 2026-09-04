@@ -18,13 +18,6 @@ namespace Data {
 
 class Session;
 
-struct ContactTimeZoneContext {
-	bool secret = false;
-	bool topic = false;
-	bool replies = false;
-	bool scheduled = false;
-};
-
 struct ContactTimeZoneView {
 	const ContactTimeZone *zone = nullptr;
 	QString currentTime;
@@ -52,7 +45,7 @@ public:
 
 private:
 	void persist();
-	void refreshAll();
+	void refreshAll(bool notifyUsers = false);
 	void refreshCurrent();
 	void rebuildSamples();
 	void rearmMinuteTimer();

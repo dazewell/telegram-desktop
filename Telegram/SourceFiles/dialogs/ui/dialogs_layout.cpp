@@ -945,6 +945,14 @@ void PaintRow(
 					- st::dialogsMuteIconSkip);
 		}
 		auto badgeWidth = 0;
+		const auto timeZone = context.contactTimeZoneBadge;
+		const auto timeZoneSkip = timeZone
+			? st::dialogsScamSkip + timeZone->width
+			: 0;
+		if (timeZone) {
+			rectForName.setWidth(
+				std::max(rectForName.width() - timeZoneSkip, 0));
+		}
 		if ((history || sublist) && !context.search) {
 			const auto widthBefore = rectForName.width();
 			paintPeerBadge(rowName.maxWidth());
@@ -960,6 +968,28 @@ void PaintRow(
 			.availableWidth = rectForName.width(),
 			.elisionLines = 1,
 		});
+		if (timeZone) {
+			const auto height = st::dialogsScamPadding.top()
+				+ st::dialogsScamFont->height
+				+ st::dialogsScamPadding.bottom();
+			const auto left = rectForName.left()
+				+ std::min(rowName.maxWidth(), rectForName.width())
+				+ badgeWidth
+				+ st::dialogsScamSkip;
+			const auto top = rectForName.top()
+				+ (rectForName.height() - height) / 2;
+			Ui::DrawTextBadge(
+				p,
+				QRect(left, top, timeZone->width, height),
+				context.width,
+				context.active
+					? st::dialogsNameFgActive
+					: context.selected
+					? st::dialogsNameFgOver
+					: st::dialogsNameFg,
+				timeZone->phrase,
+				timeZone->phraseWidth);
+		}
 		if (drawMuteIcon) {
 			const auto &muteIcon = ThreeStateIcon(
 				st::dialogsMuteIcon,
@@ -971,6 +1001,7 @@ void PaintRow(
 			const auto muteLeft = rectForName.left()
 				+ nameW
 				+ badgeWidth
+				+ timeZoneSkip
 				+ st::dialogsMuteIconSkip;
 			const auto muteTop = rectForName.top()
 				+ (st::semiboldFont->height - muteIcon.height()) / 2;

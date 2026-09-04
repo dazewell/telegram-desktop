@@ -288,6 +288,7 @@ private:
 	struct SponsoredSearchResult;
 	struct PeerSearchResult;
 	struct TagCache;
+	struct TimeZoneState;
 
 	enum class JumpSkip {
 		PreviousOrBegin,
@@ -412,6 +413,10 @@ private:
 
 	int defaultRowTop(not_null<Row*> row) const;
 	void setupOnlineStatusCheck();
+	void rebuildTimeZoneBadgeWidth();
+	void refreshTimeZoneBadge(UserId userId);
+	void refreshVisibleTimeZoneBadges(bool notifyAccessibility);
+	void notifyTimeZoneAccessibility(not_null<Row*> row);
 	void jumpToTop();
 
 	void updateRowCornerStatusShown(not_null<History*> history);
@@ -652,6 +657,7 @@ private:
 	std::vector<std::unique_ptr<CollapsedRow>> _collapsedRows;
 	not_null<const style::DialogRow*> _st;
 	mutable std::unique_ptr<Ui::TopicJumpCache> _topicJumpCache;
+	std::unique_ptr<TimeZoneState> _timeZoneState;
 	base::flat_map<uint64, CachedRow> _cachedRows;
 	Ui::RowsScrollCache _rowsScrollCache{[this] {
 		_cachedRows.clear();

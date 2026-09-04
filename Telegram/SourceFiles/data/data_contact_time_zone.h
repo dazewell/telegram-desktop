@@ -30,6 +30,13 @@ struct ContactTimeZone {
 	int fixedOffsetSeconds = 0;
 };
 
+struct ContactTimeZoneContext {
+	bool secret = false;
+	bool topic = false;
+	bool replies = false;
+	bool scheduled = false;
+};
+
 struct ParsedContactTimeZoneNote {
 	TextWithEntities visible;
 	std::optional<QString> rawPayload;
@@ -81,6 +88,18 @@ struct ContactTimeZoneNoteUpdate {
 [[nodiscard]] QString FormatContactTimeZoneTime(
 	qint64 timestamp,
 	const ContactTimeZone &zone,
+	const QLocale &locale = QLocale());
+
+[[nodiscard]] bool ContactTimeZoneContextEligible(
+	bool personalUser,
+	bool self,
+	bool repliesPeer,
+	ContactTimeZoneContext context = {});
+
+[[nodiscard]] QString FormatContactTimeZoneHistoricalMetadata(
+	QString localText,
+	TimeId timestamp,
+	const ContactTimeZone *zone,
 	const QLocale &locale = QLocale());
 
 [[nodiscard]] bool ContactTimeZonesEquivalent(

@@ -22,16 +22,11 @@ constexpr auto kEquivalenceHorizonYears = 5;
 bool ContactTimeZoneEligible(
 		const PeerData *peer,
 		ContactTimeZoneContext context) {
-	if (!peer
-		|| context.secret
-		|| context.topic
-		|| context.replies
-		|| context.scheduled
-		|| peer->isSelf()
-		|| peer->isRepliesChat()) {
-		return false;
-	}
-	return (peer->asUser() != nullptr);
+	return peer && ContactTimeZoneContextEligible(
+		peer->asUser() != nullptr,
+		peer->isSelf(),
+		peer->isRepliesChat(),
+		context);
 }
 
 ContactTimeZones::ContactTimeZones(not_null<Session*> owner)
@@ -51,14 +46,14 @@ ContactTimeZones::ContactTimeZones(not_null<Session*> owner)
 
 	Lang::Updated(
 	) | rpl::on_next([=] {
-		refreshAll();
+		refreshAll(true);
 		_globalChanges.fire({});
 		rearmMinuteTimer();
 	}, _lifetime);
 
 	Core::App().systemTimeChanges(
 	) | rpl::on_next([=] {
-		refreshAll();
+		refreshAll(true);
 		_globalChanges.fire({});
 		rearmMinuteTimer();
 	}, _lifetime);
@@ -128,7 +123,13 @@ void ContactTimeZones::persist() {
 	}
 }
 
-void ContactTimeZones::refreshAll() {
+void ContactTimeZones::refreshAll(bool notifyUsers) {
+	auto changedUsers = base::flat_set<UserId>();
+	if (notifyUsers) {
+		for (const auto &entry : _views) {
+			changedUsers.emplace(entry.first);
+		}
+	}
 	_locale = QLocale();
 	_systemZone = QTimeZone::systemTimeZone();
 	rebuildSamples();
@@ -148,8 +149,14 @@ void ContactTimeZones::refreshAll() {
 		_views.emplace(UserId(bareUserId), ContactTimeZoneView{
 			.zone = zone,
 		});
+		if (notifyUsers) {
+			changedUsers.emplace(UserId(bareUserId));
+		}
 	}
 	refreshCurrent();
+	for (const auto &userId : changedUsers) {
+		_userChanges.fire_copy(userId);
+	}
 }
 
 void ContactTimeZones::refreshCurrent() {

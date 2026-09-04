@@ -1858,6 +1858,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_info_hours_next_day" = "{time} (next day)";
 "lng_info_hours_local_time" = "local time";
 "lng_info_hours_my_time" = "my time";
+"lng_contact_timezone_tooltip" = "Local time for {name}: {time}";
 "lng_info_user_title" = "User Info";
 "lng_info_bot_title" = "Bot Info";
 "lng_info_group_title" = "Group Info";
