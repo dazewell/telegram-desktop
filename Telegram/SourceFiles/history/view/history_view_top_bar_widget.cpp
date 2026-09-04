@@ -856,7 +856,9 @@ void TopBarWidget::updateTimeZoneBadgeGeometry() {
 		_titleBadgeLayout.width(),
 		st::dialogsScamSkip,
 		_timeZoneBadgeWidth,
-		height);
+		height,
+		st::msgNameStyle.font->ascent,
+		st::dialogsScamPadding.top() + st::dialogsScamFont->ascent);
 }
 
 QString TopBarWidget::tooltipText() const {

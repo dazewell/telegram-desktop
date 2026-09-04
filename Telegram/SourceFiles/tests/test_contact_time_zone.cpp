@@ -397,6 +397,10 @@ void TestMinuteBoundary() {
 
 void TestTopBarLayout() {
 	const auto titleLine = QRect(20, 11, 300, 19);
+	const auto titleBaselineFromTop = 15;
+	const auto chipTopPadding = 2;
+	const auto chipFontAscent = 8;
+	const auto chipTextBaselineFromTop = chipTopPadding + chipFontAscent;
 	const auto shortNoBadge = HistoryView::ComputeTopBarTimeZoneLayout(
 		titleLine,
 		80,
@@ -404,7 +408,9 @@ void TestTopBarLayout() {
 		0,
 		6,
 		50,
-		13);
+		13,
+		titleBaselineFromTop,
+		chipTextBaselineFromTop);
 	Expects(shortNoBadge.titleWidth == 80);
 	Expects(shortNoBadge.chipRect.x() == 106);
 
@@ -415,7 +421,9 @@ void TestTopBarLayout() {
 		18,
 		6,
 		50,
-		13);
+		13,
+		titleBaselineFromTop,
+		chipTextBaselineFromTop);
 	Expects(shortBadge.titleWidth == 80);
 	Expects(shortBadge.nameBadgeRect.width() == 98);
 	Expects(shortBadge.chipRect.x() == 124);
@@ -427,7 +435,9 @@ void TestTopBarLayout() {
 		18,
 		6,
 		50,
-		13);
+		13,
+		titleBaselineFromTop,
+		chipTextBaselineFromTop);
 	Expects(longBadge.titleWidth == 226);
 	Expects(longBadge.chipRect.x() == 270);
 	Expects(longBadge.chipRect.right() == titleLine.right());
@@ -439,11 +449,25 @@ void TestTopBarLayout() {
 		18,
 		6,
 		50,
-		13);
+		13,
+		titleBaselineFromTop,
+		chipTextBaselineFromTop);
 	Expects(!insufficient);
 
-	Expects(shortBadge.chipRect.y()
-		== titleLine.y() + (titleLine.height() - 13) / 2);
+	Expects(shortBadge.chipRect.y() + chipTextBaselineFromTop
+		== titleLine.y() + titleBaselineFromTop);
+
+	const auto invalidBaseline = HistoryView::ComputeTopBarTimeZoneLayout(
+		titleLine,
+		80,
+		19,
+		18,
+		6,
+		50,
+		13,
+		titleBaselineFromTop,
+		14);
+	Expects(!invalidBaseline);
 }
 
 } // namespace

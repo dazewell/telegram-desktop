@@ -28,6 +28,8 @@ struct TopBarTimeZoneLayout {
 	int badgeWidth,
 	int spacing,
 	int chipWidth,
-	int chipHeight);
+	int chipHeight,
+	int titleBaselineFromTop,
+	int chipTextBaselineFromTop);
 
 } // namespace HistoryView

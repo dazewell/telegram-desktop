@@ -18,14 +18,20 @@ TopBarTimeZoneLayout ComputeTopBarTimeZoneLayout(
 		int badgeWidth,
 		int spacing,
 		int chipWidth,
-		int chipHeight) {
+		int chipHeight,
+		int titleBaselineFromTop,
+		int chipTextBaselineFromTop) {
 	if (titleLine.isEmpty()
 		|| titleNaturalWidth <= 0
 		|| minimumTitleWidth <= 0
 		|| badgeWidth < 0
 		|| spacing < 0
 		|| chipWidth <= 0
-		|| chipHeight <= 0) {
+		|| chipHeight <= 0
+		|| titleBaselineFromTop < 0
+		|| titleBaselineFromTop > titleLine.height()
+		|| chipTextBaselineFromTop < 0
+		|| chipTextBaselineFromTop > chipHeight) {
 		return {};
 	}
 	const auto reservedWidth = badgeWidth + spacing + chipWidth;
@@ -42,7 +48,8 @@ TopBarTimeZoneLayout ComputeTopBarTimeZoneLayout(
 		+ badgeWidth
 		+ spacing;
 	const auto chipTop = titleLine.y()
-		+ (titleLine.height() - chipHeight) / 2;
+		+ titleBaselineFromTop
+		- chipTextBaselineFromTop;
 	return {
 		.nameBadgeRect = QRect(
 			titleLine.topLeft(),
