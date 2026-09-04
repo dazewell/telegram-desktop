@@ -198,6 +198,8 @@ public:
 	bool toggleActiveWindowFullScreen();
 	[[nodiscard]] QWidget *getFileDialogParent();
 	void notifyFileDialogShown(bool shown);
+	void notifySystemTimeChanged();
+	[[nodiscard]] rpl::producer<> systemTimeChanges() const;
 	void checkSystemDarkMode();
 	[[nodiscard]] bool isActiveForTrayMenu() const;
 	void closeChatFromWindows(not_null<PeerData*> peer);
@@ -487,6 +489,7 @@ private:
 
 	rpl::event_stream<Media::View::OpenRequest> _openInMediaViewRequests;
 	rpl::event_stream<> _inAppKeyPressed;
+	rpl::event_stream<> _systemTimeChanges;
 
 	rpl::event_stream<> _materializeLocalDraftsRequests;
 

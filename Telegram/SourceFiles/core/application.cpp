@@ -1844,6 +1844,14 @@ void Application::notifyFileDialogShown(bool shown) {
 	}
 }
 
+void Application::notifySystemTimeChanged() {
+	_systemTimeChanges.fire({});
+}
+
+rpl::producer<> Application::systemTimeChanges() const {
+	return _systemTimeChanges.events();
+}
+
 QPoint Application::getPointForCallPanelCenter() const {
 	if (const auto window = activeWindow()) {
 		return window->getPointForCallPanelCenter();

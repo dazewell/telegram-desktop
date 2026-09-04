@@ -687,6 +687,8 @@ PRIVATE
     data/data_community.h
     data/data_contact_time_zone.cpp
     data/data_contact_time_zone.h
+    data/data_contact_time_zones.cpp
+    data/data_contact_time_zones.h
     data/data_document.cpp
     data/data_document.h
     data/data_document_media.cpp

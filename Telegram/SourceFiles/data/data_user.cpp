@@ -22,6 +22,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/business/data_business_info.h"
 #include "data/components/credits.h"
 #include "data/data_cloud_themes.h"
+#include "data/data_contact_time_zones.h"
 #include "data/data_forum.h"
 #include "data/data_forum_icons.h"
 #include "data/data_saved_music.h"
@@ -1080,6 +1081,7 @@ void ApplyUserUpdate(not_null<UserData*> user, const MTPDuserFull &update) {
 		update.is_noforwards_peer_enabled());
 
 	user->fullUpdated();
+	user->owner().contactTimeZones().applyAuthoritative(user);
 }
 
 StarRefProgram ParseStarRefProgram(const MTPStarRefProgram *program) {

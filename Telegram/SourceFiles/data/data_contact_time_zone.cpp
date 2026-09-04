@@ -1,5 +1,8 @@
 #include "data/data_contact_time_zone.h"
 
+#include <QtCore/QDataStream>
+#include <QtCore/QIODevice>
+
 #include <algorithm>
 #include <limits>
 
@@ -7,18 +10,24 @@ namespace Data {
 namespace {
 
 constexpr auto kMaximumOffsetHours = 14;
+constexpr auto kPayloadMapMagic = quint32(0x43545A50);
+constexpr auto kPayloadMapVersion = quint32(1);
+constexpr auto kMaximumPayloadMapEntries = quint32(100000);
+constexpr auto kMaximumPayloadBytes = quint32(128);
+constexpr auto kMinuteMs = qint64(60000);
+constexpr auto kMinuteBoundaryEpsilon = qint64(50);
 
 [[nodiscard]] bool IsAsciiLetter(QChar character) {
 	const auto value = character.unicode();
 	return ((value >= 'A') && (value <= 'Z'))
-	       || ((value >= 'a') && (value <= 'z'));
+		|| ((value >= 'a') && (value <= 'z'));
 }
 
 [[nodiscard]] bool IsIanaCharacter(QChar character) {
 	const auto value = character.unicode();
 	return IsAsciiLetter(character) || ((value >= '0') && (value <= '9'))
-	       || (value == '_') || (value == '-') || (value == '+')
-	       || (value == '.');
+		|| (value == '_') || (value == '-') || (value == '+')
+		|| (value == '.');
 }
 
 [[nodiscard]] bool IsIanaIdentifier(QStringView payload) {
@@ -48,7 +57,7 @@ constexpr auto kMaximumOffsetHours = 14;
 
 [[nodiscard]] std::optional<int> ParseOffset(QStringView payload) {
 	if ((payload.size() < 3)
-	        || ((payload.front() != '+') && (payload.front() != '-'))) {
+		|| ((payload.front() != '+') && (payload.front() != '-'))) {
 		return std::nullopt;
 	}
 	const auto digit = [&](qsizetype index) -> std::optional<int> {
@@ -57,8 +66,8 @@ constexpr auto kMaximumOffsetHours = 14;
 		}
 		const auto value = payload[index].unicode();
 		return ((value >= '0') && (value <= '9'))
-		               ? std::make_optional(int(value - '0'))
-		               : std::nullopt;
+			? std::make_optional(int(value - '0'))
+			: std::nullopt;
 	};
 	const auto hourTens = digit(1);
 	const auto hourOnes = digit(2);
@@ -87,7 +96,7 @@ constexpr auto kMaximumOffsetHours = 14;
 	}
 	const auto hours = (*hourTens * 10) + *hourOnes;
 	if ((minutes >= 60) || (hours > kMaximumOffsetHours)
-	        || ((hours == kMaximumOffsetHours) && (minutes != 0))) {
+		|| ((hours == kMaximumOffsetHours) && (minutes != 0))) {
 		return std::nullopt;
 	}
 	const auto sign = (payload.front() == '-') ? -1 : 1;
@@ -103,13 +112,14 @@ constexpr auto kMaximumOffsetHours = 14;
 	return true;
 }
 
-[[nodiscard]] qsizetype VisibleBoundary(const QString &text,
-        qsizetype markerPosition) {
+[[nodiscard]] qsizetype VisibleBoundary(
+		const QString &text,
+		qsizetype markerPosition) {
 	if ((markerPosition > 0) && (text[markerPosition - 1] == '\n')) {
 		return ((markerPosition > 1)
-		               && (text[markerPosition - 2] == '\r'))
-		               ? markerPosition - 2
-		               : markerPosition - 1;
+			&& (text[markerPosition - 2] == '\r'))
+			? markerPosition - 2
+			: markerPosition - 1;
 	}
 	if ((markerPosition > 0) && (text[markerPosition - 1] == '\r')) {
 		return markerPosition - 1;
@@ -117,8 +127,9 @@ constexpr auto kMaximumOffsetHours = 14;
 	return markerPosition;
 }
 
-[[nodiscard]] TextWithEntities VisibleText(const TextWithEntities &note,
-        qsizetype boundary) {
+[[nodiscard]] TextWithEntities VisibleText(
+		const TextWithEntities &note,
+		qsizetype boundary) {
 	auto result = TextWithEntities();
 	result.text = note.text.left(boundary);
 	if (boundary > std::numeric_limits<int>::max()) {
@@ -131,16 +142,16 @@ constexpr auto kMaximumOffsetHours = 14;
 	const auto visibleLength = int(boundary);
 	for (const auto &entity : note.entities) {
 		if (!entity.validForText(int(fullLength))
-		        || (entity.offset() >= visibleLength)) {
+			|| (entity.offset() >= visibleLength)) {
 			continue;
 		}
 		const auto length = std::min(entity.length(),
-		        visibleLength - entity.offset());
+			visibleLength - entity.offset());
 		if (length > 0) {
 			result.entities.push_back(EntityInText(entity.type(),
-			        entity.offset(),
-			        length,
-			        entity.data()));
+				entity.offset(),
+				length,
+				entity.data()));
 		}
 	}
 	return result;
@@ -149,38 +160,38 @@ constexpr auto kMaximumOffsetHours = 14;
 } // namespace
 
 std::optional<ContactTimeZoneSyntax> ParseContactTimeZoneSyntax(
-        QStringView payload) {
+		QStringView payload) {
 	if ((payload.compare(u"Z", Qt::CaseInsensitive) == 0)
-	        || (payload.compare(u"UTC", Qt::CaseInsensitive) == 0)
-	        || (payload.compare(u"GMT", Qt::CaseInsensitive) == 0)) {
+		|| (payload.compare(u"UTC", Qt::CaseInsensitive) == 0)
+		|| (payload.compare(u"GMT", Qt::CaseInsensitive) == 0)) {
 		return ContactTimeZoneSyntax{
-		        .kind = ContactTimeZoneKind::FixedOffset,
-		        .rawPayload = payload.toString(),
-		        .fixedOffsetSeconds = 0,
+			.kind = ContactTimeZoneKind::FixedOffset,
+			.rawPayload = payload.toString(),
+			.fixedOffsetSeconds = 0,
 		};
 	}
 	if (const auto offset = ParseOffset(payload)) {
 		return ContactTimeZoneSyntax{
-		        .kind = ContactTimeZoneKind::FixedOffset,
-		        .rawPayload = payload.toString(),
-		        .fixedOffsetSeconds = *offset,
+			.kind = ContactTimeZoneKind::FixedOffset,
+			.rawPayload = payload.toString(),
+			.fixedOffsetSeconds = *offset,
 		};
 	}
 	if (IsIanaIdentifier(payload)) {
 		return ContactTimeZoneSyntax{
-		        .kind = ContactTimeZoneKind::Named,
-		        .rawPayload = payload.toString(),
+			.kind = ContactTimeZoneKind::Named,
+			.rawPayload = payload.toString(),
 		};
 	}
 	return std::nullopt;
 }
 
 std::optional<ContactTimeZone> ResolveContactTimeZone(
-        const ContactTimeZoneSyntax &syntax) {
+		const ContactTimeZoneSyntax &syntax) {
 	if (syntax.kind == ContactTimeZoneKind::FixedOffset) {
 		return ContactTimeZone{
-		        .kind = ContactTimeZoneKind::FixedOffset,
-		        .fixedOffsetSeconds = syntax.fixedOffsetSeconds,
+			.kind = ContactTimeZoneKind::FixedOffset,
+			.fixedOffsetSeconds = syntax.fixedOffsetSeconds,
 		};
 	}
 	const auto zone = QTimeZone(syntax.rawPayload.toUtf8());
@@ -188,96 +199,96 @@ std::optional<ContactTimeZone> ResolveContactTimeZone(
 		return std::nullopt;
 	}
 	return ContactTimeZone{
-	        .kind = ContactTimeZoneKind::Named,
-	        .namedZone = zone,
+		.kind = ContactTimeZoneKind::Named,
+		.namedZone = zone,
 	};
 }
 
 ParsedContactTimeZoneNote ParseContactTimeZoneNote(
-        const TextWithEntities &note) {
+		const TextWithEntities &note) {
 	const auto marker = QChar(0x200B);
 	auto markerPosition = note.text.lastIndexOf(marker);
 	while (markerPosition >= 0) {
 		auto lineEnd = markerPosition + 1;
 		while ((lineEnd < note.text.size())
-		        && (note.text[lineEnd] != '\r')
-		        && (note.text[lineEnd] != '\n')) {
+			&& (note.text[lineEnd] != '\r')
+			&& (note.text[lineEnd] != '\n')) {
 			++lineEnd;
 		}
 		const auto rawPayload
-		        = QStringView(note.text).mid(markerPosition + 1,
-		                lineEnd - markerPosition - 1);
+			= QStringView(note.text).mid(markerPosition + 1,
+				lineEnd - markerPosition - 1);
 		const auto syntax = ParseContactTimeZoneSyntax(rawPayload);
 		if (syntax
-		        && IsWhitespace(QStringView(note.text).mid(lineEnd))) {
+			&& IsWhitespace(QStringView(note.text).mid(lineEnd))) {
 			return ParsedContactTimeZoneNote{
-			        .visible = VisibleText(note,
-			                VisibleBoundary(note.text,
-			                        markerPosition)),
-			        .rawPayload = rawPayload.toString(),
-			        .resolved = ResolveContactTimeZone(*syntax),
+				.visible = VisibleText(note,
+					VisibleBoundary(note.text,
+						markerPosition)),
+				.rawPayload = rawPayload.toString(),
+				.resolved = ResolveContactTimeZone(*syntax),
 			};
 		}
 		if (markerPosition == 0) {
 			break;
 		}
 		markerPosition
-		        = note.text.lastIndexOf(marker, markerPosition - 1);
+			= note.text.lastIndexOf(marker, markerPosition - 1);
 	}
 	return ParsedContactTimeZoneNote{
-	        .visible = VisibleText(note, note.text.size()),
+		.visible = VisibleText(note, note.text.size()),
 	};
 }
 
-int ContactTimeZoneEditableLimit(int serverLimit,
-        const std::optional<QString> &rawPayload,
-        bool visibleNotePresent) {
+int ContactTimeZoneEditableLimit(
+		int serverLimit,
+		const std::optional<QString> &rawPayload,
+		bool visibleNotePresent) {
 	if (!rawPayload) {
 		return std::max(serverLimit, 0);
 	}
 	const auto suffixLength
-	        = qint64(1) + rawPayload->size() + (visibleNotePresent ? 1 : 0);
+		= qint64(1) + rawPayload->size() + (visibleNotePresent ? 1 : 0);
 	return int(std::clamp(qint64(serverLimit) - suffixLength,
-	        qint64(0),
-	        qint64(std::numeric_limits<int>::max())));
+		qint64(0),
+		qint64(std::numeric_limits<int>::max())));
 }
 
 ComposedContactTimeZoneNote ComposeContactTimeZoneNote(
-        const TextWithEntities &visible,
-        const std::optional<QString> &rawPayload,
-        int serverLimit) {
+		const TextWithEntities &visible,
+		const std::optional<QString> &rawPayload,
+		int serverLimit) {
 	const auto editableLimit = ContactTimeZoneEditableLimit(serverLimit,
-	        rawPayload,
-	        !visible.text.isEmpty());
+		rawPayload,
+		!visible.text.isEmpty());
 	if (rawPayload && !ParseContactTimeZoneSyntax(*rawPayload)) {
 		return {
-		        .editableLimit = editableLimit,
-		        .error = ContactTimeZoneComposeError::InvalidPayload,
+			.editableLimit = editableLimit,
+			.error = ContactTimeZoneComposeError::InvalidPayload,
 		};
 	}
 	if (visible.text.size() > std::numeric_limits<int>::max()) {
 		return {
-		        .editableLimit = editableLimit,
-		        .error = ContactTimeZoneComposeError::InvalidEntity,
+			.editableLimit = editableLimit,
+			.error = ContactTimeZoneComposeError::InvalidEntity,
 		};
 	}
 	for (const auto &entity : visible.entities) {
 		if (!entity.validForText(int(visible.text.size()))) {
 			return {
-			        .editableLimit = editableLimit,
-			        .error
-			        = ContactTimeZoneComposeError::InvalidEntity,
+				.editableLimit = editableLimit,
+				.error
+				= ContactTimeZoneComposeError::InvalidEntity,
 			};
 		}
 	}
-	const auto composedLength
-	        = qint64(visible.text.size())
-	          + (rawPayload ? qint64(1) + rawPayload->size() : 0)
-	          + ((rawPayload && !visible.text.isEmpty()) ? 1 : 0);
+	const auto composedLength = qint64(visible.text.size())
+		+ (rawPayload ? qint64(1) + rawPayload->size() : 0)
+		+ ((rawPayload && !visible.text.isEmpty()) ? 1 : 0);
 	if ((serverLimit < 0) || (composedLength > serverLimit)) {
 		return {
-		        .editableLimit = editableLimit,
-		        .error = ContactTimeZoneComposeError::TooLong,
+			.editableLimit = editableLimit,
+			.error = ContactTimeZoneComposeError::TooLong,
 		};
 	}
 	auto note = visible;
@@ -288,48 +299,148 @@ ComposedContactTimeZoneNote ComposeContactTimeZoneNote(
 		note.text.append(QChar(0x200B)).append(*rawPayload);
 	}
 	return {
-	        .note = std::move(note),
-	        .editableLimit = editableLimit,
+		.note = std::move(note),
+		.editableLimit = editableLimit,
 	};
 }
 
-QDateTime ContactTimeZoneDateTime(qint64 timestamp,
-        const ContactTimeZone &zone) {
+QDateTime ContactTimeZoneDateTime(
+		qint64 timestamp,
+		const ContactTimeZone &zone) {
 	return (zone.kind == ContactTimeZoneKind::Named)
-	               ? QDateTime::fromSecsSinceEpoch(timestamp,
-	                         zone.namedZone)
-	               : QDateTime::fromSecsSinceEpoch(timestamp,
-	                         QTimeZone::fromSecondsAheadOfUtc(
-	                                 zone.fixedOffsetSeconds));
+		? QDateTime::fromSecsSinceEpoch(timestamp, zone.namedZone)
+		: QDateTime::fromSecsSinceEpoch(timestamp,
+			  QTimeZone::fromSecondsAheadOfUtc(
+				  zone.fixedOffsetSeconds));
 }
 
 QString FormatContactTimeZoneTime(
-        qint64 timestamp, const ContactTimeZone &zone, const QLocale &locale) {
+		qint64 timestamp,
+		const ContactTimeZone &zone,
+		const QLocale &locale) {
 	return locale.toString(ContactTimeZoneDateTime(timestamp, zone).time(),
-	        QLocale::ShortFormat);
+		QLocale::ShortFormat);
 }
 
-bool ContactTimeZonesEquivalent(const ContactTimeZone &peerZone,
-        const QTimeZone &systemZone,
-        QDateTime horizonStartUtc,
-        QDateTime horizonEndUtc) {
+bool ContactTimeZonesEquivalent(
+		const ContactTimeZone &peerZone,
+		const QTimeZone &systemZone,
+		QDateTime horizonStartUtc,
+		QDateTime horizonEndUtc) {
 	if (!systemZone.isValid() || !horizonStartUtc.isValid()
-	        || !horizonEndUtc.isValid()
-	        || (horizonStartUtc > horizonEndUtc)) {
+		|| !horizonEndUtc.isValid()
+		|| (horizonStartUtc > horizonEndUtc)) {
 		return false;
 	}
 	if (peerZone.kind == ContactTimeZoneKind::Named) {
 		return peerZone.namedZone.isValid()
-		       && (peerZone.namedZone.id() == systemZone.id());
+			&& (peerZone.namedZone.id() == systemZone.id());
 	}
 	const auto start = systemZone.offsetData(horizonStartUtc);
 	const auto end = systemZone.offsetData(horizonEndUtc);
 	return (start.offsetFromUtc == peerZone.fixedOffsetSeconds)
-	       && (end.offsetFromUtc == peerZone.fixedOffsetSeconds)
-	       && (start.daylightTimeOffset == 0)
-	       && (end.daylightTimeOffset == 0)
-	       && systemZone.transitions(horizonStartUtc, horizonEndUtc)
-	                  .isEmpty();
+		&& (end.offsetFromUtc == peerZone.fixedOffsetSeconds)
+		&& (start.daylightTimeOffset == 0)
+		&& (end.daylightTimeOffset == 0)
+		&& systemZone.transitions(horizonStartUtc, horizonEndUtc)
+			   .isEmpty();
+}
+
+QByteArray SerializeContactTimeZonePayloads(
+		const ContactTimeZonePayloads &payloads) {
+	auto result = QByteArray();
+	auto stream = QDataStream(&result, QIODevice::WriteOnly);
+	stream.setVersion(QDataStream::Qt_6_2);
+	stream << kPayloadMapMagic
+		<< kPayloadMapVersion
+		<< quint32(payloads.size());
+	for (const auto &[userId, payload] : payloads) {
+		const auto encoded = payload.toUtf8();
+		stream << quint64(userId) << quint32(encoded.size());
+		stream.writeRawData(encoded.constData(), encoded.size());
+	}
+	return result;
+}
+
+std::optional<ContactTimeZonePayloads> DeserializeContactTimeZonePayloads(
+		const QByteArray &serialized) {
+	auto stream = QDataStream(serialized);
+	stream.setVersion(QDataStream::Qt_6_2);
+	auto magic = quint32();
+	auto version = quint32();
+	auto count = quint32();
+	stream >> magic >> version >> count;
+	if (stream.status() != QDataStream::Ok || magic != kPayloadMapMagic
+		|| version != kPayloadMapVersion
+		|| count > kMaximumPayloadMapEntries
+		|| count > quint32(serialized.size() / 12)) {
+		return std::nullopt;
+	}
+	auto result = ContactTimeZonePayloads();
+	result.reserve(count);
+	for (auto index = quint32(); index != count; ++index) {
+		auto userId = quint64();
+		auto size = quint32();
+		stream >> userId >> size;
+		if (stream.status() != QDataStream::Ok || !userId
+			|| size > kMaximumPayloadBytes
+			|| size > quint32(serialized.size())) {
+			return std::nullopt;
+		}
+		auto encoded = QByteArray(size, Qt::Uninitialized);
+		if (stream.readRawData(encoded.data(), size) != int(size)) {
+			return std::nullopt;
+		}
+		const auto payload = QString::fromUtf8(encoded);
+		if (payload.toUtf8() != encoded
+			|| !ParseContactTimeZoneSyntax(payload)
+			|| result.contains(userId)) {
+			return std::nullopt;
+		}
+		result.emplace(userId, payload);
+	}
+	if (stream.status() != QDataStream::Ok || !stream.atEnd()) {
+		return std::nullopt;
+	}
+	return result;
+}
+
+ContactTimeZoneNoteUpdate ApplyContactTimeZoneNote(
+		ContactTimeZonePayloads &payloads,
+		base::flat_set<uint64> &authoritativeUsers,
+		uint64 userId,
+		const TextWithEntities &note,
+		bool authoritativeKnown) {
+	if (!authoritativeKnown || !userId) {
+		return {};
+	}
+	auto result = ContactTimeZoneNoteUpdate{
+		.authoritativeChanged = authoritativeUsers.emplace(userId).second,
+	};
+	const auto parsed = ParseContactTimeZoneNote(note);
+	const auto i = payloads.find(userId);
+	if (!parsed.rawPayload) {
+		if (i == end(payloads)) {
+			return result;
+		}
+		payloads.erase(i);
+		result.payloadChanged = true;
+		return result;
+	}
+	if (i != end(payloads) && i->second == *parsed.rawPayload) {
+		return result;
+	}
+	payloads.insert_or_assign(userId, *parsed.rawPayload);
+	result.payloadChanged = true;
+	return result;
+}
+
+qint64 ContactTimeZoneMinuteDelay(qint64 nowMs) {
+	auto remainder = nowMs % kMinuteMs;
+	if (remainder < 0) {
+		remainder += kMinuteMs;
+	}
+	return kMinuteMs - remainder + kMinuteBoundaryEpsilon;
 }
 
 } // namespace Data

@@ -13,6 +13,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_changes.h"
 #include "data/data_channel.h"
 #include "data/data_chat.h"
+#include "data/data_contact_time_zone.h"
 #include "data/data_file_origin.h"
 #include "data/data_peer.h"
 #include "data/data_peer_values.h"
@@ -241,7 +242,9 @@ void ProcessFullPhoto(
 				? Info::Profile::UsernameUrl(peer, username, true)
 				: QString()),
 			.birthday = user ? user->birthday() : Data::Birthday(),
-			.note = user ? user->note() : TextWithEntities(),
+			.note = user
+				? Data::ParseContactTimeZoneNote(user->note()).visible
+				: TextWithEntities(),
 			.isBio = (user && !user->isBot()),
 		};
 	});
