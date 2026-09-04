@@ -1142,6 +1142,8 @@ PRIVATE
     history/view/history_view_translate_bar.h
     history/view/history_view_translate_tracker.cpp
     history/view/history_view_translate_tracker.h
+    history/view/history_view_top_bar_layout.cpp
+    history/view/history_view_top_bar_layout.h
     history/view/history_view_top_bar_widget.cpp
     history/view/history_view_top_bar_widget.h
     history/view/history_view_view_button.cpp

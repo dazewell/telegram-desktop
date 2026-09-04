@@ -13,6 +13,8 @@ nice_target_sources(test_contact_time_zone ${src_loc}
 PRIVATE
     data/data_contact_time_zone.cpp
     data/data_contact_time_zone.h
+    history/view/history_view_top_bar_layout.cpp
+    history/view/history_view_top_bar_layout.h
     tests/test_contact_time_zone.cpp
 )
 

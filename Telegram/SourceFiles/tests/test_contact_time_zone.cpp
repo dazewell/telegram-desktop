@@ -1,5 +1,6 @@
 #include "base/assertion.h"
 #include "data/data_contact_time_zone.h"
+#include "history/view/history_view_top_bar_layout.h"
 #include "rpl/rpl.h"
 
 #include <iostream>
@@ -394,6 +395,57 @@ void TestMinuteBoundary() {
 	Expects(Data::ContactTimeZoneMinuteDelay(-1) == 51);
 }
 
+void TestTopBarLayout() {
+	const auto titleLine = QRect(20, 11, 300, 19);
+	const auto shortNoBadge = HistoryView::ComputeTopBarTimeZoneLayout(
+		titleLine,
+		80,
+		19,
+		0,
+		6,
+		50,
+		13);
+	Expects(shortNoBadge.titleWidth == 80);
+	Expects(shortNoBadge.chipRect.x() == 106);
+
+	const auto shortBadge = HistoryView::ComputeTopBarTimeZoneLayout(
+		titleLine,
+		80,
+		19,
+		18,
+		6,
+		50,
+		13);
+	Expects(shortBadge.titleWidth == 80);
+	Expects(shortBadge.nameBadgeRect.width() == 98);
+	Expects(shortBadge.chipRect.x() == 124);
+
+	const auto longBadge = HistoryView::ComputeTopBarTimeZoneLayout(
+		titleLine,
+		400,
+		19,
+		18,
+		6,
+		50,
+		13);
+	Expects(longBadge.titleWidth == 226);
+	Expects(longBadge.chipRect.x() == 270);
+	Expects(longBadge.chipRect.right() == titleLine.right());
+
+	const auto insufficient = HistoryView::ComputeTopBarTimeZoneLayout(
+		QRect(20, 11, 92, 19),
+		80,
+		19,
+		18,
+		6,
+		50,
+		13);
+	Expects(!insufficient);
+
+	Expects(shortBadge.chipRect.y()
+		== titleLine.y() + (titleLine.height() - 13) / 2);
+}
+
 } // namespace
 
 void TestContactTimeZone() {
@@ -404,6 +456,7 @@ void TestContactTimeZone() {
 	TestConversion();
 	TestPersistenceAndState();
 	TestMinuteBoundary();
+	TestTopBarLayout();
 }
 
 } // namespace Test
@@ -416,6 +469,6 @@ rpl::producer<> on_main_update_requests() { return rpl::never<>(); }
 
 int main() {
 	Test::TestContactTimeZone();
-	std::cout << "7 contact time-zone test groups passed.\n";
+	std::cout << "8 contact time-zone test groups passed.\n";
 	return 0;
 }

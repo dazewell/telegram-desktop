@@ -7,14 +7,15 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include "ui/rp_widget.h"
-#include "ui/unread_badge.h"
-#include "ui/effects/animations.h"
-#include "ui/widgets/tooltip.h"
-#include "base/timer.h"
 #include "base/object_ptr.h"
+#include "base/timer.h"
 #include "data/data_report.h"
 #include "dialogs/dialogs_key.h"
+#include "history/view/history_view_top_bar_layout.h"
+#include "ui/effects/animations.h"
+#include "ui/widgets/tooltip.h"
+#include "ui/rp_widget.h"
+#include "ui/unread_badge.h"
 
 #include <QtGui/QFont>
 
@@ -230,11 +231,12 @@ private:
 	rpl::lifetime _activeChatLifetime;
 
 	Ui::PeerBadge _titleBadge;
+	Ui::PeerBadge::Layout _titleBadgeLayout;
 	Ui::Text::String _title;
 	int _titleNameVersion = 0;
 	QString _timeZonePhrase;
 	QString _timeZoneTooltip;
-	QRect _timeZoneRect;
+	TopBarTimeZoneLayout _timeZoneLayout;
 	int _timeZonePhraseWidth = 0;
 	int _timeZoneBadgeWidth = 0;
 	int _timeZoneStablePhraseWidth = 0;

@@ -188,7 +188,12 @@ void DrawTextBadge(
 		int outerWidth,
 		const style::color &color,
 		const QString &phrase,
-		int phraseWidth) {
+		int phraseWidth,
+		bool mirror) {
+	const auto logicalRect = rect;
+	if (mirror && style::RightToLeft()) {
+		rect.moveLeft(outerWidth - rect.x() - rect.width());
+	}
 	PainterHighQualityEnabler hq(p);
 	auto pen = color->p;
 	pen.setWidth(st::lineWidth);
@@ -207,7 +212,7 @@ void DrawTextBadge(
 			phrase);
 	} else {
 		p.drawTextLeft(
-			rect.x() + st::dialogsScamPadding.left(),
+			logicalRect.x() + st::dialogsScamPadding.left(),
 			rect.y() + st::dialogsScamPadding.top(),
 			outerWidth,
 			phrase,
@@ -235,16 +240,25 @@ PeerBadge::PeerBadge() = default;
 
 PeerBadge::~PeerBadge() = default;
 
-int PeerBadge::drawGetWidth(Painter &p, Descriptor &&descriptor) {
+PeerBadge::Layout PeerBadge::layout(const Descriptor &descriptor) {
 	Expects(descriptor.customEmojiRepaint != nullptr);
 
+	auto result = Layout();
 	const auto peer = descriptor.peer;
 	if ((descriptor.scam && (peer->isScam() || peer->isFake()))
 		|| (descriptor.direct && peer->isMonoforum())) {
 		if (_emojiStatus) {
 			_emojiStatus->painted = false;
 		}
-		return drawTextBadge(p, descriptor);
+		result._textBadge = peer->isScam()
+			? TextBadgeType::Scam
+			: peer->isFake()
+			? TextBadgeType::Fake
+			: TextBadgeType::Direct;
+		result._width = st::dialogsScamSkip
+			+ TextBadgeSize(result._textBadge).width();
+		result._paintText = true;
+		return result;
 	}
 	const auto verifyCheck = descriptor.verified && peer->isVerified();
 	const auto premiumMark = descriptor.premium
@@ -264,40 +278,63 @@ int PeerBadge::drawGetWidth(Painter &p, Descriptor &&descriptor) {
 		&& (!paintVerify || descriptor.bothVerifyAndStatus);
 	const auto paintStar = premiumStar && !paintVerify;
 
-	auto result = 0;
-	if (paintEmoji) {
-		auto &rectForName = descriptor.rectForName;
-		const auto verifyWidth = descriptor.verified->width();
-		if (paintVerify) {
-			rectForName.setWidth(rectForName.width() - verifyWidth);
-		}
-		result += drawPremiumEmojiStatus(p, descriptor);
-		if (!paintVerify) {
-			return result;
-		}
-		rectForName.setWidth(rectForName.width() + verifyWidth);
-		descriptor.nameWidth += result;
+	result._paintEmoji = paintEmoji
+		&& preparePremiumEmojiStatus(descriptor);
+	result._paintVerify = paintVerify;
+	result._paintStar = paintStar;
+	if (result._paintEmoji) {
+		result._width += descriptor.premium->width()
+			- 4 * _emojiStatus->skip;
 	} else if (_emojiStatus) {
 		_emojiStatus->painted = false;
 	}
-	if (paintVerify) {
-		result += drawVerifyCheck(p, descriptor);
-		return result;
-	} else if (paintStar) {
-		return drawPremiumStar(p, descriptor);
+	if (result._paintVerify) {
+		result._width += descriptor.verified->width();
+	} else if (result._paintStar) {
+		result._width = descriptor.premium->width();
 	}
-	return 0;
+	return result;
 }
 
-int PeerBadge::drawTextBadge(Painter &p, const Descriptor &descriptor) {
-	const auto type = [&] {
-		if (descriptor.peer->isScam()) {
-			return TextBadgeType::Scam;
-		} else if (descriptor.peer->isFake()) {
-			return TextBadgeType::Fake;
+int PeerBadge::draw(
+		Painter &p,
+		Descriptor &&descriptor,
+		const Layout &layout) {
+	Expects(descriptor.customEmojiRepaint != nullptr);
+
+	if (layout._paintText) {
+		drawTextBadge(p, descriptor, layout._textBadge);
+		return layout._width;
+	}
+	if (layout._paintEmoji) {
+		auto &rectForName = descriptor.rectForName;
+		const auto verifyWidth = descriptor.verified->width();
+		if (layout._paintVerify) {
+			rectForName.setWidth(rectForName.width() - verifyWidth);
 		}
-		return TextBadgeType::Direct;
-	}();
+		drawPremiumEmojiStatus(p, descriptor);
+		if (layout._paintVerify) {
+			rectForName.setWidth(rectForName.width() + verifyWidth);
+			descriptor.nameWidth += layout._width - verifyWidth;
+		}
+	}
+	if (layout._paintVerify) {
+		drawVerifyCheck(p, descriptor);
+	} else if (layout._paintStar) {
+		drawPremiumStar(p, descriptor);
+	}
+	return layout._width;
+}
+
+int PeerBadge::drawGetWidth(Painter &p, Descriptor &&descriptor) {
+	const auto prepared = layout(descriptor);
+	return draw(p, std::move(descriptor), prepared);
+}
+
+void PeerBadge::drawTextBadge(
+		Painter &p,
+		const Descriptor &descriptor,
+		TextBadgeType type) {
 	const auto phrase = TextBadgeText(type);
 	const auto phraseWidth = st::dialogsScamFont->width(phrase);
 	const auto width = st::dialogsScamPadding.left()
@@ -324,10 +361,9 @@ int PeerBadge::drawTextBadge(Painter &p, const Descriptor &descriptor) {
 			: descriptor.scam),
 		phrase,
 		phraseWidth);
-	return st::dialogsScamSkip + width;
 }
 
-int PeerBadge::drawVerifyCheck(Painter &p, const Descriptor &descriptor) {
+void PeerBadge::drawVerifyCheck(Painter &p, const Descriptor &descriptor) {
 	const auto iconw = descriptor.verified->width();
 	const auto rectForName = descriptor.rectForName;
 	const auto nameWidth = descriptor.nameWidth;
@@ -336,19 +372,12 @@ int PeerBadge::drawVerifyCheck(Painter &p, const Descriptor &descriptor) {
 		rectForName.x() + qMin(nameWidth, rectForName.width() - iconw),
 		rectForName.y(),
 		descriptor.outerWidth);
-	return iconw;
 }
 
-int PeerBadge::drawPremiumEmojiStatus(
-		Painter &p,
+bool PeerBadge::preparePremiumEmojiStatus(
 		const Descriptor &descriptor) {
 	const auto peer = descriptor.peer;
 	const auto id = peer->emojiStatusId();
-	const auto rectForName = descriptor.rectForName;
-	const auto iconw = descriptor.premium->width();
-	const auto iconx = rectForName.x()
-		+ qMin(descriptor.nameWidth, rectForName.width() - iconw);
-	const auto icony = rectForName.y();
 	if (!_emojiStatus) {
 		_emojiStatus = std::make_unique<EmojiStatus>();
 		const auto size = st::emojiSize;
@@ -365,9 +394,19 @@ int PeerBadge::drawPremiumEmojiStatus(
 				descriptor.customEmojiRepaint),
 			kPlayStatusLimit);
 	}
-	if (!_emojiStatus->emoji) {
-		return 0;
-	}
+	return (_emojiStatus->emoji != nullptr);
+}
+
+void PeerBadge::drawPremiumEmojiStatus(
+		Painter &p,
+		const Descriptor &descriptor) {
+	Expects(_emojiStatus && _emojiStatus->emoji);
+
+	const auto rectForName = descriptor.rectForName;
+	const auto iconw = descriptor.premium->width();
+	const auto iconx = rectForName.x()
+		+ qMin(descriptor.nameWidth, rectForName.width() - iconw);
+	const auto icony = rectForName.y();
 	_emojiStatus->lastPosition = QPoint(
 		iconx - 2 * _emojiStatus->skip,
 		icony + _emojiStatus->skip);
@@ -379,10 +418,9 @@ int PeerBadge::drawPremiumEmojiStatus(
 		.position = _emojiStatus->lastPosition,
 		.paused = descriptor.paused || On(PowerSaving::kEmojiStatus),
 	});
-	return iconw - 4 * _emojiStatus->skip;
 }
 
-int PeerBadge::drawPremiumStar(Painter &p, const Descriptor &descriptor) {
+void PeerBadge::drawPremiumStar(Painter &p, const Descriptor &descriptor) {
 	const auto rectForName = descriptor.rectForName;
 	const auto iconw = descriptor.premium->width();
 	const auto iconx = rectForName.x()
@@ -390,7 +428,6 @@ int PeerBadge::drawPremiumStar(Painter &p, const Descriptor &descriptor) {
 	const auto icony = rectForName.y();
 	_emojiStatus = nullptr;
 	descriptor.premium->paint(p, iconx, icony, descriptor.outerWidth);
-	return iconw;
 }
 
 QRect PeerBadge::emojiStatusRect() const {

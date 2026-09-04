@@ -157,6 +157,11 @@ TopBarWidget::TopBarWidget(
 	) | rpl::on_next([=] {
 		refreshTimeZoneBadge();
 	}, lifetime());
+	session().premiumPossibleValue(
+	) | rpl::on_next([=] {
+		updateTimeZoneBadgeGeometry();
+		update();
+	}, lifetime());
 
 	_forward->setClickedCallback([=] { _forwardSelection.fire({}); });
 	_forward->setWidthChangedCallback([=] { updateControlsGeometry(); });
@@ -229,11 +234,17 @@ TopBarWidget::TopBarWidget(
 		| UpdateFlag::SupportInfo
 		| UpdateFlag::Rights
 		| UpdateFlag::EmojiStatus
+		| UpdateFlag::VerifyInfo
 		| UpdateFlag::Name
 	) | rpl::on_next([=](const Data::PeerUpdate &update) {
 		if ((update.flags & UpdateFlag::Name)
 			&& (update.peer == titleNamePeer())) {
 			refreshTimeZoneBadge();
+		} else if ((update.flags
+			& (UpdateFlag::EmojiStatus | UpdateFlag::VerifyInfo))
+			&& (update.peer == titleNamePeer())) {
+			updateTimeZoneBadgeGeometry();
+			this->update();
 		}
 		if (update.flags & UpdateFlag::HasCalls) {
 			if (update.peer->isUser()
@@ -254,10 +265,6 @@ TopBarWidget::TopBarWidget(
 				&& !_activeChat.key.topic()) {
 				updateOnlineDisplay();
 			}
-		}
-		if ((update.flags & UpdateFlag::EmojiStatus)
-			&& (_activeChat.key.peer() == update.peer)) {
-			this->update();
 		}
 	}, lifetime());
 
@@ -675,16 +682,15 @@ void TopBarWidget::paintTopBar(Painter &p) {
 			nameleft += skip + st::dialogsChatTypeSkip;
 			namewidth -= skip + st::dialogsChatTypeSkip;
 		}
-		const auto timeZoneSkip = _timeZoneRect.isEmpty()
-			? 0
-			: st::dialogsScamSkip + _timeZoneBadgeWidth;
-		const auto badgeWidth = _titleBadge.drawGetWidth(p, {
+		auto badgeDescriptor = Ui::PeerBadge::Descriptor{
 			.peer = namePeer,
-			.rectForName = QRect(
-				nameleft,
-				nametop,
-				std::max(namewidth - timeZoneSkip, 0),
-				st::msgNameStyle.font->height),
+			.rectForName = _timeZoneLayout
+				? _timeZoneLayout.nameBadgeRect
+				: QRect(
+					nameleft,
+					nametop,
+					namewidth,
+					st::msgNameStyle.font->height),
 			.nameWidth = _title.maxWidth(),
 			.outerWidth = width(),
 			.verified = &st::dialogsVerifiedIcon,
@@ -697,8 +703,18 @@ void TopBarWidget::paintTopBar(Painter &p) {
 			.bothVerifyAndStatus = true,
 			.paused = _controller->isGifPausedAtLeastFor(
 				Window::GifPauseReason::Any),
-		});
-		namewidth -= badgeWidth + timeZoneSkip;
+		};
+		if (_timeZoneLayout) {
+			_titleBadge.draw(
+				p,
+				std::move(badgeDescriptor),
+				_titleBadgeLayout);
+			namewidth = _timeZoneLayout.titleWidth;
+		} else {
+			namewidth -= _titleBadge.drawGetWidth(
+				p,
+				std::move(badgeDescriptor));
+		}
 
 		p.setPen(st::dialogsNameFg);
 		_title.draw(p, {
@@ -706,14 +722,15 @@ void TopBarWidget::paintTopBar(Painter &p) {
 			.availableWidth = namewidth,
 			.elisionLines = 1,
 		});
-		if (!_timeZonePhrase.isEmpty() && !_timeZoneRect.isEmpty()) {
+		if (!_timeZonePhrase.isEmpty() && _timeZoneLayout) {
 			Ui::DrawTextBadge(
 				p,
-				_timeZoneRect,
+				_timeZoneLayout.chipRect,
 				width(),
 				st::windowSubTextFg,
 				_timeZonePhrase,
-				_timeZonePhraseWidth);
+				_timeZonePhraseWidth,
+				true);
 		}
 
 		p.setFont(st::dialogsTextFont);
@@ -790,7 +807,7 @@ void TopBarWidget::refreshTimeZoneBadge(bool rebuildStableWidth) {
 }
 
 void TopBarWidget::updateTimeZoneBadgeGeometry() {
-	_timeZoneRect = QRect();
+	_timeZoneLayout = {};
 	const auto peer = titleNamePeer();
 	if (_timeZonePhrase.isEmpty() || !peer || !width()) {
 		return;
@@ -811,20 +828,40 @@ void TopBarWidget::updateTimeZoneBadgeGeometry() {
 		nameleft += st::emojiSize + st::dialogsChatTypeSkip;
 		namewidth -= st::emojiSize + st::dialogsChatTypeSkip;
 	}
-	if (namewidth < _timeZoneBadgeWidth) {
-		return;
-	}
 	const auto height = st::dialogsScamPadding.top()
 		+ st::dialogsScamFont->height
 		+ st::dialogsScamPadding.bottom();
-	const auto left = nameleft + namewidth - _timeZoneBadgeWidth;
-	const auto top = st::topBarArrowPadding.top()
-		+ (st::msgNameStyle.font->height - height) / 2;
-	_timeZoneRect = QRect(left, top, _timeZoneBadgeWidth, height);
+	const auto titleLine = QRect(
+		nameleft,
+		st::topBarArrowPadding.top(),
+		namewidth,
+		st::msgNameStyle.font->height);
+	_titleBadgeLayout = _titleBadge.layout({
+		.peer = peer,
+		.rectForName = titleLine,
+		.nameWidth = _title.maxWidth(),
+		.outerWidth = width(),
+		.verified = &st::dialogsVerifiedIcon,
+		.premium = &st::dialogsPremiumIcon.icon,
+		.scam = &st::attentionButtonFg,
+		.direct = &st::windowSubTextFg,
+		.premiumFg = &st::dialogsVerifiedIconBg,
+		.customEmojiRepaint = [=] { update(); },
+		.bothVerifyAndStatus = true,
+	});
+	_timeZoneLayout = ComputeTopBarTimeZoneLayout(
+		titleLine,
+		_title.maxWidth(),
+		st::msgNameStyle.font->height,
+		_titleBadgeLayout.width(),
+		st::dialogsScamSkip,
+		_timeZoneBadgeWidth,
+		height);
 }
 
 QString TopBarWidget::tooltipText() const {
-	return myrtlrect(_timeZoneRect).contains(mapFromGlobal(QCursor::pos()))
+	return myrtlrect(_timeZoneLayout.chipRect).contains(
+		mapFromGlobal(QCursor::pos()))
 		? _timeZoneTooltip
 		: QString();
 }
@@ -947,7 +984,7 @@ void TopBarWidget::mousePressEvent(QMouseEvent *e) {
 void TopBarWidget::mouseMoveEvent(QMouseEvent *e) {
 	RpWidget::mouseMoveEvent(e);
 	if (!_timeZoneTooltip.isEmpty()
-		&& myrtlrect(_timeZoneRect).contains(e->pos())) {
+		&& myrtlrect(_timeZoneLayout.chipRect).contains(e->pos())) {
 		Ui::Tooltip::Show(QApplication::startDragTime(), this);
 	} else {
 		Ui::Tooltip::Hide();
@@ -1018,9 +1055,25 @@ void TopBarWidget::setActiveChat(
 	if (peerChanged || topicChanged) {
 		_titleBadge.unload();
 		_titleNameVersion = 0;
+		updateTimeZoneBadgeGeometry();
 		_emojiInteractionSeen = nullptr;
 		_activeChatLifetime.destroy();
 		if (const auto peer = _activeChat.key.peer()) {
+			if (const auto user = peer->asUser()) {
+				using Flag = UserDataFlag;
+				using FlagsChange = UserData::Flags::Change;
+				user->flagsValue(
+				) | rpl::filter([](FlagsChange change) {
+					return change.diff
+						& (Flag::Premium
+							| Flag::Verified
+							| Flag::Scam
+							| Flag::Fake);
+				}) | rpl::on_next([=] {
+					updateTimeZoneBadgeGeometry();
+					update();
+				}, _activeChatLifetime);
+			}
 			session().changes().peerFlagsValue(
 				peer,
 				Data::PeerUpdate::Flag::GroupCall

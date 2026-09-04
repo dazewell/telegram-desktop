@@ -1,0 +1,33 @@
+/*
+This file is part of Telegram Desktop,
+the official desktop application for the Telegram messaging service.
+
+For license and copyright information please follow this link:
+https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
+*/
+#pragma once
+
+#include <QtCore/QRect>
+
+namespace HistoryView {
+
+struct TopBarTimeZoneLayout {
+	QRect nameBadgeRect;
+	QRect chipRect;
+	int titleWidth = 0;
+
+	explicit operator bool() const {
+		return !chipRect.isEmpty();
+	}
+};
+
+[[nodiscard]] TopBarTimeZoneLayout ComputeTopBarTimeZoneLayout(
+	QRect titleLine,
+	int titleNaturalWidth,
+	int minimumTitleWidth,
+	int badgeWidth,
+	int spacing,
+	int chipWidth,
+	int chipHeight);
+
+} // namespace HistoryView
