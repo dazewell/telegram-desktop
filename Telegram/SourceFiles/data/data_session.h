@@ -61,6 +61,7 @@ class Reactions;
 class EmojiStatuses;
 class ForumIcons;
 class AiComposeTones;
+class ContactTimeZones;
 class ChatFilters;
 class CloudThemes;
 class Streaming;
@@ -186,6 +187,9 @@ public:
 	}
 	[[nodiscard]] const Groups &groups() const {
 		return _groups;
+	}
+	[[nodiscard]] ContactTimeZones &contactTimeZones() const {
+		return *_contactTimeZones;
 	}
 	[[nodiscard]] AiComposeTones &aiComposeTones() const {
 		return *_aiComposeTones;
@@ -408,6 +412,7 @@ public:
 	void requestViewRepaint(not_null<const ViewElement*> view, QRect r = QRect());
 	[[nodiscard]] rpl::producer<RequestViewRepaint> viewRepaintRequest() const;
 	void requestItemResize(not_null<const HistoryItem*> item);
+	void requestHistoryItemsResize(not_null<History*> history);
 	[[nodiscard]] rpl::producer<not_null<const HistoryItem*>> itemResizeRequest() const;
 	void requestViewResize(not_null<ViewElement*> view);
 	[[nodiscard]] rpl::producer<not_null<ViewElement*>> viewResizeRequest() const;
@@ -1427,6 +1432,7 @@ private:
 	mutable base::flat_map<PeerId, std::vector<FullMsgId>> _messagesWithPeer;
 
 	Groups _groups;
+	const std::unique_ptr<ContactTimeZones> _contactTimeZones;
 	const std::unique_ptr<AiComposeTones> _aiComposeTones;
 	const std::unique_ptr<ChatFilters> _chatsFilters;
 	const std::unique_ptr<CloudThemes> _cloudThemes;

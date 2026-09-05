@@ -19,6 +19,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/click_handler_types.h"
 #include "core/ui_integration.h"
 #include "data/data_changes.h"
+#include "data/data_contact_time_zone.h"
 #include "data/data_document.h"
 #include "data/data_premium_limits.h"
 #include "data/data_session.h"
@@ -47,6 +48,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/text/text_utilities.h"
 #include "ui/toast/toast.h"
 #include "ui/vertical_list.h"
+#include "ui/widgets/buttons.h"
 #include "ui/widgets/checkbox.h"
 #include "ui/widgets/fields/input_field.h"
 #include "ui/widgets/labels.h"
@@ -232,6 +234,7 @@ private:
 	void setupDeleteContactButton();
 	void setupWarning();
 	void setupSharePhoneNumber();
+	void applyAuthoritativeNote();
 	void initNameFields(
 		not_null<Ui::InputField*> first,
 		not_null<Ui::InputField*> last,
@@ -255,6 +258,7 @@ private:
 	Ui::Checkbox *_sharePhone = nullptr;
 	Ui::InputField *_notesField = nullptr;
 	Ui::InputField *_firstNameField = nullptr;
+	QPointer<Ui::RoundButton> _saveButton;
 	base::unique_qptr<ChatHelpers::TabbedPanel> _emojiPanel;
 	base::unique_qptr<Ui::PopupMenu> _photoMenu;
 	std::unique_ptr<Ui::AnimatedIcon> _suggestIcon;
@@ -262,6 +266,8 @@ private:
 	Ui::RpWidget *_suggestIconWidget = nullptr;
 	Ui::RpWidget *_cameraIconWidget = nullptr;
 	QString _phone;
+	std::optional<QString> _rawNotePayload;
+	bool _noteLoaded = false;
 	Fn<void()> _focus;
 	Fn<void()> _save;
 
@@ -286,9 +292,25 @@ void Controller::prepare() {
 		? tr::lng_edit_contact_title()
 		: tr::lng_enter_contact_data());
 
-	_box->addButton(tr::lng_box_done(), _save);
+	_saveButton = _box->addButton(tr::lng_box_done(), _save);
 	_box->addButton(tr::lng_cancel(), [=] { _box->closeBox(); });
 	_box->setFocusCallback(_focus);
+	if (_user->wasFullUpdated()) {
+		applyAuthoritativeNote();
+	} else {
+		_box->verticalLayout()->setDisabled(true);
+		_saveButton->setDisabled(true);
+		_box->showLoading(true);
+		_user->session().api().requestFullPeer(_user);
+		_user->session().changes().peerUpdates(
+			_user,
+			Data::PeerUpdate::Flag::FullInfo
+		) | rpl::filter([=] {
+			return _user->wasFullUpdated();
+		}) | rpl::take(1) | rpl::on_next([=] {
+			applyAuthoritativeNote();
+		}, _box->lifetime());
+	}
 }
 
 void Controller::setupContent() {
@@ -371,22 +393,12 @@ void Controller::initNameFields(
 			return;
 		}
 
-		if (_notesField) {
-			const auto limit = Data::PremiumLimits(
-				&_user->session()).contactNoteLengthCurrent();
-			const auto remove = Ui::ComputeFieldCharacterCount(_notesField)
-				- limit;
-			if (remove > 0) {
-				_box->showToast(tr::lng_contact_notes_limit_reached(
-					tr::now,
-					lt_count,
-					remove));
-				_notesField->setFocus();
-				return;
-			}
+		if (!_noteLoaded || !_user->wasFullUpdated()) {
+			_user->session().api().requestFullPeer(_user);
+			return;
 		}
 
-		const auto noteValue = _notesField
+		const auto visibleNote = _notesField
 			? [&] {
 				auto textWithTags = _notesField->getTextWithAppliedMarkdown();
 				return TextWithEntities{
@@ -396,6 +408,24 @@ void Controller::initNameFields(
 				};
 			}()
 			: TextWithEntities();
+		const auto serverLimit = Data::PremiumLimits(
+			&_user->session()).contactNoteLengthCurrent();
+		const auto composed = Data::ComposeContactTimeZoneNote(
+			visibleNote,
+			_rawNotePayload,
+			serverLimit);
+		if (!composed.note) {
+			const auto remove = std::max(
+				Ui::ComputeFieldCharacterCount(_notesField)
+					- composed.editableLimit,
+				1);
+			_box->showToast(tr::lng_contact_notes_limit_reached(
+				tr::now,
+				lt_count,
+				remove));
+			_notesField->setFocus();
+			return;
+		}
 		SendRequest(
 			base::make_weak(_box),
 			_user,
@@ -403,7 +433,7 @@ void Controller::initNameFields(
 			firstValue,
 			lastValue,
 			_phone,
-			noteValue);
+			*composed.note);
 	};
 	const auto submit = [=] {
 		const auto firstValue = first->getLastText().trimmed();
@@ -451,11 +481,6 @@ void Controller::setupNotesField() {
 	_notesField->setCustomTextContext(Core::TextContext({
 		.session = &_user->session()
 	}));
-	_notesField->setTextWithTags({
-		_user->note().text,
-		TextUtilities::ConvertEntitiesToTextTags(_user->note().entities)
-	});
-
 	_notesField->setMarkdownReplacesEnabled(rpl::single(
 		Ui::MarkdownEnabledState{
 			Ui::MarkdownEnabled{
@@ -520,8 +545,13 @@ void Controller::setupNotesField() {
 	const auto limitState = _notesField->lifetime().make_state<LimitState>();
 
 	const auto checkCharsLimitation = [=, w = _notesField->window()] {
-		const auto limit = Data::PremiumLimits(
+		const auto serverLimit = Data::PremiumLimits(
 			&_user->session()).contactNoteLengthCurrent();
+		const auto limit = Data::ContactTimeZoneEditableLimit(
+			serverLimit,
+			_rawNotePayload,
+			!_notesField->getLastText().isEmpty());
+		_notesField->setMaxLength(limit);
 		const auto remove = Ui::ComputeFieldCharacterCount(_notesField)
 			- limit;
 		if (!limitState->charsLimitation) {
@@ -547,10 +577,27 @@ void Controller::setupNotesField() {
 	_notesField->changes() | rpl::on_next([=] {
 		checkCharsLimitation();
 	}, _notesField->lifetime());
+	checkCharsLimitation();
 
 	Ui::AddDividerText(
 		_box->verticalLayout(),
 		tr::lng_contact_add_notes_about());
+}
+
+void Controller::applyAuthoritativeNote() {
+	if (_noteLoaded || !_user->wasFullUpdated()) {
+		return;
+	}
+	const auto parsed = Data::ParseContactTimeZoneNote(_user->note());
+	_rawNotePayload = parsed.rawPayload;
+	_notesField->setTextWithTags({
+		parsed.visible.text,
+		TextUtilities::ConvertEntitiesToTextTags(parsed.visible.entities)
+	});
+	_noteLoaded = true;
+	_box->verticalLayout()->setDisabled(false);
+	_saveButton->setDisabled(false);
+	_box->showLoading(false);
 }
 
 void Controller::setupPhotoButtons() {

@@ -187,6 +187,7 @@ bool WindowsIntegration::processEvent(
 
 	case WM_TIMECHANGE:
 		Core::App().checkAutoLockIn(100);
+		Core::App().notifySystemTimeChanged();
 		break;
 
 	case WM_WTSSESSION_CHANGE:
@@ -201,6 +202,7 @@ bool WindowsIntegration::processEvent(
 
 	case WM_SETTINGCHANGE:
 		RefreshTaskbarThemeValue();
+		Core::App().notifySystemTimeChanged();
 #if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
 		Core::App().settings().setSystemDarkMode(Platform::IsDarkMode());
 #endif // Qt < 6.5.0

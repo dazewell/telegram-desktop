@@ -75,6 +75,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_emoji_statuses.h"
 #include "data/data_forum_icons.h"
 #include "data/data_cloud_themes.h"
+#include "data/data_contact_time_zones.h"
 #include "data/data_saved_messages.h"
 #include "data/data_saved_music.h"
 #include "data/data_saved_sublist.h"
@@ -332,6 +333,7 @@ Session::Session(not_null<Main::Session*> session)
 , _pollsClosingTimer([=] { checkPollsClosings(); })
 , _watchForOfflineTimer([=] { checkLocalUsersWentOffline(); })
 , _groups(this)
+, _contactTimeZones(std::make_unique<ContactTimeZones>(this))
 , _aiComposeTones(std::make_unique<AiComposeTones>(session))
 , _chatsFilters(std::make_unique<ChatFilters>(this))
 , _cloudThemes(std::make_unique<CloudThemes>(session))
@@ -366,6 +368,13 @@ Session::Session(not_null<Main::Session*> session)
 	setupChannelLeavingViewer();
 	setupPeerNameViewer();
 	setupUserIsContactViewer();
+
+	_contactTimeZones->userChanges(
+	) | rpl::on_next([=](UserId userId) {
+		if (const auto history = historyLoaded(peerFromUser(userId))) {
+			requestHistoryItemsResize(history);
+		}
+	}, _lifetime);
 
 	_chatsList.unreadStateChanges(
 	) | rpl::on_next([=] {
@@ -2252,6 +2261,18 @@ void Session::requestItemResize(not_null<const HistoryItem*> item) {
 	enumerateItemViews(item, [&](not_null<ViewElement*> view) {
 		requestViewResize(view);
 	});
+}
+
+void Session::requestHistoryItemsResize(not_null<History*> history) {
+	const auto list = messagesList(history->peer->id);
+	if (!list) {
+		return;
+	}
+	for (const auto &[messageId, item] : *list) {
+		if (item->history() == history) {
+			requestItemResize(item);
+		}
+	}
 }
 
 rpl::producer<not_null<const HistoryItem*>> Session::itemResizeRequest() const {

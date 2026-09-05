@@ -7,13 +7,18 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
-#include "ui/rp_widget.h"
-#include "ui/unread_badge.h"
-#include "ui/effects/animations.h"
-#include "base/timer.h"
 #include "base/object_ptr.h"
+#include "base/timer.h"
+#include "base/weak_qptr.h"
 #include "data/data_report.h"
 #include "dialogs/dialogs_key.h"
+#include "history/view/history_view_top_bar_layout.h"
+#include "ui/effects/animations.h"
+#include "ui/widgets/tooltip.h"
+#include "ui/rp_widget.h"
+#include "ui/unread_badge.h"
+
+#include <QtGui/QFont>
 
 namespace style {
 struct UserpicButton;
@@ -50,7 +55,9 @@ class SendActionPainter;
 
 [[nodiscard]] QString SwitchToChooseFromQuery();
 
-class TopBarWidget final : public Ui::RpWidget {
+class TopBarWidget final
+	: public Ui::RpWidget
+	, public Ui::AbstractTooltipShower {
 public:
 	struct SelectedState {
 		bool textSelected = false;
@@ -132,10 +139,16 @@ public:
 		float64 narrowRatio);
 	void showPeerMenu();
 
+	QString tooltipText() const override;
+	QPoint tooltipPos() const override;
+	bool tooltipWindowActive() const override;
+
 protected:
 	void paintEvent(QPaintEvent *e) override;
+	void mouseMoveEvent(QMouseEvent *e) override;
 	void mousePressEvent(QMouseEvent *e) override;
 	void resizeEvent(QResizeEvent *e) override;
+	void leaveEventHook(QEvent *e) override;
 	bool eventFilter(QObject *obj, QEvent *e) override;
 
 	int resizeGetHeight(int newWidth) override;
@@ -168,6 +181,8 @@ private:
 	[[nodiscard]] bool createMenu(
 		not_null<Ui::IconButton*> button,
 		bool withIcons = true);
+	void closeMenu();
+	void unrippleMenuButton();
 
 	void handleEmojiInteractionSeen(const QString &emoticon);
 	bool paintSendAction(
@@ -186,6 +201,8 @@ private:
 
 	void paintTopBar(Painter &p);
 	[[nodiscard]] PeerData *titleNamePeer() const;
+	void refreshTimeZoneBadge(bool rebuildStableWidth = false);
+	void updateTimeZoneBadgeGeometry();
 	void paintStatus(
 		Painter &p,
 		int left,
@@ -217,8 +234,16 @@ private:
 	rpl::lifetime _activeChatLifetime;
 
 	Ui::PeerBadge _titleBadge;
+	Ui::PeerBadge::Layout _titleBadgeLayout;
 	Ui::Text::String _title;
 	int _titleNameVersion = 0;
+	QString _timeZonePhrase;
+	QString _timeZoneTooltip;
+	TopBarTimeZoneLayout _timeZoneLayout;
+	int _timeZonePhraseWidth = 0;
+	int _timeZoneBadgeWidth = 0;
+	int _timeZoneStablePhraseWidth = 0;
+	QFont _timeZoneStableFont;
 
 	int _selectedCount = 0;
 	bool _canDelete = false;
@@ -255,6 +280,7 @@ private:
 	object_ptr<Ui::IconButton> _infoToggle;
 	object_ptr<Ui::IconButton> _menuToggle;
 	base::unique_qptr<Ui::PopupMenu> _menu;
+	base::weak_qptr<Ui::IconButton> _menuButton;
 
 	object_ptr<RpWidget> _membersShowArea = { nullptr };
 	rpl::event_stream<bool> _membersShowAreaActive;

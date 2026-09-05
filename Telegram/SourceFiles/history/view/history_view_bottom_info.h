@@ -7,6 +7,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
+#include "data/data_contact_time_zone.h"
 #include "history/view/history_view_object.h"
 #include "ui/text/text.h"
 #include "base/flags.h"
@@ -54,11 +55,14 @@ public:
 
 		QDateTime date;
 		QDateTime editedDate;
+		std::optional<::Data::ContactTimeZone> contactTimeZone;
 		QString author;
 		EffectId effectId = 0;
 		int64 tonStake = 0;
 		int stars = 0;
 		TimeId scheduleRepeatPeriod = 0;
+		TimeId dateTimestamp = 0;
+		TimeId editedTimestamp = 0;
 		std::optional<int> views;
 		std::optional<int> replies;
 		std::optional<int> forwardsCount;
