@@ -14,6 +14,8 @@ namespace HistoryView {
 TopBarTimeZoneLayout ComputeTopBarTimeZoneLayout(
 		QRect titleLine,
 		int titleNaturalWidth,
+		int titleAvailableWidth,
+		int titleRenderedWidth,
 		int minimumTitleWidth,
 		int badgeWidth,
 		int spacing,
@@ -23,6 +25,9 @@ TopBarTimeZoneLayout ComputeTopBarTimeZoneLayout(
 		int chipTextBaselineFromTop) {
 	if (titleLine.isEmpty()
 		|| titleNaturalWidth <= 0
+		|| titleAvailableWidth <= 0
+		|| titleRenderedWidth <= 0
+		|| titleRenderedWidth > titleAvailableWidth
 		|| minimumTitleWidth <= 0
 		|| badgeWidth < 0
 		|| spacing < 0
@@ -34,17 +39,16 @@ TopBarTimeZoneLayout ComputeTopBarTimeZoneLayout(
 		|| chipTextBaselineFromTop > chipHeight) {
 		return {};
 	}
-	const auto reservedWidth = badgeWidth + spacing + chipWidth;
-	const auto titleAvailable = titleLine.width() - reservedWidth;
 	const auto meaningfulTitleWidth = std::min(
 		titleNaturalWidth,
 		minimumTitleWidth);
-	if (titleAvailable < meaningfulTitleWidth) {
+	if (titleAvailableWidth < meaningfulTitleWidth
+		|| titleAvailableWidth + badgeWidth + spacing + chipWidth
+			> titleLine.width()) {
 		return {};
 	}
-	const auto titleWidth = std::min(titleNaturalWidth, titleAvailable);
 	const auto chipLeft = titleLine.x()
-		+ titleWidth
+		+ titleRenderedWidth
 		+ badgeWidth
 		+ spacing;
 	const auto chipTop = titleLine.y()
@@ -53,9 +57,12 @@ TopBarTimeZoneLayout ComputeTopBarTimeZoneLayout(
 	return {
 		.nameBadgeRect = QRect(
 			titleLine.topLeft(),
-			QSize(titleWidth + badgeWidth, titleLine.height())),
+			QSize(
+				titleRenderedWidth + badgeWidth,
+				titleLine.height())),
 		.chipRect = QRect(chipLeft, chipTop, chipWidth, chipHeight),
-		.titleWidth = titleWidth,
+		.titleAvailableWidth = titleAvailableWidth,
+		.titleRenderedWidth = titleRenderedWidth,
 	};
 }
 

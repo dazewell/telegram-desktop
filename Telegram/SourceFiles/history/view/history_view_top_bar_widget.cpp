@@ -705,7 +705,9 @@ void TopBarWidget::paintTopBar(Painter &p) {
 					nametop,
 					namewidth,
 					st::msgNameStyle.font->height),
-			.nameWidth = _title.maxWidth(),
+			.nameWidth = _timeZoneLayout
+				? _timeZoneLayout.titleRenderedWidth
+				: _title.maxWidth(),
 			.outerWidth = width(),
 			.verified = &st::dialogsVerifiedIcon,
 			.premium = &st::dialogsPremiumIcon.icon,
@@ -723,7 +725,7 @@ void TopBarWidget::paintTopBar(Painter &p) {
 				p,
 				std::move(badgeDescriptor),
 				_titleBadgeLayout);
-			namewidth = _timeZoneLayout.titleWidth;
+			namewidth = _timeZoneLayout.titleAvailableWidth;
 		} else {
 			namewidth -= _titleBadge.drawGetWidth(
 				p,
@@ -826,11 +828,12 @@ void TopBarWidget::updateTimeZoneBadgeGeometry() {
 	if (_timeZonePhrase.isEmpty() || !peer || !width()) {
 		return;
 	}
+	const auto titleText = TopBarNameText(peer, _activeChat);
 	if (_titleNameVersion < peer->nameVersion()) {
 		_titleNameVersion = peer->nameVersion();
 		_title.setText(
 			st::msgNameStyle,
-			TopBarNameText(peer, _activeChat),
+			titleText,
 			Ui::NameTextOptions());
 	}
 	auto nameleft = _leftTaken;
@@ -863,11 +866,28 @@ void TopBarWidget::updateTimeZoneBadgeGeometry() {
 		.customEmojiRepaint = [=] { update(); },
 		.bothVerifyAndStatus = true,
 	});
+	const auto badgeWidth = _titleBadgeLayout.width();
+	const auto titleAvailableWidth = std::min(
+		_title.maxWidth(),
+		titleLine.width()
+			- badgeWidth
+			- st::dialogsScamSkip
+			- _timeZoneBadgeWidth);
+	const auto titleRenderedWidth = (titleAvailableWidth <= 0)
+		? 0
+		: (_title.maxWidth() <= titleAvailableWidth)
+		? _title.maxWidth()
+		: st::msgNameStyle.font->width(
+			st::msgNameStyle.font->elided(
+				titleText,
+				titleAvailableWidth));
 	_timeZoneLayout = ComputeTopBarTimeZoneLayout(
 		titleLine,
 		_title.maxWidth(),
+		titleAvailableWidth,
+		titleRenderedWidth,
 		st::msgNameStyle.font->height,
-		_titleBadgeLayout.width(),
+		badgeWidth,
 		st::dialogsScamSkip,
 		_timeZoneBadgeWidth,
 		height,

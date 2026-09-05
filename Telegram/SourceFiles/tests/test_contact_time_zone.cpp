@@ -404,6 +404,8 @@ void TestTopBarLayout() {
 	const auto shortNoBadge = HistoryView::ComputeTopBarTimeZoneLayout(
 		titleLine,
 		80,
+		80,
+		80,
 		19,
 		0,
 		6,
@@ -411,11 +413,14 @@ void TestTopBarLayout() {
 		13,
 		titleBaselineFromTop,
 		chipTextBaselineFromTop);
-	Expects(shortNoBadge.titleWidth == 80);
+	Expects(shortNoBadge.titleAvailableWidth == 80);
+	Expects(shortNoBadge.titleRenderedWidth == 80);
 	Expects(shortNoBadge.chipRect.x() == 106);
 
 	const auto shortBadge = HistoryView::ComputeTopBarTimeZoneLayout(
 		titleLine,
+		80,
+		80,
 		80,
 		19,
 		18,
@@ -424,13 +429,16 @@ void TestTopBarLayout() {
 		13,
 		titleBaselineFromTop,
 		chipTextBaselineFromTop);
-	Expects(shortBadge.titleWidth == 80);
+	Expects(shortBadge.titleAvailableWidth == 80);
+	Expects(shortBadge.titleRenderedWidth == 80);
 	Expects(shortBadge.nameBadgeRect.width() == 98);
 	Expects(shortBadge.chipRect.x() == 124);
 
 	const auto longBadge = HistoryView::ComputeTopBarTimeZoneLayout(
 		titleLine,
 		400,
+		226,
+		219,
 		19,
 		18,
 		6,
@@ -438,13 +446,33 @@ void TestTopBarLayout() {
 		13,
 		titleBaselineFromTop,
 		chipTextBaselineFromTop);
-	Expects(longBadge.titleWidth == 226);
-	Expects(longBadge.chipRect.x() == 270);
-	Expects(longBadge.chipRect.right() == titleLine.right());
+	Expects(longBadge.titleAvailableWidth == 226);
+	Expects(longBadge.titleRenderedWidth == 219);
+	Expects(longBadge.nameBadgeRect.width() == 237);
+	Expects(longBadge.chipRect.x() == 263);
+
+	const auto longNoBadge = HistoryView::ComputeTopBarTimeZoneLayout(
+		titleLine,
+		400,
+		244,
+		237,
+		19,
+		0,
+		6,
+		50,
+		13,
+		titleBaselineFromTop,
+		chipTextBaselineFromTop);
+	Expects(longNoBadge.titleAvailableWidth == 244);
+	Expects(longNoBadge.titleRenderedWidth == 237);
+	Expects(longNoBadge.nameBadgeRect.width() == 237);
+	Expects(longNoBadge.chipRect.x() == 263);
 
 	const auto insufficient = HistoryView::ComputeTopBarTimeZoneLayout(
 		QRect(20, 11, 92, 19),
 		80,
+		18,
+		18,
 		19,
 		18,
 		6,
@@ -459,6 +487,8 @@ void TestTopBarLayout() {
 
 	const auto invalidBaseline = HistoryView::ComputeTopBarTimeZoneLayout(
 		titleLine,
+		80,
+		80,
 		80,
 		19,
 		18,

@@ -14,7 +14,8 @@ namespace HistoryView {
 struct TopBarTimeZoneLayout {
 	QRect nameBadgeRect;
 	QRect chipRect;
-	int titleWidth = 0;
+	int titleAvailableWidth = 0;
+	int titleRenderedWidth = 0;
 
 	explicit operator bool() const {
 		return !chipRect.isEmpty();
@@ -24,6 +25,8 @@ struct TopBarTimeZoneLayout {
 [[nodiscard]] TopBarTimeZoneLayout ComputeTopBarTimeZoneLayout(
 	QRect titleLine,
 	int titleNaturalWidth,
+	int titleAvailableWidth,
+	int titleRenderedWidth,
 	int minimumTitleWidth,
 	int badgeWidth,
 	int spacing,
