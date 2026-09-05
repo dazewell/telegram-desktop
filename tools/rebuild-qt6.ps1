@@ -2,7 +2,7 @@
 .SYNOPSIS
 	Local-only helper: rebase the current branch onto `source/dev`, then
 	reconfigure (and optionally rebuild the Qt 6 / third-party libraries) so the
-	Visual Studio solution is regenerated against Qt 6.11.1.
+	Visual Studio solution is regenerated against the repository-pinned Qt 6.
 
 .DESCRIPTION
 	Telegram Desktop's build scripts (Telegram\build\qt_version.py) OVERRIDE the
@@ -17,9 +17,10 @@
 	cmake/external/qt/package.cmake does `set(qt_requested $ENV{QT} ... FORCE)`,
 	producing:
 
-		Configured Qt version 6.11.1 does not match requested version 6.9.0.
+		Configured Qt version <pinned> does not match requested version <ambient>.
 
-	So this script pins `QT` for the whole session and clears the stale `QTDIR`.
+	So this script pins `QT` for the whole session, clears the stale `QTDIR`, and
+	invalidates cached Qt package locations before configuring.
 
 	Typical flow after a new merge from upstream:
 		.\tools\rebuild-qt6.ps1                 # sync + configure (fast)
@@ -131,6 +132,19 @@ function Get-PinnedQtVersion([string]$repoRoot) {
 	}
 	throw "Could not determine the pinned Qt 6 version from $path."
 }
+
+function Get-PinnedQtRoot(
+		[string]$buildPath,
+		[string]$arch,
+		[string]$version) {
+	$libraries = if ($arch -eq 'x64') {
+		Join-Path $buildPath 'Libraries\win64'
+	} else {
+		Join-Path $buildPath 'Libraries'
+	}
+	return Join-Path $libraries ("Qt-" + $version)
+}
+
 function Write-Step($message) {
 	Write-Host ""
 	Write-Host "==> $message" -ForegroundColor Cyan
@@ -204,6 +218,7 @@ function Import-VsDevEnv([string]$targetArch, [string]$vcvarsVer) {
 # Must happen before ANY cmake invocation, including the implicit reconfigure
 # that `cmake --build` triggers after an upstream merge. See .DESCRIPTION.
 $PinnedQt = Get-PinnedQtVersion $RepoRoot
+$PinnedQtRoot = Get-PinnedQtRoot $BuildPath $Arch $PinnedQt
 Write-Step "Pinning QT=$PinnedQt for this session"
 if ($env:QT -and $env:QT -ne $PinnedQt) {
 	Write-Host "Overriding inherited QT=$($env:QT) (likely from the Visual Studio Qt extension)."
@@ -279,6 +294,12 @@ if ($Prepare) {
 	Write-Step "Skipping library prepare (pass -Prepare to rebuild Qt/libs)"
 }
 
+$pinnedQtCMake = Join-Path $PinnedQtRoot 'lib\cmake\Qt6'
+if (-not (Test-Path $pinnedQtCMake)) {
+	$recovery = ".\tools\rebuild-qt6.ps1 -SkipRebase -Prepare"
+	throw "Pinned Qt $PinnedQt is not installed at '$PinnedQtRoot'. Run $recovery, then retry."
+}
+
 # --- 4. Reconfigure the solution against Qt 6 ---------------------------------
 Write-Step "Configuring solution (qt6)"
 
@@ -289,7 +310,14 @@ Import-DotEnv $EnvFile
 if (-not $ApiId)   { $ApiId   = $env:TDESKTOP_API_ID }
 if (-not $ApiHash) { $ApiHash = $env:TDESKTOP_API_HASH }
 
-$configureArgs = @($Arch, 'qt6')
+$configureArgs = @(
+	$Arch,
+	'qt6',
+	'-UQT_DIR',
+	'-UQt6*_DIR',
+	'-UQSB_EXECUTABLE',
+	'-UWINDEPLOYQT_EXECUTABLE'
+)
 if ($ApiId)   { $configureArgs += "-D"; $configureArgs += "TDESKTOP_API_ID=$ApiId" }
 if ($ApiHash) { $configureArgs += "-D"; $configureArgs += "TDESKTOP_API_HASH=$ApiHash" }
 
