@@ -824,6 +824,7 @@ void DeleteContactNote(
 	const auto note = *composed.note;
 	guard->setDisabled(true);
 	guard->setCursor(Qt::WaitCursor);
+	const auto weakGuard = base::make_weak(guard);
 	user->session().api().request(MTPcontacts_UpdateContactNote(
 		user->inputUser(),
 		MTP_textWithEntities(
@@ -831,6 +832,10 @@ void DeleteContactNote(
 			MTP_vector<MTPMessageEntity>())
 	)).done([=] {
 		user->setNote(note);
+		if (weakGuard) {
+			weakGuard->setDisabled(false);
+			weakGuard->unsetCursor();
+		}
 	}).fail(crl::guard(guard, [=](const MTP::Error &error) {
 		guard->setDisabled(false);
 		guard->unsetCursor();

@@ -2264,8 +2264,11 @@ void Session::requestItemResize(not_null<const HistoryItem*> item) {
 }
 
 void Session::requestHistoryItemsResize(not_null<History*> history) {
-	const auto &list = _messages[history->peer->id];
-	for (const auto &[messageId, item] : list) {
+	const auto list = messagesList(history->peer->id);
+	if (!list) {
+		return;
+	}
+	for (const auto &[messageId, item] : *list) {
 		if (item->history() == history) {
 			requestItemResize(item);
 		}
