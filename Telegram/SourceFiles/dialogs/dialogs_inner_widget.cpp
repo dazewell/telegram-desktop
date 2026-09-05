@@ -40,6 +40,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/screen_reader_mode.h"
 #include "ui/ui_utility.h"
 #include "data/components/sponsored_messages.h"
+#include "data/data_contact_time_zones.h"
 #include "data/data_drafts.h"
 #include "data/data_folder.h"
 #include "data/data_forum.h"
@@ -286,6 +287,12 @@ struct InnerWidget::TagCache {
 	QImage frame;
 };
 
+struct InnerWidget::TimeZoneState {
+	base::flat_map<UserId, Ui::ContactTimeZoneBadge> badges;
+	int stablePhraseWidth = 0;
+	QFont font;
+};
+
 Key InnerWidget::FilterResult::key() const {
 	return row->key();
 }
@@ -302,6 +309,7 @@ InnerWidget::InnerWidget(
 , _controller(controller)
 , _shownList(controller->session().data().chatsList()->indexed())
 , _st(&st::defaultDialogRow)
+, _timeZoneState(std::make_unique<TimeZoneState>())
 , _pinnedShiftAnimation([=](crl::time now) {
 	return pinnedShiftAnimationCallback(now);
 })
@@ -346,6 +354,26 @@ InnerWidget::InnerWidget(
 	) | rpl::on_next([=] {
 		refresh();
 		refreshEmpty();
+		refreshVisibleTimeZoneBadges(false);
+	}, lifetime());
+
+	auto &timeZones = session().data().contactTimeZones();
+	rebuildTimeZoneBadgeWidth();
+	timeZones.userChanges(
+	) | rpl::on_next([=](UserId userId) {
+		refreshTimeZoneBadge(userId);
+		if (const auto history = session().data().historyLoaded(
+				peerFromUser(userId))) {
+			if (const auto row = _shownList->getRow(history)) {
+				updateDialogRow({ history, FullMsgId() });
+				notifyTimeZoneAccessibility(row);
+			}
+		}
+	}, lifetime());
+	timeZones.globalChanges(
+	) | rpl::on_next([=] {
+		rebuildTimeZoneBadgeWidth();
+		refreshVisibleTimeZoneBadges(true);
 	}, lifetime());
 
 	session().data().itemRemoved(
@@ -1072,6 +1100,16 @@ void InnerWidget::paintEvent(QPaintEvent *e) {
 		}
 
 		context.st = (forum || monoforum) ? &st::forumDialogRow : _st.get();
+		context.contactTimeZoneBadge = nullptr;
+		if (history && !forum && !monoforum) {
+			if (const auto user = history->peer->asUser()) {
+				const auto i = _timeZoneState->badges.find(
+					peerToUser(user->id));
+				if (i != end(_timeZoneState->badges)) {
+					context.contactTimeZoneBadge = &i->second;
+				}
+			}
+		}
 
 		const auto videoUserpic = validateVideoUserpic(row);
 		const auto cacheRatio = style::DevicePixelRatio();
@@ -4583,6 +4621,7 @@ void InnerWidget::visibleTopBottomUpdated(
 	}
 	_visibleTop = visibleTop;
 	_visibleBottom = visibleBottom;
+	refreshVisibleTimeZoneBadges(false);
 	preloadRowsData();
 	const auto loadTill = _visibleTop
 		+ PreloadHeightsCount * (_visibleBottom - _visibleTop);
@@ -4595,6 +4634,82 @@ void InnerWidget::visibleTopBottomUpdated(
 		if (_loadMoreCallback) {
 			_loadMoreCallback();
 		}
+	}
+}
+
+void InnerWidget::rebuildTimeZoneBadgeWidth() {
+	_timeZoneState->font = st::dialogsScamFont->f;
+	_timeZoneState->stablePhraseWidth = 0;
+	for (const auto &sample
+			: session().data().contactTimeZones().shortTimeSamples()) {
+		accumulate_max(
+			_timeZoneState->stablePhraseWidth,
+			st::dialogsScamFont->width(sample));
+	}
+}
+
+void InnerWidget::refreshTimeZoneBadge(UserId userId) {
+	if (_timeZoneState->font != st::dialogsScamFont->f) {
+		rebuildTimeZoneBadgeWidth();
+	}
+	const auto user = session().data().userLoaded(userId);
+	const auto view = user
+		? session().data().contactTimeZones().lookup(user)
+		: nullptr;
+	if (!view) {
+		_timeZoneState->badges.remove(userId);
+		return;
+	}
+	_timeZoneState->badges.insert_or_assign(userId, Ui::ContactTimeZoneBadge{
+		.phrase = view->currentTime,
+		.phraseWidth = st::dialogsScamFont->width(view->currentTime),
+		.width = st::dialogsScamPadding.left()
+			+ _timeZoneState->stablePhraseWidth
+			+ st::dialogsScamPadding.right(),
+	});
+}
+
+void InnerWidget::refreshVisibleTimeZoneBadges(bool notifyAccessibility) {
+	if (_state != WidgetState::Default || _visibleBottom <= _visibleTop) {
+		return;
+	}
+	for (const auto &row : *_shownList) {
+		const auto top = row->top() + dialogsOffset();
+		if (top + row->height() <= _visibleTop) {
+			continue;
+		} else if (top >= _visibleBottom) {
+			break;
+		}
+		const auto history = row->history();
+		const auto user = history ? history->peer->asUser() : nullptr;
+		if (!user) {
+			continue;
+		}
+		refreshTimeZoneBadge(peerToUser(user->id));
+		updateDialogRow({ history, FullMsgId() });
+		if (notifyAccessibility) {
+			notifyTimeZoneAccessibility(row);
+		}
+	}
+}
+
+void InnerWidget::notifyTimeZoneAccessibility(not_null<Row*> row) {
+	if (_state != WidgetState::Default) {
+		return;
+	}
+	const auto i = _shownList->cfind(row);
+	if (i == _shownList->cend()) {
+		return;
+	}
+	const auto shownIndex = int(i - _shownList->cbegin());
+	const auto skip = _skipTopDialog ? 1 : 0;
+	if (shownIndex < skip) {
+		return;
+	}
+	const auto index = int(_collapsedRows.size()) + shownIndex - skip;
+	const auto rect = accessibilityChildRect(index);
+	if (rect.bottom() > _visibleTop && rect.top() < _visibleBottom) {
+		accessibilityChildNameChanged(index);
 	}
 }
 

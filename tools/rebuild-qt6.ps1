@@ -307,6 +307,7 @@ if ($Build) {
 	# latter into '-v: m' and MSBuild fails with MSB1016.
 	Invoke-Native 'cmake' @('--build', (Join-Path $RepoRoot 'out'), '--config', 'Release', '--target', 'Telegram', '--parallel') $RepoRoot
 	Write-Step "Done. Built $RepoRoot\out\Release\Telegram.exe"
+	Invoke-Item (Join-Path $RepoRoot 'out\Release')
 } else {
 	Write-Step "Done. Open $RepoRoot\out\Telegram.slnx in Visual Studio and build, or re-run with -Build."
 }

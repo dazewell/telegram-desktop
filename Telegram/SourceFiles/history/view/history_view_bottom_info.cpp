@@ -30,6 +30,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "main/main_session.h"
 #include "lottie/lottie_icon.h"
 #include "data/data_channel.h"
+#include "data/data_contact_time_zones.h"
 #include "data/data_session.h"
 #include "data/data_message_reactions.h"
 #include "window/window_session_controller.h"
@@ -500,11 +501,15 @@ void BottomInfo::layoutDateText() {
 		: QString();
 	const auto author = _data.author;
 	const auto prefix = !author.isEmpty() ? u", "_q : QString();
-	const auto date = editedPrimary
+	auto date = editedPrimary
 		? FormatEditedDate(_data.date, _data.editedDate)
 		: edited + ((_data.flags & Data::Flag::ForwardedDate)
 		? Ui::FormatDateTimeSavedFrom(_data.date)
 		: QLocale().toString(_data.date.time(), QLocale::ShortFormat));
+	date = ::Data::FormatContactTimeZoneHistoricalMetadata(
+		std::move(date),
+		editedPrimary ? _data.editedTimestamp : _data.dateTimestamp,
+		_data.contactTimeZone ? &*_data.contactTimeZone : nullptr);
 	const auto afterAuthor = prefix + date;
 	const auto afterAuthorWidth = st::msgDateFont->width(afterAuthor);
 	const auto authorWidth = st::msgDateFont->width(author);
@@ -663,6 +668,17 @@ BottomInfo::Data BottomInfoDataFromMessage(not_null<Message*> message) {
 
 	auto result = BottomInfo::Data();
 	result.date = message->dateTime();
+	result.dateTimestamp = result.date.isValid() ? item->date() : 0;
+	const auto historyPeer = item->history()->peer.get();
+	const auto timeZone = historyPeer->owner().contactTimeZones().lookup(
+		historyPeer,
+		{
+			.replies = (message->context() == Context::Replies),
+			.scheduled = item->isScheduled(),
+		});
+	if (timeZone) {
+		result.contactTimeZone = *timeZone->zone;
+	}
 	result.effectId = item->effectId();
 	if (message->hasOutLayout()) {
 		result.flags |= Flag::OutLayout;
@@ -692,6 +708,7 @@ BottomInfo::Data BottomInfoDataFromMessage(not_null<Message*> message) {
 		result.flags |= Flag::Edited;
 		if (item->history()->session().messagePrimaryEditedDate()) {
 			result.flags |= Flag::EditedPrimary;
+			result.editedTimestamp = editedDate;
 			result.editedDate = base::unixtime::parse(editedDate);
 		}
 	}
@@ -752,12 +769,14 @@ BottomInfo::Data BottomInfoDataFromMessage(not_null<Message*> message) {
 	}
 	if (forwarded->savedFromMsgId && forwarded->savedFromDate) {
 		result.date = base::unixtime::parse(forwarded->savedFromDate);
+		result.dateTimestamp = forwarded->savedFromDate;
 		result.flags |= Flag::ForwardedDate;
 	} else if (forwarded->originalDate
 		&& (message->context() == Context::SavedSublist
 			|| item->history()->peer->isSelf())
 		&& !item->externalReply()) {
 		result.date = base::unixtime::parse(forwarded->originalDate);
+		result.dateTimestamp = forwarded->originalDate;
 		result.flags |= Flag::ForwardedDate;
 	}
 	// We don't want to pass and update it in Data for now.

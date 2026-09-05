@@ -45,10 +45,34 @@ struct BotVerifyDetails {
 		const BotVerifyDetails &) = default;
 };
 
+enum class TextBadgeType : uchar {
+	Scam,
+	Fake,
+	Direct,
+};
+
 class PeerBadge {
 public:
 	PeerBadge();
 	~PeerBadge();
+
+	class Layout {
+	public:
+		[[nodiscard]] int width() const {
+			return _width;
+		}
+
+	private:
+		friend class PeerBadge;
+
+		TextBadgeType _textBadge = TextBadgeType::Scam;
+		int _width = 0;
+		bool _paintText = false;
+		bool _paintVerify = false;
+		bool _paintEmoji = false;
+		bool _paintStar = false;
+
+	};
 
 	struct Descriptor {
 		not_null<PeerData*> peer;
@@ -66,6 +90,8 @@ public:
 		bool bothVerifyAndStatus = false;
 		bool paused = false;
 	};
+	[[nodiscard]] Layout layout(const Descriptor &descriptor);
+	int draw(Painter &p, Descriptor &&descriptor, const Layout &layout);
 	int drawGetWidth(Painter &p, Descriptor &&descriptor);
 	[[nodiscard]] QRect emojiStatusRect() const;
 	void paintEmojiStatusFrame(QPainter &p, crl::time now, bool paused);
@@ -92,23 +118,30 @@ private:
 	struct EmojiStatus;
 	struct BotVerifiedData;
 
-	int drawTextBadge(Painter &p, const Descriptor &descriptor);
-	int drawVerifyCheck(Painter &p, const Descriptor &descriptor);
-	int drawPremiumEmojiStatus(Painter &p, const Descriptor &descriptor);
-	int drawPremiumStar(Painter &p, const Descriptor &descriptor);
+	[[nodiscard]] bool preparePremiumEmojiStatus(
+		const Descriptor &descriptor);
+	void drawTextBadge(
+		Painter &p,
+		const Descriptor &descriptor,
+		TextBadgeType type);
+	void drawVerifyCheck(Painter &p, const Descriptor &descriptor);
+	void drawPremiumEmojiStatus(Painter &p, const Descriptor &descriptor);
+	void drawPremiumStar(Painter &p, const Descriptor &descriptor);
 
 	std::unique_ptr<EmojiStatus> _emojiStatus;
 	mutable std::unique_ptr<BotVerifiedData> _botVerifiedData;
 
 };
 
-enum class TextBadgeType : uchar {
-	Scam,
-	Fake,
-	Direct,
-};
-
 QSize TextBadgeSize(TextBadgeType type);
+void DrawTextBadge(
+	Painter &p,
+	QRect rect,
+	int outerWidth,
+	const style::color &color,
+	const QString &phrase,
+	int phraseWidth,
+	bool mirror = false);
 void DrawTextBadge(
 	TextBadgeType,
 	Painter &p,

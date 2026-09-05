@@ -10,6 +10,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/notify/data_notify_settings.h"
 #include "data/data_channel.h"
 #include "data/data_chat_filters.h"
+#include "data/data_contact_time_zones.h"
 #include "data/data_drafts.h"
 #include "data/data_folder.h"
 #include "data/data_forum_topic.h"
@@ -198,6 +199,15 @@ QString RowAccessibilityName(
 	}
 
 	parts << peer->name();
+
+	if (const auto timeZone = peer->owner().contactTimeZones().lookup(peer)) {
+		parts << tr::lng_contact_timezone_tooltip(
+			tr::now,
+			lt_name,
+			peer->name(),
+			lt_time,
+			timeZone->currentTime);
+	}
 
 	if (peer->isScam()) {
 		parts << tr::lng_sr_chat_scam(tr::now);

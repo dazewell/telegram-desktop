@@ -54,6 +54,12 @@ struct TopicJumpCache {
 	TopicJumpCorners rippleMask;
 };
 
+struct ContactTimeZoneBadge {
+	QString phrase;
+	int phraseWidth = 0;
+	int width = 0;
+};
+
 struct PaintContext {
 	RightButton *rightButton = nullptr;
 	std::vector<QImage*> *chatsFilterTags = nullptr;
@@ -63,6 +69,7 @@ struct PaintContext {
 	Data::Folder *folder = nullptr;
 	Data::Forum *forum = nullptr;
 	Data::CommunityInfo *community = nullptr;
+	const ContactTimeZoneBadge *contactTimeZoneBadge = nullptr;
 	required<QBrush> currentBg;
 	FilterId filter = 0;
 	float64 topicsExpanded = 0.;

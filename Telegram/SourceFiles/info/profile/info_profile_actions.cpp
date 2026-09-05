@@ -40,10 +40,12 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_channel.h"
 #include "data/data_chat.h"
 #include "data/data_chat_filters.h"
+#include "data/data_contact_time_zone.h"
 #include "data/data_folder.h"
 #include "data/data_forum.h"
 #include "data/data_forum_topic.h"
 #include "data/data_peer_values.h"
+#include "data/data_premium_limits.h"
 #include "data/data_saved_sublist.h"
 #include "data/data_session.h"
 #include "data/data_user.h"
@@ -787,17 +789,60 @@ void SetupAboutPeerIdDrag(
 
 void DeleteContactNote(
 		not_null<UserData*> user,
+		not_null<Ui::RpWidget*> guard,
 		Fn<void(const QString &)> showError = nullptr) {
+	if (!user->wasFullUpdated()) {
+		guard->setDisabled(true);
+		guard->setCursor(Qt::WaitCursor);
+		user->session().api().requestFullPeer(user);
+		user->session().changes().peerUpdates(
+			user,
+			Data::PeerUpdate::Flag::FullInfo
+		) | rpl::filter([=] {
+			return user->wasFullUpdated();
+		}) | rpl::take(1) | rpl::on_next([=] {
+			DeleteContactNote(user, guard, showError);
+		}, guard->lifetime());
+		return;
+	}
+	const auto parsed = Data::ParseContactTimeZoneNote(user->note());
+	const auto serverLimit = Data::PremiumLimits(
+		&user->session()).contactNoteLengthCurrent();
+	const auto composed = Data::ComposeContactTimeZoneNote(
+		tr::marked(),
+		parsed.rawPayload,
+		serverLimit);
+	if (!composed.note) {
+		if (showError) {
+			showError(tr::lng_contact_notes_limit_reached(
+				tr::now,
+				lt_count,
+				1));
+		}
+		return;
+	}
+	const auto note = *composed.note;
+	guard->setDisabled(true);
+	guard->setCursor(Qt::WaitCursor);
+	const auto weakGuard = base::make_weak(guard);
 	user->session().api().request(MTPcontacts_UpdateContactNote(
 		user->inputUser(),
-		MTP_textWithEntities(MTP_string(), MTP_vector<MTPMessageEntity>())
+		MTP_textWithEntities(
+			MTP_string(note.text),
+			MTP_vector<MTPMessageEntity>())
 	)).done([=] {
-		user->setNote(TextWithEntities());
-	}).fail([=](const MTP::Error &error) {
+		user->setNote(note);
+		if (weakGuard) {
+			weakGuard->setDisabled(false);
+			weakGuard->unsetCursor();
+		}
+	}).fail(crl::guard(guard, [=](const MTP::Error &error) {
+		guard->setDisabled(false);
+		guard->unsetCursor();
 		if (showError) {
 			showError(error.description());
 		}
-	}).send();
+	})).send();
 }
 
 [[nodiscard]] object_ptr<Ui::SlideWrap<>> CreateNotes(
@@ -808,7 +853,7 @@ void DeleteContactNote(
 		user,
 		Data::PeerUpdate::Flag::FullInfo
 	) | rpl::map([=] {
-		return user->note();
+		return Data::ParseContactTimeZoneNote(user->note()).visible;
 	});
 
 	auto notesText = rpl::duplicate(
@@ -865,9 +910,11 @@ void DeleteContactNote(
 		addAction({
 			.text = tr::lng_delete_note(tr::now),
 			.handler = [=] {
-				DeleteContactNote(user, [=](const QString &error) {
-					controller->showToast(error);
-				});
+				if (raw->isEnabled()) {
+					DeleteContactNote(user, raw, [=](const QString &error) {
+						controller->showToast(error);
+					});
+				}
 			},
 			.isAttention = true,
 		});
