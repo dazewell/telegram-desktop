@@ -17,7 +17,7 @@ criteria to `../tdfork-code-review/SKILL.md`, and process cleanup to
 - The fork and upstream development branches are `origin/dev` and `source/dev`.
 - Application code is rooted at `Telegram/SourceFiles`, resources at
   `Telegram/Resources`, and target composition at `Telegram/CMakeLists.txt`.
-- The local Windows build tree is `out`, configured for x64 Visual Studio 18,
+- The local Windows build tree is `out`, configured for x64 Visual Studio 2022,
   toolset `v143`, MSVC 19.44, and Qt 6.11.2 under
   `C:/TBuild/Libraries/win64/Qt-6.11.2`.
 - The normal implementation gate from the repository root is:
