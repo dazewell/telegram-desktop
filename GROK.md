@@ -1,5 +1,5 @@
-# Grok Build Pointer
+# Grok Pointer
 
-Read `AGENTS.md` and treat it as the canonical repository-wide instructions.
-For `/continue`, `/perform-task`, and `/process-inbox`, also read
-`.grok/ai-workflow-adapter.md`.
+Read `AGENTS.md`. The normative workflow is in `.github/skills/` and the five
+serial roles are in `.github/agents/`. Start a fresh same-checkout session after
+customization changes so discovery can refresh.
