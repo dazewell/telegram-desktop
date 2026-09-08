@@ -6,6 +6,7 @@ For license and copyright information please follow this link:
 https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
+#include "core/shortcuts.h"
 
 #include "base/timer.h"
 #include "data/data_report.h"
@@ -159,6 +160,9 @@ public:
 		const QVector<MTPMessage> &messages);
 
 	[[nodiscard]] TextForMimeData getSelectedText() const;
+	[[nodiscard]] Fn<bool()> selectedTextAction(
+		Shortcuts::Command command,
+		bool shortcut = false);
 	[[nodiscard]] Iv::RichPageBlocksSlice getSelectedRichBlocks() const;
 
 	void touchScrollUpdated(const QPoint &screenPos);
@@ -621,6 +625,7 @@ private:
 	style::cursor _cursor = style::cur_default;
 	SelectedItems _selected;
 	HistoryItem *_selectedTextItem = nullptr;
+	uint64 _selectedTextGeneration = 0;
 	MessageSelection _selectedTextSelection;
 	TextForMimeData _selectedText;
 	HistoryView::KeyboardTextSelection _keyboardTextSelection;

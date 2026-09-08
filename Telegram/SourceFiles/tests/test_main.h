@@ -31,6 +31,8 @@ namespace Test {
 
 void test(not_null<Ui::RpWindow*> window, not_null<Ui::RpWidget*> widget);
 
+[[nodiscard]] int selectedTextShortcutsTest();
+
 [[nodiscard]] inline int scale(int value) {
 	return style::ConvertScale(value);
 };

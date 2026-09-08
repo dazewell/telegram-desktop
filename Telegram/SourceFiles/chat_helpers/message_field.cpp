@@ -6,6 +6,8 @@ For license and copyright information please follow this link:
 https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "chat_helpers/message_field.h"
+#include "chat_helpers/message_field_tag_policy.h"
+#include "chat_helpers/selected_text_cite.h"
 
 #include "history/history_widget.h"
 #include "history/history.h" // History::session
@@ -91,41 +93,22 @@ constexpr auto kLinkProtocols = {
 		Fn<bool(QStringView)> keepCustomEmojiData) {
 	return [=](QStringView mimeTag) {
 		const auto id = session->userId().bare;
-		auto all = TextUtilities::SplitTags(mimeTag);
 		auto premiumSkipped = (DocumentData*)nullptr;
-		for (auto i = all.begin(); i != all.end();) {
-			const auto tag = *i;
-			if (TextUtilities::IsMentionLink(tag)
-				&& TextUtilities::MentionNameDataToFields(tag).selfId != id) {
-				i = all.erase(i);
-				continue;
-			} else if (Ui::InputField::IsCustomEmojiLink(tag)) {
-				const auto data = Ui::InputField::CustomEmojiEntityData(tag);
-				if (keepCustomEmojiData && keepCustomEmojiData(data)) {
-					++i;
-					continue;
-				}
-				const auto emoji = Data::ParseCustomEmojiData(data);
-				if (!emoji) {
-					i = all.erase(i);
-					continue;
-				} else if (!session->premium()) {
-					const auto document = session->data().document(emoji);
-					if (document->isPremiumEmoji()) {
-						if (!allowPremiumEmoji
-							|| premiumSkipped
-							|| !session->premiumPossible()
-							|| !allowPremiumEmoji(document)) {
-							premiumSkipped = document;
-							i = all.erase(i);
-							continue;
-						}
-					}
+		return ChatHelpers::ValidateMessageFieldTags(mimeTag, id, [&](QStringView data) {
+			const auto emoji = Data::ParseCustomEmojiData(data);
+			if (!emoji) {
+				return false;
+			} else if (!session->premium()) {
+				const auto document = session->data().document(emoji);
+				if (document->isPremiumEmoji()
+					&& (!allowPremiumEmoji || premiumSkipped
+						|| !session->premiumPossible() || !allowPremiumEmoji(document))) {
+					premiumSkipped = document;
+					return false;
 				}
 			}
-			++i;
-		}
-		return TextUtilities::JoinTag(all);
+			return true;
+		}, keepCustomEmojiData);
 	};
 }
 
@@ -534,6 +517,19 @@ Fn<void(QString now, Fn<void(QString)> save)> DefaultEditLanguageCallback(
 	};
 }
 
+bool AppendMessageFieldCite(
+		not_null<Ui::InputField*> field,
+		const TextForMimeData &selected) {
+	const auto validator = field->property("selectedTextCiteTagProcessor")
+		.value<Fn<QString(QStringView)>>();
+	return validator && ChatHelpers::AppendSelectedTextCite(
+		field,
+		ChatHelpers::SelectedTextCiteTags(selected),
+		validator,
+		-1,
+		field->property("selectedTextCiteContext").value<Ui::Text::MarkedContext>());
+}
+
 auto InitMessageFieldHandlers(MessageFieldHandlersArgs &&args)
 -> std::shared_ptr<Ui::ChatStyle> {
 	const auto paused = [passed = args.customEmojiPaused] {
@@ -541,10 +537,13 @@ auto InitMessageFieldHandlers(MessageFieldHandlersArgs &&args)
 	};
 	const auto field = args.field;
 	const auto session = args.session;
-	field->setTagMimeProcessor(FieldTagMimeProcessor(
+	auto incomingTagProcessor = FieldTagMimeProcessor(
 		session,
 		args.allowPremiumEmoji,
-		std::move(args.keepCustomEmojiData)));
+		std::move(args.keepCustomEmojiData));
+	field->setProperty("selectedTextCiteTagProcessor",
+		QVariant::fromValue(incomingTagProcessor));
+	field->setTagMimeProcessor(std::move(incomingTagProcessor));
 	auto context = Core::TextContext({ .session = session });
 	if (args.customEmojiFactory) {
 		auto parent = std::move(context.customEmojiFactory);
@@ -562,6 +561,7 @@ auto InitMessageFieldHandlers(MessageFieldHandlersArgs &&args)
 			return result;
 		};
 	}
+	field->setProperty("selectedTextCiteContext", QVariant::fromValue(context));
 	field->setCustomTextContext(std::move(context), [paused] {
 		return On(PowerSaving::kEmojiChat) || paused();
 	}, [paused] {

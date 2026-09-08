@@ -24,6 +24,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include <qpa/qplatformscreen.h>
 
+#ifdef Q_OS_WIN
+#include "base/platform/win/base_windows_winrt.h"
+#endif
+
 namespace Test {
 
 bool App::nativeEventFilter(
@@ -173,6 +177,11 @@ int UiIntegration::touchCounterNow() {
 int main(int argc, char *argv[]) {
 	using namespace Test;
 
+#ifdef Q_OS_WIN
+	if (!base::WinRT::Supported()) {
+		return 2;
+	}
+#endif
 	auto app = App(argc, argv);
 	app.installNativeEventFilter(&app);
 
@@ -206,6 +215,11 @@ int main(int argc, char *argv[]) {
 		style::StartManager(chosen);
 
 		Ui::Emoji::Init();
+
+		if (App::arguments().contains(u"--selected-text-shortcuts"_q)) {
+			App::exit(selectedTextShortcutsTest());
+			return;
+		}
 
 		const auto window = new Ui::RpWindow();
 		window->setGeometry(

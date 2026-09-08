@@ -6,6 +6,7 @@ For license and copyright information please follow this link:
 https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
+#include "chat_helpers/selected_text_action.h"
 
 #include "history/view/controls/history_view_compose_media_edit_manager.h"
 #include "history/view/history_view_corner_buttons.h"
@@ -225,10 +226,13 @@ public:
 	MessageIdsList getSelectedItems() const;
 	void itemEdited(not_null<HistoryItem*> item);
 
-	void replyToMessage(FullReplyTo id);
+	void replyToMessage(FullReplyTo id, ChatHelpers::SelectedTextAction action = {});
 	void replyToMessage(
 		not_null<HistoryItem*> item,
-		FullReplyTo fields = {});
+		FullReplyTo fields = {},
+		ChatHelpers::SelectedTextAction action = {});
+	[[nodiscard]] bool canCiteSelectedText() const;
+	bool citeSelectedText(const TextForMimeData &text);
 	void editMessage(
 		not_null<HistoryItem*> item,
 		const TextSelection &selection);
@@ -405,6 +409,10 @@ private:
 		Fn<void(int)> withPaymentApproved);
 
 	void checkSuggestToGigagroup();
+	void clearProcessingReply();
+	void continueProcessingReply(
+		uint64 generation,
+		std::optional<MsgId> topicRootId);
 	void processReply();
 	void setReplyFieldsFromProcessing();
 
@@ -798,7 +806,9 @@ private:
 	Ui::Text::String _replyToName;
 
 	FullReplyTo _processingReplyTo;
+	ChatHelpers::SelectedTextAction _processingSelectedAction;
 	HistoryItem *_processingReplyItem = nullptr;
+	uint64 _processingReplyGeneration = 0;
 
 	std::shared_ptr<QMimeData> _pendingRichPaste;
 	MsgId _editMsgId = 0;

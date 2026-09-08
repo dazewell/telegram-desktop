@@ -860,7 +860,19 @@ bool AddReplyToMessageAction(
 		: tr::lng_context_quote_and_reply)(
 			tr::now,
 			Ui::Text::FixAmpersandInAction);
+	const auto selectedAction = !quote.highlight.quote.empty()
+		? list->selectedTextAction(Shortcuts::Command::QuoteSelectedText)
+		: Fn<bool()>();
+	if (!quote.highlight.quote.empty()) {
+		text = Shortcuts::WithBindingHint(std::move(text), Shortcuts::Command::QuoteSelectedText);
+	}
 	menu->addAction(std::move(text), [=, itemId = item->fullId()] {
+		if (!quote.highlight.quote.empty()) {
+			if (selectedAction) {
+				selectedAction();
+			}
+			return;
+		}
 		list->replyToMessageRequestNotify({
 			.messageId = itemId,
 			.quote = quote.highlight.quote,
@@ -1776,6 +1788,13 @@ void FillContextMenuItems(
 		&& Api::WhoReactedExists(item, Api::WhoReactedList::All);
 
 	AddReplyToMessageAction(result, request, list);
+	if (request.overSelection) {
+		if (const auto action = list->selectedTextAction(Shortcuts::Command::CiteSelectedText)) {
+			result->addAction(Shortcuts::WithBindingHint(
+				tr::lng_context_cite(tr::now), Shortcuts::Command::CiteSelectedText),
+				[=] { action(); }, &st::menuIconReply);
+		}
+	}
 	if (item) {
 		const auto media = item->media();
 		const auto document = media ? media->document() : nullptr;
@@ -1820,7 +1839,15 @@ void FillContextMenuItems(
 			list->copySelectedText();
 		}, &st::menuIconCopy);
 	}
-	if (request.overSelection
+	if (request.overSelection && request.selectedItems.empty()) {
+		if (const auto action = list->selectedTextAction(Shortcuts::Command::TranslateSelectedText)) {
+			result->addAction(Shortcuts::WithBindingHint(
+				tr::lng_context_translate_selected(tr::now),
+				Shortcuts::Command::TranslateSelectedText),
+				[=] { action(); }, &st::menuIconTranslate);
+		}
+	}
+	if (request.overSelection && !request.selectedItems.empty()
 		&& view
 		&& !Ui::SkipTranslate(list->getSelectedText().rich)) {
 		const auto owner = &view->history()->owner();

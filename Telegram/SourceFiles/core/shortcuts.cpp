@@ -11,6 +11,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/event_filter.h"
 #include "base/parse_helper.h"
 #include "core/application.h"
+#include "core/shortcuts_contextual.h"
 #include "core/version.h"
 #include "mainwindow.h"
 #include "mainwidget.h"
@@ -19,6 +20,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "platform/platform_specific.h"
 
 #include <QAction>
+#include <QApplication>
+#include <QInputMethodEvent>
 #include <QShortcut>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
@@ -30,6 +33,8 @@ namespace {
 constexpr auto kCountLimit = 256; // How many shortcuts can be in json file.
 
 rpl::event_stream<not_null<Request*>> RequestsStream;
+rpl::event_stream<not_null<ContextualRequest*>> ContextualRequestsStream;
+ContextualDispatcher SelectedTextDispatcher;
 bool Paused/* = false*/;
 
 const auto kChatSwitchSpecialKeys = std::array{
@@ -128,6 +133,9 @@ const auto CommandByName = base::flat_map<QString, Command>{
 
 	{ u"show_chat_menu"_q                , Command::ShowChatMenu },
 	{ u"show_chat_preview"_q             , Command::ShowChatPreview },
+	{ u"quote_selected_text"_q           , Command::QuoteSelectedText },
+	{ u"cite_selected_text"_q            , Command::CiteSelectedText },
+	{ u"translate_selected_text"_q       , Command::TranslateSelectedText },
 
 	{ u"record_voice"_q                  , Command::RecordVoice },
 
@@ -181,6 +189,7 @@ public:
 	void toggleSupport(bool toggled);
 	void listen(not_null<QWidget*> widget);
 	[[nodiscard]] bool handles(const QKeySequence &sequence) const;
+	[[nodiscard]] std::vector<Command> contextual(const QKeySequence &keys) const;
 
 	[[nodiscard]] const QStringList &errors() const;
 
@@ -382,12 +391,27 @@ void Manager::listen(not_null<QWidget*> widget) {
 	pruneListened();
 	_listened.push_back(widget.get());
 	for (const auto &[keys, shortcut] : _shortcuts) {
-		widget->addAction(shortcut.get());
+		if (!shortcut->shortcut().isEmpty()) {
+			widget->addAction(shortcut.get());
+		}
 	}
 }
 
 bool Manager::handles(const QKeySequence &sequence) const {
-	return _shortcuts.contains(sequence);
+	const auto found = _shortcuts.find(sequence);
+	return found != _shortcuts.end()
+		&& !found->second->shortcut().isEmpty()
+		&& found->second->isEnabled();
+}
+
+std::vector<Command> Manager::contextual(const QKeySequence &keys) const {
+	const auto found = _shortcuts.find(keys);
+	if (found == _shortcuts.end()) {
+		return {};
+	}
+	auto commands = lookup(found->second.get());
+	std::erase_if(commands, [](Command command) { return !IsContextual(command); });
+	return commands;
 }
 
 void Manager::pruneListened() {
@@ -539,6 +563,9 @@ void Manager::fillDefaults() {
 
 	set(u"ctrl+\\"_q                 , Command::ShowChatMenu);
 	set(u"ctrl+]"_q                  , Command::ShowChatPreview);
+	set(u"q"_q                       , Command::QuoteSelectedText);
+	set(u"c"_q                       , Command::CiteSelectedText);
+	set(u"t"_q                       , Command::TranslateSelectedText);
 
 	set(u"ctrl+r"_q                  , Command::RecordVoice);
 
@@ -686,8 +713,22 @@ void Manager::set(
 		const QKeySequence &keys,
 		Command command,
 		bool replace) {
+	if (!ValidBinding(keys, command)) {
+		if (keys.isEmpty()) {
+			_errors.push_back(
+				u"Could not derive key sequence '%1'!"_q.arg(keys.toString()));
+		} else {
+			_errors.push_back(
+				u"Contextual command '%1' requires a single-stroke key sequence; rejected '%2'!"_q.arg(
+					CommandNames().find(command)->second,
+					keys.toString(QKeySequence::PortableText)));
+		}
+		return;
+	}
 	auto shortcut = base::make_unique_q<QAction>();
-	shortcut->setShortcut(keys);
+	if (!IsContextual(command)) {
+		shortcut->setShortcut(keys);
+	}
 	shortcut->setShortcutContext(Qt::ApplicationShortcut);
 	if (!AutoRepeatCommands.contains(command)) {
 		shortcut->setAutoRepeat(false);
@@ -716,7 +757,9 @@ void Manager::set(
 		}
 		pruneListened();
 		for (const auto &widget : _listened) {
-			widget->addAction(i->second.get());
+			if (!i->second->shortcut().isEmpty()) {
+				widget->addAction(i->second.get());
+			}
 		}
 	}
 }
@@ -764,6 +807,34 @@ void Manager::unregister(base::unique_qptr<QAction> shortcut) {
 Manager Data;
 
 } // namespace
+
+rpl::producer<not_null<ContextualRequest*>> ContextualRequests() {
+	return ContextualRequestsStream.events();
+}
+
+QString BindingHint(Command command) {
+	auto hints = QStringList();
+	for (const auto &[keys, commands] : Data.keysCurrents()) {
+		if (commands.contains(command)) {
+			hints.push_back(keys.toString(QKeySequence::NativeText));
+		}
+	}
+	return hints.join(u", "_q);
+}
+
+QString WithBindingHint(QString text, Command command) {
+	const auto hint = BindingHint(command);
+	return hint.isEmpty() ? text : (text + '\t' + hint);
+}
+
+bool HandleContextualEvent(not_null<QObject*> object, not_null<QEvent*> event) {
+	return SelectedTextDispatcher.handle(
+		object,
+		event,
+		Paused,
+		[](const QKeySequence &keys) { return Data.contextual(keys); },
+		[](not_null<ContextualRequest*> request) { ContextualRequestsStream.fire(std::move(request)); });
+}
 
 Request::Request(std::vector<Command> commands)
 : _commands(std::move(commands)) {
