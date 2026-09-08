@@ -2908,7 +2908,7 @@ bool HistoryWidget::applyDraft(FieldHistoryAction fieldHistoryAction) {
 				requestMessageData(_replyTo.messageId.msg);
 			}
 		}
-		_processingReplyItem = nullptr;
+		clearProcessingReply();
 		_processingReplyTo = _replyTo;
 		setEditMsgId(0);
 		cancelSuggestPost();
@@ -2932,8 +2932,9 @@ bool HistoryWidget::applyDraft(FieldHistoryAction fieldHistoryAction) {
 			&& _editMsgId != 0);
 		clearFieldText(0, fieldHistoryAction);
 		setInnerFocus();
-		_processingReplyItem = _replyEditMsg = nullptr;
-		_processingReplyTo = _replyTo = FullReplyTo();
+		clearProcessingReply();
+		_replyEditMsg = nullptr;
+		_replyTo = FullReplyTo();
 		setEditMsgId(0);
 		if (_preview) {
 			_preview->apply({ .removed = true });
@@ -2953,8 +2954,9 @@ bool HistoryWidget::applyDraft(FieldHistoryAction fieldHistoryAction) {
 	_textUpdateEvents = TextUpdateEvent::SaveDraft
 		| TextUpdateEvent::SendTyping;
 
-	_processingReplyItem = _replyEditMsg = nullptr;
-	_processingReplyTo = _replyTo = FullReplyTo();
+	clearProcessingReply();
+	_replyEditMsg = nullptr;
+	_replyTo = FullReplyTo();
 	setEditMsgId(editMsgId);
 	updateCmdStartShown();
 	updateControlsVisibility();
@@ -3218,8 +3220,9 @@ void HistoryWidget::showHistory(
 	HistoryView::Element::ClearGlobal();
 
 	_saveEditMsgRequestId = 0;
-	_processingReplyItem = _replyEditMsg = nullptr;
-	_processingReplyTo = _replyTo = FullReplyTo();
+	clearProcessingReply();
+	_replyEditMsg = nullptr;
+	_replyTo = FullReplyTo();
 	_editMsgId = MsgId();
 	_canReplaceMedia = _canAddMedia = false;
 	_photoEditMedia = nullptr;
@@ -3963,8 +3966,6 @@ void HistoryWidget::refreshSuggestPostToggle() {
 			using namespace HistoryView;
 			applySuggestOptions({ .exists = 1 }, SuggestMode::New);
 			cancelReply();
-			_processingReplyTo = FullReplyTo();
-			_processingReplyItem = nullptr;
 			updateControlsVisibility();
 			updateControlsGeometry();
 		});
@@ -8212,8 +8213,7 @@ void HistoryWidget::itemRemoved(not_null<const HistoryItem*> item) {
 		cancelReply();
 	}
 	if (item == _processingReplyItem) {
-		_processingReplyTo = {};
-		_processingReplyItem = nullptr;
+		clearProcessingReply();
 	}
 	if (_kbReplyTo && item == _kbReplyTo) {
 		toggleKeyboard();
@@ -10226,13 +10226,37 @@ void HistoryWidget::clearFieldText(
 	setFieldText(TextWithTags(), events, fieldHistoryAction);
 }
 
-void HistoryWidget::replyToMessage(FullReplyTo id) {
+bool HistoryWidget::canCiteSelectedText() const {
+	return _history && _canSendTexts && !_editMsgId
+		&& _field->isVisible() && _field->isEnabled()
+		&& !_voiceRecordBar->isActive() && !isRecording();
+}
+
+bool HistoryWidget::citeSelectedText(const TextForMimeData &text) {
+	if (!canCiteSelectedText()) {
+		return false;
+	} else if (!AppendMessageFieldCite(_field, text)) {
+		controller()->showToast(tr::lng_cite_unavailable(tr::now));
+		return false;
+	}
+	_field->setFocus();
+	_field->ensureCursorVisible();
+	saveDraftWithTextNow();
+	return true;
+}
+
+void HistoryWidget::replyToMessage(
+		FullReplyTo id,
+		ChatHelpers::SelectedTextAction action) {
+	if (!action.isValid()) {
+		return;
+	}
 	if (const auto item = session().data().message(id.messageId)) {
-		if (CanSendReply(item) && !base::IsCtrlPressed()) {
-			replyToMessage(item, id);
+		if (CanSendReply(item) && (action.shortcut || !base::IsCtrlPressed())) {
+			replyToMessage(item, id, std::move(action));
 		} else if (item->allowsForward()) {
 			const auto show = controller()->uiShow();
-			HistoryView::Controls::ShowReplyToChatBox(show, id);
+			HistoryView::Controls::ShowReplyToChatBox(show, id, nullptr, std::move(action));
 		} else {
 			controller()->showToast(
 				tr::lng_error_cant_reply_other(tr::now));
@@ -10242,42 +10266,67 @@ void HistoryWidget::replyToMessage(FullReplyTo id) {
 
 void HistoryWidget::replyToMessage(
 		not_null<HistoryItem*> item,
-		FullReplyTo fields) {
-	if (isJoinChannel()) {
+		FullReplyTo fields,
+		ChatHelpers::SelectedTextAction action) {
+	if (isJoinChannel() || !action.isValid()) {
 		return;
 	}
 	fields.messageId = item->fullId();
+	clearProcessingReply();
+	_processingSelectedAction = std::move(action);
 	_processingReplyTo = fields;
 	_processingReplyItem = item;
 	processReply();
 }
 
+void HistoryWidget::clearProcessingReply() {
+	++_processingReplyGeneration;
+	_processingReplyTo = {};
+	_processingReplyItem = nullptr;
+	if (_processingSelectedAction.result) {
+		*_processingSelectedAction.result = ChatHelpers::SelectedTextResult::Rejected;
+	}
+	_processingSelectedAction = {};
+}
+
+void HistoryWidget::continueProcessingReply(
+		uint64 generation,
+		std::optional<MsgId> topicRootId) {
+	if (_processingReplyGeneration != generation) {
+		return;
+	} else if (!_peer || !_processingReplyTo
+		|| !_processingSelectedAction.isValid()) {
+		return clearProcessingReply();
+	}
+	if (!_processingReplyItem) {
+		_processingReplyItem = _peer->owner().message(
+			_processingReplyTo.messageId);
+	}
+	if (!_processingReplyItem) {
+		return clearProcessingReply();
+	} else if (topicRootId) {
+		const auto forum = _peer->forum();
+		if (!forum || !forum->topicFor(*topicRootId)) {
+			return clearProcessingReply();
+		}
+	}
+	processReply();
+}
+
 void HistoryWidget::processReply() {
-	const auto processContinue = [=] {
+	const auto processContinue = [=](
+			std::optional<MsgId> topicRootId = std::nullopt) {
+		const auto generation = _processingReplyGeneration;
 		return crl::guard(_list, [=] {
-			if (!_peer || !_processingReplyTo) {
-				return;
-			} else if (!_processingReplyItem) {
-				_processingReplyItem = _peer->owner().message(
-					_processingReplyTo.messageId);
-				if (!_processingReplyItem) {
-					_processingReplyTo = {};
-				} else {
-					processReply();
-				}
-			}
+			continueProcessingReply(generation, topicRootId);
 		});
 	};
-	const auto processCancel = [=] {
-		_processingReplyTo = {};
-		_processingReplyItem = nullptr;
-	};
 
-	if (!_peer || !_processingReplyTo) {
-		return processCancel();
+	if (!_peer || !_processingReplyTo || !_processingSelectedAction.isValid()) {
+		return clearProcessingReply();
 	}
-	cancelSuggestPost();
 	if (!_processingReplyItem) {
+		_processingSelectedAction.markPending();
 		session().api().requestMessageData(
 			session().data().peer(_processingReplyTo.messageId.peer),
 			_processingReplyTo.messageId.msg,
@@ -10300,33 +10349,36 @@ void HistoryWidget::processReply() {
 					.confirmText = tr::lng_selected_forward(),
 				}));
 		}
-		return processCancel();
+		return clearProcessingReply();
 #endif
 	} else if (!_processingReplyItem->isRegular()
 		&& !CanReplyToEphemeral(_processingReplyItem)) {
-		return processCancel();
+		return clearProcessingReply();
 	} else if (const auto forum = _peer->forum()
 		; forum && _processingReplyItem->history() == _history) {
 		const auto topicRootId = _processingReplyItem->topicRootId();
 		using namespace Data;
 		if (forum->topicDeleted(topicRootId)
 			&& !(topicRootId == ForumTopic::kGeneralId && _peer->isBot())) {
-			return processCancel();
+			return clearProcessingReply();
 		} else if (const auto topic = forum->topicFor(topicRootId)) {
 			if (!Data::CanSendAnything(topic)) {
-				return processCancel();
+				return clearProcessingReply();
 			}
 		} else {
-			forum->requestTopic(topicRootId, processContinue());
+			_processingSelectedAction.markPending();
+			forum->requestTopic(topicRootId, processContinue(topicRootId));
+			return;
 		}
 	} else if (!Data::CanSendAnything(_peer)) {
-		return processCancel();
+		return clearProcessingReply();
 	}
 	setReplyFieldsFromProcessing();
 }
 
 void HistoryWidget::setReplyFieldsFromProcessing() {
-	if (!_processingReplyTo || !_processingReplyItem) {
+	if (!_processingReplyTo || !_processingReplyItem
+		|| !_processingSelectedAction.isValid()) {
 		return;
 	}
 
@@ -10336,6 +10388,8 @@ void HistoryWidget::setReplyFieldsFromProcessing() {
 
 	const auto id = base::take(_processingReplyTo);
 	const auto item = base::take(_processingReplyItem);
+	const auto action = base::take(_processingSelectedAction);
+	clearProcessingReply();
 	if (_editMsgId) {
 		if (const auto localDraft = _history->localDraft({}, {})) {
 			localDraft->reply = id;
@@ -10377,6 +10431,7 @@ void HistoryWidget::setReplyFieldsFromProcessing() {
 
 	saveDraftWithTextNow();
 	setInnerFocus();
+	action.accept();
 }
 
 void HistoryWidget::editMessage(
@@ -10517,11 +10572,12 @@ bool HistoryWidget::cancelReplyOrSuggest(bool lastKeyboardUsed) {
 
 bool HistoryWidget::cancelReply(bool lastKeyboardUsed) {
 	bool wasReply = false;
+	clearProcessingReply();
 	if (_replyTo) {
 		wasReply = true;
 
-		_processingReplyItem = _replyEditMsg = nullptr;
-		_processingReplyTo = _replyTo = FullReplyTo();
+		_replyEditMsg = nullptr;
+		_replyTo = FullReplyTo();
 		mouseMoveEvent(0);
 		if (!readyToForward()
 			&& !_previewDrawPreview

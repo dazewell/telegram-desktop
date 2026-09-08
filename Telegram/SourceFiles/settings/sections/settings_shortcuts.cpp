@@ -108,6 +108,10 @@ struct Labeled {
 		{ C::ShowChatMenu, tr::lng_shortcuts_show_chat_menu() },
 		{ C::ShowChatPreview, tr::lng_shortcuts_show_chat_preview() },
 		separator,
+		{ C::QuoteSelectedText, tr::lng_context_quote_and_reply() },
+		{ C::CiteSelectedText, tr::lng_shortcuts_cite_selected() },
+		{ C::TranslateSelectedText, tr::lng_context_translate_selected() },
+		separator,
 		{ C::JustSendMessage, tr::lng_shortcuts_just_send() },
 		{ C::SendSilentMessage, tr::lng_shortcuts_silent_send() },
 		{ C::ScheduleMessage, tr::lng_shortcuts_schedule() },
@@ -287,6 +291,9 @@ struct SetupShortcutsResult {
 						const QKeySequence &key,
 						Button *recording,
 						bool removed) {
+					if (S::IsContextual(raw->command)) {
+						widget->setAccessibleName(button + ' ' + ToString(key));
+					}
 					const auto &st = st::settingsButtonNoIcon;
 					const auto available = width
 						- st.padding.left()
@@ -314,6 +321,11 @@ struct SetupShortcutsResult {
 						st.padding.top());
 				}, keys->lifetime());
 				keys->setAttribute(Qt::WA_TransparentForMouseEvents);
+				if (S::IsContextual(entry.command)) {
+					tr::lng_shortcuts_selected_text_only() | rpl::on_next([=](const QString &text) {
+						widget->setAccessibleDescription(text);
+					}, widget->lifetime());
+				}
 
 				widget->setAcceptBoth(true);
 				widget->clicks(
@@ -444,7 +456,9 @@ struct SetupShortcutsResult {
 				|| k == Qt::Key_Alt
 				|| k == Qt::Key_Meta) {
 				return base::EventFilterResult::Cancel;
-			} else if (!m && !clear && !S::AllowWithoutModifiers(k)) {
+			} else if (!m && !clear && !S::AllowWithoutModifiers(k)
+				&& !(S::IsContextual(state->recording.current()->command)
+					&& k > 0 && k <= 0xFFFF && QChar(k).isLetter())) {
 				if (k != Qt::Key_Escape) {
 					stopRecording();
 				}
@@ -527,11 +541,14 @@ struct SetupShortcutsResult {
 	nothingFound->setDuration(0);
 	nothingFound->hide(anim::type::instant);
 
+	const auto selectionNote = std::make_shared<
+		QPointer<Ui::SlideWrap<Ui::VerticalLayout>>>();
 	const auto refreshFilter = [=] {
 		const auto words = SearchWords(state->query);
 		const auto reset = MatchesWords(state->resetTerms, words);
 		state->resetShown = reset;
 		auto found = reset && state->modified.current();
+		auto selectionShown = false;
 		for (auto &entry : state->entries) {
 			if (!entry.wrap) {
 				continue;
@@ -543,6 +560,10 @@ struct SetupShortcutsResult {
 			const auto shown = MatchesWords(terms, words);
 			entry.wrap->toggle(shown, anim::type::instant);
 			found = found || shown;
+			selectionShown = selectionShown || (shown && S::IsContextual(entry.command));
+		}
+		if (*selectionNote) {
+			(*selectionNote)->toggle(selectionShown, anim::type::instant);
 		}
 		for (const auto separator : state->separators) {
 			separator->toggle(words.isEmpty(), anim::type::instant);
@@ -582,6 +603,15 @@ struct SetupShortcutsResult {
 		entry.wrap->setDuration(0);
 		entry.inner = entry.wrap->entity();
 		fill(entry);
+		if (entry.command == S::Command::TranslateSelectedText) {
+			const auto note = content->add(
+				object_ptr<Ui::SlideWrap<Ui::VerticalLayout>>(
+					content,
+					object_ptr<Ui::VerticalLayout>(content)));
+			note->setDuration(0);
+			AddDividerText(note->entity(), tr::lng_shortcuts_selected_text_only());
+			*selectionNote = note;
+		}
 
 		const auto raw = &entry;
 		rpl::duplicate(

@@ -668,6 +668,9 @@ ChatWidget::ChatWidget(
 
 	_inner->replyToMessageRequested(
 	) | rpl::on_next([=](ListWidget::ReplyToMessageRequest request) {
+		if (!request.action.isValid()) {
+			return;
+		}
 		const auto canSendReply = CanSendResolved(
 			_peer,
 			resolvedTopic(),
@@ -680,9 +683,11 @@ ChatWidget::ChatWidget(
 			&& (bottomBarActive
 				|| !canSendReply
 				|| request.forceAnotherChat)) {
-			Controls::ShowReplyToChatBox(controller->uiShow(), { to });
+			Controls::ShowReplyToChatBox(
+				controller->uiShow(), to, nullptr, request.action);
 		} else if (!bottomBarActive && canSendReply) {
-			replyToMessage(to);
+			_composeControls->replyToMessage(to, request.action);
+			refreshTopBarActiveChat();
 			_composeControls->focus();
 			if (_composeSearch) {
 				_composeSearch->hideAnimated();
@@ -701,6 +706,11 @@ ChatWidget::ChatWidget(
 		if (const auto field = _composeControls->fieldForMention()) {
 			Menu::InsertTextAtCursor(field, text);
 		}
+	});
+	_inner->setCiteSelectedTextCallback([=] {
+		return !_bottom->isButtonActive() && _composeControls->canCiteSelectedText();
+	}, [=](const TextForMimeData &text) {
+		return !_bottom->isButtonActive() && _composeControls->citeSelectedText(text);
 	});
 
 	_composeControls->sendActionUpdates(

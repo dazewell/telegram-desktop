@@ -6,6 +6,8 @@ For license and copyright information please follow this link:
 https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "history/history_inner_widget.h"
+#include "base/event_filter.h"
+#include "chat_helpers/selected_text_action.h"
 
 #include "api/api_polls.h"
 #include "chat_helpers/stickers_emoji_pack.h"
@@ -399,6 +401,18 @@ HistoryInner::HistoryInner(
 	[=] { return window()->isActiveWindow(); })
 , _scrollDateCheck([this] { scrollDateCheck(); })
 , _scrollDateHideTimer([this] { scrollDateHideByTimer(); }) {
+	Shortcuts::ContextualRequests() | rpl::on_next([=](
+			not_null<Shortcuts::ContextualRequest*> request) {
+		if (request->owner == this) {
+			request->execute = selectedTextAction(request->command, true);
+		}
+	}, lifetime());
+	base::install_event_filter(this, [=](not_null<QEvent*> event) {
+		if (event->type() == QEvent::Hide) {
+			++_selectedTextGeneration;
+		}
+		return base::EventFilterResult::Continue;
+	});
 	_history->delegateMixin()->setCurrent(this);
 	if (_migrated) {
 		_migrated->delegateMixin()->setCurrent(this);
@@ -1282,6 +1296,7 @@ bool HistoryInner::hasSelectedText() const {
 }
 
 void HistoryInner::clearTextSelection() {
+	++_selectedTextGeneration;
 	if (_selectedTextItem) {
 		if (const auto view = viewByItem(_selectedTextItem)) {
 			repaintItem(view);
@@ -1295,6 +1310,7 @@ void HistoryInner::clearTextSelection() {
 void HistoryInner::setTextSelection(
 		not_null<Element*> view,
 		MessageSelection selection) {
+	++_selectedTextGeneration;
 	if (!selection.empty()) {
 		ClickHandler::unpressed();
 	}
@@ -2733,6 +2749,72 @@ void HistoryInner::toggleFavoriteReaction(not_null<Element*> view) const {
 	item->toggleReaction(favorite, HistoryReactionSource::Quick);
 }
 
+Fn<bool()> HistoryInner::selectedTextAction(
+		Shortcuts::Command command,
+		bool shortcut) {
+	using C = Shortcuts::Command;
+	if (!isVisible() || !hasSelectedText() || _selectedTextSelection.empty()) {
+		return nullptr;
+	}
+	const auto item = _selectedTextItem;
+	const auto text = getSelectedText();
+	const auto quote = selectedQuote(item);
+	const auto eligible = (command == C::CiteSelectedText)
+		? (!hasCopyRestrictionForSelected() && _widget->canCiteSelectedText())
+		: (command == C::TranslateSelectedText)
+		? !Ui::SkipTranslate(text.rich)
+		: (command == C::QuoteSelectedText)
+			&& quote && !IsAnchoredEphemeral(item)
+			&& (item->isRegular() || CanReplyToEphemeral(item))
+			&& (CanSendReply(item) || item->allowsForward());
+	if (!eligible || text.empty()) {
+		return nullptr;
+	}
+	const auto sourceId = item->fullId();
+	const auto quoteId = quote.item ? quote.item->fullId() : FullMsgId();
+	const auto generation = _selectedTextGeneration;
+	const auto weak = QPointer<HistoryInner>(this);
+	return [=] {
+		if (!weak || generation != _selectedTextGeneration
+			|| getSelectedText().rich != text.rich || getSelectedText().tags != text.tags
+			|| !selectedTextAction(command, shortcut)) {
+			return false;
+		}
+		auto action = ChatHelpers::MakeSelectedTextAction(
+			this,
+			_selectedTextGeneration,
+			[=] {
+				return hasSelectedText() && _selectedTextItem->fullId() == sourceId
+					&& session().data().message(sourceId) == _selectedTextItem
+					&& getSelectedText().rich == text.rich && getSelectedText().tags == text.tags
+					&& selectedTextAction(command, shortcut);
+			},
+			[=] { clearTextSelection(); _widget->updateTopBarSelection(); },
+			shortcut);
+		if (command == C::CiteSelectedText) {
+			if (_widget->citeSelectedText(getSelectedText())) {
+				action.accept();
+			}
+		} else if (command == C::TranslateSelectedText) {
+			auto box = Box(Ui::TranslateBox,
+				item->history()->peer, MsgId(), getSelectedText().rich,
+				hasCopyRestrictionForSelected());
+			const auto shown = QPointer<Ui::GenericBox>(box.data());
+			_controller->show(std::move(box));
+			if (shown && shown->isVisible()) {
+				action.accept();
+			}
+		} else {
+			_widget->replyToMessage({
+				.messageId = quoteId,
+				.quote = quote.highlight.quote,
+				.quoteOffset = quote.highlight.quoteOffset,
+			}, action);
+		}
+		return *action.result != ChatHelpers::SelectedTextResult::Rejected;
+	};
+}
+
 HistoryView::SelectedQuote HistoryInner::selectedQuote(
 		not_null<HistoryItem*> item) const {
 	if (!hasSelectedText() || _selectedTextItem != item) {
@@ -3279,16 +3361,26 @@ void HistoryInner::showContextMenu(QContextMenuEvent *e, bool showFromTouch) {
 					Ui::Text::FixAmpersandInAction);
 			const auto replyToItem = selected.item ? selected.item : item;
 			const auto itemId = replyToItem->fullId();
+			const auto selectedAction = selected
+				? selectedTextAction(Shortcuts::Command::QuoteSelectedText)
+				: Fn<bool()>();
+			if (selected) {
+				text = Shortcuts::WithBindingHint(
+					std::move(text), Shortcuts::Command::QuoteSelectedText);
+			}
 			_menu->addAction(std::move(text), [=] {
+				if (selected) {
+					if (selectedAction) {
+						selectedAction();
+					}
+					return;
+				}
 				_widget->replyToMessage({
 					.messageId = itemId,
 					.quote = selected.highlight.quote,
 					.quoteOffset = selected.highlight.quoteOffset,
 					.todoItemId = todoListTaskId,
 				});
-				if (!selected.highlight.quote.empty()) {
-					_widget->clearSelected();
-				}
 			}, &st::menuIconReply);
 			const auto media = item->media();
 			const auto document = media
@@ -3341,6 +3433,21 @@ void HistoryInner::showContextMenu(QContextMenuEvent *e, bool showFromTouch) {
 			}),
 			&st::menuIconAdd);
 	};
+	const auto addCiteAction = [&] {
+		if (const auto action = selectedTextAction(Shortcuts::Command::CiteSelectedText)) {
+			_menu->addAction(Shortcuts::WithBindingHint(
+				tr::lng_context_cite(tr::now), Shortcuts::Command::CiteSelectedText),
+				[=] { action(); }, &st::menuIconReply);
+		}
+	};
+	const auto addTranslateAction = [&] {
+		if (const auto action = selectedTextAction(Shortcuts::Command::TranslateSelectedText)) {
+			_menu->addAction(Shortcuts::WithBindingHint(
+				tr::lng_context_translate_selected(tr::now),
+				Shortcuts::Command::TranslateSelectedText),
+				[=] { action(); }, &st::menuIconTranslate);
+		}
+	};
 	const auto lnkPhoto = link
 		? reinterpret_cast<PhotoData*>(
 			link->property(kPhotoLinkMediaProperty).toULongLong())
@@ -3355,6 +3462,7 @@ void HistoryInner::showContextMenu(QContextMenuEvent *e, bool showFromTouch) {
 		addReplyAction(item);
 
 		if (isUponSelected > 0) {
+			addCiteAction();
 			const auto selectedText = getSelectedText();
 			if (!hasCopyRestrictionForSelected()
 				&& !selectedText.empty()) {
@@ -3365,7 +3473,8 @@ void HistoryInner::showContextMenu(QContextMenuEvent *e, bool showFromTouch) {
 					[=] { copySelectedText(); },
 					&st::menuIconCopy);
 			}
-			if (item && !Ui::SkipTranslate(selectedText.rich)) {
+			addTranslateAction();
+			if (!hasSelectedText() && item && !Ui::SkipTranslate(selectedText.rich)) {
 				const auto peer = item->history()->peer;
 				_menu->addAction(tr::lng_context_translate_selected({}), [=] {
 					_controller->show(Box(
@@ -3518,6 +3627,7 @@ void HistoryInner::showContextMenu(QContextMenuEvent *e, bool showFromTouch) {
 		}
 		if (isUponSelected > 0) {
 			addReplyAction(item);
+			addCiteAction();
 				const auto selectedText = getSelectedText();
 			if (!hasCopyRestrictionForSelected() && !selectedText.empty()) {
 				_menu->addAction(
@@ -3527,7 +3637,8 @@ void HistoryInner::showContextMenu(QContextMenuEvent *e, bool showFromTouch) {
 					[=] { copySelectedText(); },
 					&st::menuIconCopy);
 			}
-			if (item && !Ui::SkipTranslate(selectedText.rich)) {
+			addTranslateAction();
+			if (!hasSelectedText() && item && !Ui::SkipTranslate(selectedText.rich)) {
 				const auto peer = item->history()->peer;
 				_menu->addAction(tr::lng_context_translate_selected({}), [=] {
 					_controller->show(Box(

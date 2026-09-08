@@ -8,6 +8,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include "data/data_drafts.h"
+#include "chat_helpers/selected_text_action.h"
 
 class History;
 struct MessageLinkRange;
@@ -42,6 +43,7 @@ void EditDraftOptions(EditDraftOptionsArgs &&args);
 void ShowReplyToChatBox(
 	std::shared_ptr<ChatHelpers::Show> show,
 	FullReplyTo reply,
-	Fn<void()> clearOldDraft = nullptr);
+	Fn<void()> clearOldDraft = nullptr,
+	ChatHelpers::SelectedTextAction action = {});
 
 } // namespace HistoryView::Controls

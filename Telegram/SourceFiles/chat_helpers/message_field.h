@@ -115,6 +115,10 @@ void InitSpellchecker(
 
 bool HasSendText(not_null<const Ui::InputField*> field);
 
+[[nodiscard]] bool AppendMessageFieldCite(
+	not_null<Ui::InputField*> field,
+	const TextForMimeData &selected);
+
 void InitMessageFieldFade(
 	not_null<Ui::InputField*> field,
 	const style::color &bg);

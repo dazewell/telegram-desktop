@@ -84,6 +84,9 @@ enum class Command {
 
 	ShowChatMenu,
 	ShowChatPreview,
+	QuoteSelectedText,
+	CiteSelectedText,
+	TranslateSelectedText,
 
 	ShowAdminLog,
 
@@ -133,6 +136,23 @@ private:
 };
 
 [[nodiscard]] rpl::producer<not_null<Request*>> Requests();
+
+[[nodiscard]] inline bool IsContextual(Command command) {
+	return command == Command::QuoteSelectedText
+		|| command == Command::CiteSelectedText
+		|| command == Command::TranslateSelectedText;
+}
+
+struct ContextualRequest {
+	Command command = {};
+	QWidget *owner = nullptr;
+	Fn<bool()> execute;
+};
+
+[[nodiscard]] rpl::producer<not_null<ContextualRequest*>> ContextualRequests();
+bool HandleContextualEvent(not_null<QObject*> object, not_null<QEvent*> event);
+[[nodiscard]] QString BindingHint(Command command);
+[[nodiscard]] QString WithBindingHint(QString text, Command command);
 
 void Start();
 void Finish();

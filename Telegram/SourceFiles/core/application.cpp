@@ -715,6 +715,14 @@ bool Application::hideMediaView() {
 }
 
 bool Application::eventFilter(QObject *object, QEvent *e) {
+	if ((e->type() == QEvent::KeyPress
+		|| e->type() == QEvent::InputMethod
+		|| e->type() == QEvent::ApplicationDeactivate
+		|| e->type() == QEvent::WindowDeactivate)
+		&& Shortcuts::HandleContextualEvent(object, e)) {
+		updateNonIdle();
+		return true;
+	}
 	switch (e->type()) {
 	case QEvent::KeyPress: {
 		updateNonIdle();
@@ -735,12 +743,18 @@ bool Application::eventFilter(QObject *object, QEvent *e) {
 
 	case QEvent::KeyRelease: {
 		const auto event = static_cast<QKeyEvent*>(e);
+		if (Shortcuts::HandleContextualEvent(object, e)) {
+			return true;
+		}
 		if (Shortcuts::HandlePossibleChatSwitch(event)) {
 			return true;
 		}
 	} break;
 
 	case QEvent::ShortcutOverride: {
+		if (Shortcuts::HandleContextualEvent(object, e)) {
+			return true;
+		}
 		// Ctrl+Tab/Ctrl+Shift+Tab chat switch is a special shortcut case,
 		// because it not only does an action on the shortcut activation,
 		// but also keeps the UI visible until you release the Ctrl key.

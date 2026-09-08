@@ -6,6 +6,8 @@ For license and copyright information please follow this link:
 https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "history/view/history_view_list_widget.h"
+#include "base/event_filter.h"
+#include "boxes/translate_box.h"
 
 #include "history/view/history_view_about_view.h"
 #include "base/unixtime.h"
@@ -90,6 +92,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_session.h"
 #include "data/data_changes.h"
 #include "data/data_folder.h"
+#include "data/data_forum_topic.h"
 #include "data/data_media_types.h"
 #include "data/data_document.h"
 #include "data/data_photo.h"
@@ -563,6 +566,18 @@ ListWidget::ListWidget(
 		[=](const QCursor &cursor) { setCursor(cursor); },
 		[=] { mouseActionUpdate(QCursor::pos()); setCursor(_cursor); },
 		[=] { return window()->isActiveWindow(); }) {
+	Shortcuts::ContextualRequests() | rpl::on_next([=](
+			not_null<Shortcuts::ContextualRequest*> request) {
+		if (request->owner == this) {
+			request->execute = selectedTextAction(request->command, true);
+		}
+	}, lifetime());
+	base::install_event_filter(this, [=](not_null<QEvent*> event) {
+		if (event->type() == QEvent::Hide) {
+			++_selectedTextGeneration;
+		}
+		return base::EventFilterResult::Continue;
+	});
 	setAttribute(Qt::WA_AcceptTouchEvents);
 	setMouseTracking(true);
 	setAccessibleName(tr::lng_sr_message_list(tr::now));
@@ -2068,6 +2083,7 @@ void ListWidget::clearSelected() {
 }
 
 void ListWidget::clearTextSelection() {
+	++_selectedTextGeneration;
 	if (_selectedTextItem) {
 		if (const auto view = viewForItem(_selectedTextItem)) {
 			repaintItem(view);
@@ -2081,6 +2097,7 @@ void ListWidget::clearTextSelection() {
 void ListWidget::setTextSelection(
 		not_null<Element*> view,
 		MessageSelection selection) {
+	++_selectedTextGeneration;
 	if (!selection.empty()) {
 		ClickHandler::unpressed();
 	}
@@ -5879,11 +5896,91 @@ auto ListWidget::replyToMessageRequested() const
 
 void ListWidget::replyToMessageRequestNotify(
 		FullReplyTo to,
-		bool forceAnotherChat) {
-	if (!to.quote.empty()) {
-		clearTextSelection();
+		bool forceAnotherChat,
+		ChatHelpers::SelectedTextAction action) {
+	if (action.isValid()) {
+		_requestedToReplyToMessage.fire({ std::move(to), forceAnotherChat, action });
 	}
-	_requestedToReplyToMessage.fire({ std::move(to), forceAnotherChat });
+}
+
+void ListWidget::setCiteSelectedTextCallback(
+		Fn<bool()> available,
+		Fn<bool(const TextForMimeData &)> callback) {
+	_citeSelectedTextAvailable = std::move(available);
+	_citeSelectedTextCallback = std::move(callback);
+}
+
+Fn<bool()> ListWidget::selectedTextAction(
+		Shortcuts::Command command,
+		bool shortcut) {
+	using C = Shortcuts::Command;
+	if (!isVisible() || !controllerOrNull()
+		|| !hasSelectedText() || _selectedTextSelection.empty()
+		|| (_context != Context::History && _context != Context::Replies
+			&& _context != Context::Monoforum)) {
+		return nullptr;
+	}
+	const auto item = _selectedTextItem;
+	const auto view = viewForItem(item);
+	const auto text = getSelectedText();
+	const auto quote = view ? view->selectedQuote(_selectedTextSelection) : SelectedQuote();
+	const auto canReply = item->allowsForward() || (item->topic()
+		? Data::CanSendAnything(item->topic())
+		: Data::CanSendAnything(item->history()->peer));
+	const auto eligible = (command == C::CiteSelectedText)
+		? (!hasCopyRestrictionForSelected() && _citeSelectedTextAvailable
+			&& _citeSelectedTextAvailable() && _citeSelectedTextCallback)
+		: (command == C::TranslateSelectedText)
+		? !Ui::SkipTranslate(text.rich)
+		: (command == C::QuoteSelectedText)
+			&& quote && canReply && !IsAnchoredEphemeral(item)
+			&& (item->isRegular() || CanReplyToEphemeral(item));
+	if (!eligible || text.empty()) {
+		return nullptr;
+	}
+	const auto sourceId = item->fullId();
+	const auto quoteId = quote.item ? quote.item->fullId() : FullMsgId();
+	const auto generation = _selectedTextGeneration;
+	const auto weak = QPointer<ListWidget>(this);
+	return [=] {
+		if (!weak || generation != _selectedTextGeneration
+			|| getSelectedText().rich != text.rich || getSelectedText().tags != text.tags
+			|| !selectedTextAction(command, shortcut)) {
+			return false;
+		}
+		auto action = ChatHelpers::MakeSelectedTextAction(
+			this,
+			_selectedTextGeneration,
+			[=] {
+				return hasSelectedText() && _selectedTextItem->fullId() == sourceId
+					&& session().data().message(sourceId) == _selectedTextItem
+					&& getSelectedText().rich == text.rich && getSelectedText().tags == text.tags
+					&& selectedTextAction(command, shortcut);
+			},
+			[=] { clearTextSelection(); },
+			shortcut);
+		if (command == C::CiteSelectedText) {
+			if (_citeSelectedTextCallback(getSelectedText())) {
+				action.accept();
+			}
+		} else if (command == C::TranslateSelectedText) {
+			auto box = Box(Ui::TranslateBox,
+				item->history()->peer, MsgId(), getSelectedText().rich,
+				hasCopyRestrictionForSelected());
+			const auto shown = QPointer<Ui::GenericBox>(box.data());
+			controller()->show(std::move(box));
+			if (shown && shown->isVisible()) {
+				action.accept();
+			}
+		} else {
+			replyToMessageRequestNotify({
+				.messageId = quoteId,
+				.quote = quote.highlight.quote,
+				.quoteOffset = quote.highlight.quoteOffset,
+			}, !shortcut && base::IsCtrlPressed(), action);
+		}
+		return *action.result != ChatHelpers::SelectedTextResult::Rejected;
+	};
 }
 
 rpl::producer<FullMsgId> ListWidget::readMessageRequested() const {

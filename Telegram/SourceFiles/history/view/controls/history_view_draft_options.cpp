@@ -1371,7 +1371,11 @@ struct AuthorSelector {
 void ShowReplyToChatBox(
 		std::shared_ptr<ChatHelpers::Show> show,
 		FullReplyTo reply,
-		Fn<void()> clearOldDraft) {
+		Fn<void()> clearOldDraft,
+		ChatHelpers::SelectedTextAction action) {
+	if (!action.isValid()) {
+		return;
+	}
 	class Controller final : public ChooseRecipientBoxController {
 	public:
 		using Chosen = not_null<Data::Thread*>;
@@ -1452,8 +1456,15 @@ void ShowReplyToChatBox(
 		auto state = State{ boxRaw, controllerRaw };
 		return boxRaw->lifetime().make_state<State>(std::move(state));
 	}();
+	action.markPending();
 
 	auto chosen = [=](not_null<Data::Thread*> thread) mutable {
+		const auto source = session->data().message(reply.messageId);
+		if (!action.isValid()
+			|| (action.valid && (!source || !source->allowsForward()
+				|| !Data::CanSendAnything(thread)))) {
+			return false;
+		}
 		const auto history = thread->owningHistory();
 		const auto topicRootId = thread->topicRootId();
 		const auto monoforumPeerId = thread->monoforumPeerId();
@@ -1478,6 +1489,7 @@ void ShowReplyToChatBox(
 		if (clearOldDraft) {
 			crl::on_main(&history->session(), clearOldDraft);
 		}
+		action.accept();
 		return true;
 	};
 	auto callback = [=, chosen = std::move(chosen)](
@@ -1491,6 +1503,11 @@ void ShowReplyToChatBox(
 	};
 	state->controller->singleChosen(
 	) | rpl::on_next(std::move(callback), state->box->lifetime());
+	state->box->boxClosing() | rpl::on_next([=] {
+		if (action.isValid() && action.cancelled) {
+			action.cancelled();
+		}
+	}, state->box->lifetime());
 }
 
 void EditDraftOptions(EditDraftOptionsArgs &&args) {

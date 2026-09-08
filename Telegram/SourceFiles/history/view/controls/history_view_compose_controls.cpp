@@ -5889,10 +5889,32 @@ void ComposeControls::maybeCancelEditMessage() {
 	}
 }
 
-void ComposeControls::replyToMessage(FullReplyTo id) {
+bool ComposeControls::canCiteSelectedText() const {
+	return _history && !isEditingMessage() && !isRecording()
+		&& !_voiceRecordBar->isActive() && fieldForMention()
+		&& _field->isEnabled();
+}
+
+bool ComposeControls::citeSelectedText(const TextForMimeData &text) {
+	if (!canCiteSelectedText()) {
+		return false;
+	} else if (!AppendMessageFieldCite(_field, text)) {
+		_show->showToast(tr::lng_cite_unavailable(tr::now));
+		return false;
+	}
+	focus();
+	_field->ensureCursorVisible();
+	saveDraftWithTextNow();
+	return true;
+}
+
+void ComposeControls::replyToMessage(
+		FullReplyTo id,
+		ChatHelpers::SelectedTextAction action) {
 	Expects(_history != nullptr);
 
-	if (draftKey(DraftType::Normal) == Data::DraftKey::None()) {
+	if (draftKey(DraftType::Normal) == Data::DraftKey::None()
+		|| !action.isValid()) {
 		return;
 	}
 	id.topicRootId = _topicRootId;
@@ -5921,6 +5943,7 @@ void ComposeControls::replyToMessage(FullReplyTo id) {
 		_header->replyToMessage(id);
 	}
 	saveDraftWithTextNow();
+	action.accept();
 }
 
 void ComposeControls::replyToMessageExternal(FullReplyTo id) {

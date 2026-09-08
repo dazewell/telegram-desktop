@@ -6,6 +6,8 @@ For license and copyright information please follow this link:
 https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
+#include "chat_helpers/selected_text_action.h"
+#include "core/shortcuts.h"
 
 #include "base/timer.h"
 #include "ui/rp_widget.h"
@@ -454,6 +456,7 @@ public:
 	struct ReplyToMessageRequest {
 		FullReplyTo to;
 		bool forceAnotherChat = false;
+		ChatHelpers::SelectedTextAction action;
 	};
 	[[nodiscard]] rpl::producer<FullMsgId> editMessageRequested() const;
 	void editMessageRequestNotify(FullMsgId item) const;
@@ -462,7 +465,14 @@ public:
 		-> rpl::producer<ReplyToMessageRequest>;
 	void replyToMessageRequestNotify(
 		FullReplyTo to,
-		bool forceAnotherChat = false);
+		bool forceAnotherChat = false,
+		ChatHelpers::SelectedTextAction action = {});
+	[[nodiscard]] Fn<bool()> selectedTextAction(
+		Shortcuts::Command command,
+		bool shortcut = false);
+	void setCiteSelectedTextCallback(
+		Fn<bool()> available,
+		Fn<bool(const TextForMimeData &)> callback);
 	[[nodiscard]] rpl::producer<FullMsgId> readMessageRequested() const;
 	[[nodiscard]] rpl::producer<FullMsgId> showMessageRequested() const;
 	void setInsertTextCallback(Fn<void(QString)> callback);
@@ -1026,6 +1036,7 @@ private:
 
 	bool _selectEnabled = false;
 	HistoryItem *_selectedTextItem = nullptr;
+	uint64 _selectedTextGeneration = 0;
 	MessageSelection _selectedTextSelection;
 	TextForMimeData _selectedText;
 	KeyboardTextSelection _keyboardTextSelection;
@@ -1096,6 +1107,8 @@ private:
 	rpl::event_stream<FullMsgId> _requestedToReadMessage;
 	rpl::event_stream<FullMsgId> _requestedToShowMessage;
 	Fn<void(QString)> _insertTextCallback;
+	Fn<bool()> _citeSelectedTextAvailable;
+	Fn<bool(const TextForMimeData &)> _citeSelectedTextCallback;
 	rpl::event_stream<not_null<QKeyEvent*>> _scrollKeyEvents;
 
 	[[nodiscard]] ElementOverlayHost &ensureOverlayHost();

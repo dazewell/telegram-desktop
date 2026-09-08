@@ -6,6 +6,7 @@ For license and copyright information please follow this link:
 https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
+#include "chat_helpers/selected_text_action.h"
 
 #include "api/api_common.h"
 #include "base/object_ptr.h"
@@ -282,7 +283,9 @@ public:
 	void cancelEditMessage();
 	void maybeCancelEditMessage(); // Confirm if changed and cancel.
 
-	void replyToMessage(FullReplyTo id);
+	void replyToMessage(FullReplyTo id, ChatHelpers::SelectedTextAction action = {});
+	[[nodiscard]] bool canCiteSelectedText() const;
+	bool citeSelectedText(const TextForMimeData &text);
 	void cancelReplyMessage();
 
 	void updateForwarding();
