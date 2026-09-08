@@ -19,7 +19,7 @@ namespace ChatHelpers {
 		} else if (Ui::InputField::IsCustomEmojiLink(tag)) {
 			const auto data = Ui::InputField::CustomEmojiEntityData(tag);
 			if ((keepCustomEmojiData && keepCustomEmojiData(data))
-				|| allowCustomEmoji(data)) {
+				|| (allowCustomEmoji && allowCustomEmoji(data))) {
 				++part;
 			} else {
 				part = parts.erase(part);

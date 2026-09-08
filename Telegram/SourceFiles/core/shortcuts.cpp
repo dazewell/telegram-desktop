@@ -714,7 +714,15 @@ void Manager::set(
 		Command command,
 		bool replace) {
 	if (!ValidBinding(keys, command)) {
-		_errors.push_back(u"Could not derive key sequence '%1'!"_q.arg(keys.toString()));
+		if (keys.isEmpty()) {
+			_errors.push_back(
+				u"Could not derive key sequence '%1'!"_q.arg(keys.toString()));
+		} else {
+			_errors.push_back(
+				u"Contextual command '%1' requires a single-stroke key sequence; rejected '%2'!"_q.arg(
+					CommandNames().find(command)->second,
+					keys.toString(QKeySequence::PortableText)));
+		}
 		return;
 	}
 	auto shortcut = base::make_unique_q<QAction>();

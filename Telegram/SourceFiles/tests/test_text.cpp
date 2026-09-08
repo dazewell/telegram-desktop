@@ -609,6 +609,65 @@ int selectedTextShortcutsTest() {
 		window.hide();
 		check(!dispatch(&list, &override), u"hidden source untouched"_q);
 	}
+	report += u"SUITE contextual-hidden-parent\n"_q;
+	{
+		using C = Shortcuts::Command;
+		auto window = QWidget();
+		auto parent = QWidget(&window);
+		auto owner = QWidget(&parent);
+		auto other = QWidget(&window);
+		owner.setFocusPolicy(Qt::StrongFocus);
+		other.setFocusPolicy(Qt::StrongFocus);
+		window.show();
+		App::setActiveWindow(&window);
+		owner.setFocus();
+		auto dispatcher = Shortcuts::ContextualDispatcher();
+		auto enabled = false;
+		auto executions = 0;
+		const auto dispatch = [&](QEvent::Type type) {
+			auto event = QKeyEvent(type, Qt::Key_C, Qt::NoModifier);
+			return dispatcher.handle(
+				&owner,
+				&event,
+				false,
+				[&](const QKeySequence &keys) {
+					return (enabled && keys == QKeySequence(u"C"_q))
+						? std::vector<C>{ C::CiteSelectedText }
+						: std::vector<C>();
+				},
+				[&](not_null<Shortcuts::ContextualRequest*> request) {
+					if (request->owner == &owner) {
+						request->execute = [&] {
+							++executions;
+							return true;
+						};
+					}
+				});
+		};
+		check(owner.isVisible() && owner.hasFocus(),
+			u"nested dispatch owner initially visible and focused"_q);
+		check(!dispatch(QEvent::ShortcutOverride),
+			u"nested dispatch disabled override untouched"_q);
+		check(!dispatch(QEvent::KeyPress) && executions == 0,
+			u"nested dispatch disabled press untouched"_q);
+		enabled = true;
+		check(dispatch(QEvent::ShortcutOverride) && executions == 0,
+			u"nested dispatch shown owner eligible without latching"_q);
+		parent.hide();
+		const auto focusAfterHide = App::focusWidget();
+		report += u"OBSERVED hidden-parent focus moved=%1 fallback=%2\n"_q.arg(
+			focusAfterHide != &owner).arg(focusAfterHide == &other);
+		check(!owner.isHidden() && !owner.isVisible(),
+			u"nested dispatch child not explicitly hidden"_q);
+		check(window.isActiveWindow() && !window.isMinimized(),
+			u"nested dispatch top window remains active"_q);
+		check(!dispatch(QEvent::ShortcutOverride),
+			u"hidden-parent direct override rejected"_q);
+		check(!dispatch(QEvent::KeyPress) && executions == 0,
+			u"hidden-parent direct press cannot execute"_q);
+		check(App::focusWidget() == focusAfterHide,
+			u"hidden-parent rejected dispatch preserves focus"_q);
+	}
 	report += u"SUITE destination-tag-policy\n"_q;
 	{
 		const auto filter = [](QStringView tag) {
@@ -616,6 +675,29 @@ int selectedTextShortcutsTest() {
 				[](QStringView data) { return data == u"123"; }, nullptr);
 		};
 		const auto emojiTag = Ui::InputField::CustomEmojiLink(u"123"_q);
+		check(ChatHelpers::ValidateMessageFieldTags(
+			emojiTag,
+			7,
+			nullptr,
+			nullptr).isEmpty(), u"empty allow callback removes custom emoji"_q);
+		check(ChatHelpers::ValidateMessageFieldTags(
+			Ui::InputField::kTagBold,
+			7,
+			nullptr,
+			nullptr) == Ui::InputField::kTagBold,
+			u"empty allow callback preserves ordinary tags"_q);
+		check(ChatHelpers::ValidateMessageFieldTags(
+			emojiTag,
+			7,
+			nullptr,
+			[](QStringView) { return true; }) == emojiTag,
+			u"keep callback retains emoji with empty allow callback"_q);
+		check(ChatHelpers::ValidateMessageFieldTags(
+			emojiTag,
+			7,
+			nullptr,
+			[](QStringView) { return false; }).isEmpty(),
+			u"false keep callback denies emoji with empty allow callback"_q);
 		check(filter(emojiTag) == emojiTag, u"allowed custom emoji retained"_q);
 		check(filter(Ui::InputField::CustomEmojiLink(u"456"_q)).isEmpty(),
 			u"destination rejects custom emoji"_q);
@@ -691,6 +773,47 @@ int selectedTextShortcutsTest() {
 		owner.reset();
 		check(!destroyed.isValid(), u"destroyed owner invalid"_q);
 	}
+	report += u"SUITE selection-hidden-parent\n"_q;
+	{
+		auto window = QWidget();
+		auto parent = QWidget(&window);
+		auto owner = QWidget(&parent);
+		auto other = QWidget(&window);
+		owner.setFocusPolicy(Qt::StrongFocus);
+		other.setFocusPolicy(Qt::StrongFocus);
+		window.show();
+		App::setActiveWindow(&window);
+		owner.setFocus();
+		auto generation = uint64(0);
+		auto cleared = 0;
+		const auto action = ChatHelpers::MakeSelectedTextAction(
+			&owner,
+			generation,
+			[] { return true; },
+			[&] { ++cleared; },
+			true);
+		check(action.isValid() && owner.hasFocus(),
+			u"nested selection initially valid and focused"_q);
+		action.markPending();
+		const auto pendingGeneration = generation;
+		parent.hide();
+		other.setFocus();
+		check(!owner.isHidden() && !owner.isVisible(),
+			u"nested selection child not explicitly hidden"_q);
+		check(generation == pendingGeneration,
+			u"ancestor visibility independent of generation"_q);
+		check(!action.isValid(), u"hidden-parent selection invalid"_q);
+		action.accept();
+		check(cleared == 0
+			&& *action.result == ChatHelpers::SelectedTextResult::Pending,
+			u"hidden-parent pending acceptance neither clears nor accepts"_q);
+		action.accepted();
+		check(cleared == 0, u"hidden-parent clear callback rejected"_q);
+		check(other.hasFocus(), u"hidden-parent cancel focus baseline"_q);
+		action.cancelled();
+		check(other.hasFocus() && !owner.hasFocus(),
+			u"hidden-parent cancellation cannot steal focus"_q);
+	}
 	const auto prepare = [&](QString draft, QString selected) {
 		return ChatHelpers::PrepareSelectedTextCite(
 			{ draft },
@@ -698,6 +821,12 @@ int selectedTextShortcutsTest() {
 			validate).text;
 	};
 	report += u"SUITE append-calculation\n"_q;
+	check(!Shortcuts::ValidBinding(
+		QKeySequence(),
+		Shortcuts::Command::QuoteSelectedText), u"empty contextual binding rejected"_q);
+	check(!Shortcuts::ValidBinding(
+		QKeySequence(),
+		Shortcuts::Command::Search), u"empty legacy binding rejected"_q);
 	check(Shortcuts::ValidBinding(QKeySequence(u"Q"_q),
 		Shortcuts::Command::QuoteSelectedText), u"contextual single key"_q);
 	check(!Shortcuts::ValidBinding(QKeySequence(u"Ctrl+Q, C"_q),
