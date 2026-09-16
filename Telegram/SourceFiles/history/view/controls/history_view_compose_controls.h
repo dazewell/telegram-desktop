@@ -279,7 +279,11 @@ public:
 	void showFinished();
 	void raisePanels();
 
-	void editMessage(FullMsgId id, const TextSelection &selection);
+	[[nodiscard]] bool canEditSelectedMessage(FullMsgId id) const;
+	void editMessage(
+		FullMsgId id,
+		const TextSelection &selection,
+		ChatHelpers::SelectedTextAction action = {});
 	void cancelEditMessage();
 	void maybeCancelEditMessage(); // Confirm if changed and cancel.
 

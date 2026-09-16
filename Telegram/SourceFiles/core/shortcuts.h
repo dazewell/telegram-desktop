@@ -95,6 +95,7 @@ enum class Command {
 	SupportScrollToCurrent,
 	SupportHistoryBack,
 	SupportHistoryForward,
+	EditSelectedMessage,
 };
 
 [[maybe_unused]] constexpr auto kShowFolder = {
@@ -140,7 +141,8 @@ private:
 [[nodiscard]] inline bool IsContextual(Command command) {
 	return command == Command::QuoteSelectedText
 		|| command == Command::CiteSelectedText
-		|| command == Command::TranslateSelectedText;
+		|| command == Command::TranslateSelectedText
+		|| command == Command::EditSelectedMessage;
 }
 
 struct ContextualRequest {

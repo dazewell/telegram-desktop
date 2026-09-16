@@ -238,6 +238,8 @@ public:
 		TextSelectType type) const override;
 	TextSelection selectionForEdit(
 		const MessageSelection &selection) const override;
+	bool allowsSelectedTextEdit(
+		const MessageSelection &selection) const override;
 	bool selectionContains(
 		const MessageSelection &selection,
 		const TextState &state) const override;

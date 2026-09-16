@@ -712,6 +712,24 @@ ChatWidget::ChatWidget(
 	}, [=](const TextForMimeData &text) {
 		return !_bottom->isButtonActive() && _composeControls->citeSelectedText(text);
 	});
+	_inner->setEditSelectedMessageCallback(crl::guard(this, [=](FullMsgId id) {
+		return !_bottom->isButtonActive() && _composeControls->canEditSelectedMessage(id);
+	}), crl::guard(this, [=](
+			FullMsgId id,
+			TextSelection selection,
+			ChatHelpers::SelectedTextAction action) {
+		if (_bottom->isButtonActive() || !action.isValid()
+			|| !_composeControls->canEditSelectedMessage(id)) {
+			return;
+		}
+		if (isChoosingTheme()) {
+			toggleChooseChatTheme(_peer, false);
+		}
+		if (_composeSearch) {
+			_composeSearch->hideAnimated();
+		}
+		_composeControls->editMessage(id, selection, action);
+	}));
 
 	_composeControls->sendActionUpdates(
 	) | rpl::on_next([=](ComposeControls::SendActionUpdate &&data) {

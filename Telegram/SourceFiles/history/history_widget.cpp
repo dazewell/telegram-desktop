@@ -10434,9 +10434,26 @@ void HistoryWidget::setReplyFieldsFromProcessing() {
 	action.accept();
 }
 
+bool HistoryWidget::canEditSelectedMessage(not_null<HistoryItem*> item) const {
+	const auto media = item->media();
+	return _history && item->history() == _history && !_editMsgId
+		&& _field->isVisible() && _field->isEnabled()
+		&& !_voiceRecordBar->isActive() && !isRecording()
+		&& !item->isSending() && !item->hasFailed() && !item->isEditingMedia()
+		&& item->allowsEdit(base::unixtime::now()) && !item->richPage()
+		&& !Iv::Editor::HasEditWindowFor(&session(), item->fullId())
+		&& (!media || media->webpage() || media->allowsEditCaption())
+		&& (!media || !media->todolist());
+}
+
 void HistoryWidget::editMessage(
 		not_null<HistoryItem*> item,
-		const TextSelection &selection) {
+		const TextSelection &selection,
+		ChatHelpers::SelectedTextAction action) {
+	if (action.result && (selection.empty()
+		|| !action.isValid() || !canEditSelectedMessage(item))) {
+		return;
+	}
 	if (Iv::Editor::ActivateEditWindowFor(&session(), item->fullId())) {
 		return;
 	}
@@ -10500,10 +10517,20 @@ void HistoryWidget::editMessage(
 	updateReplyToName();
 	updateControlsGeometry();
 	updateField();
+	if (action.result && _editMsgId != item->id) {
+		return;
+	}
 	SelectTextInFieldWithMargins(_field, selection);
 
 	saveDraftWithTextNow();
-	setInnerFocus();
+	if (action.result) {
+		action.accept();
+		if (*action.result == ChatHelpers::SelectedTextResult::Accepted) {
+			_field->setFocus();
+		}
+	} else {
+		setInnerFocus();
+	}
 }
 
 void HistoryWidget::fillSenderUserpicMenu(

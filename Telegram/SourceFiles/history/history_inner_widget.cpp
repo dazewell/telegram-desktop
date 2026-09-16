@@ -2749,12 +2749,70 @@ void HistoryInner::toggleFavoriteReaction(not_null<Element*> view) const {
 	item->toggleReaction(favorite, HistoryReactionSource::Quick);
 }
 
+HistoryItem *HistoryInner::selectedEditMessage() const {
+	if (!isVisible() || !hasSelectedText() || _selectedTextSelection.empty()) {
+		return nullptr;
+	}
+	const auto source = _selectedTextItem;
+	const auto view = viewByItem(source);
+	if (!view) {
+		return nullptr;
+	}
+	const auto item = view->textItem();
+	if (!item || !item->isRegular() || IsAnchoredEphemeral(item)
+		|| !view->allowsSelectedTextEdit(_selectedTextSelection)
+		|| !item->allowsEdit(base::unixtime::now())
+		|| item->isSending() || item->hasFailed() || item->isEditingMedia()
+		|| getSelectedTextRange(item).empty()) {
+		return nullptr;
+	}
+	return item;
+}
+
 Fn<bool()> HistoryInner::selectedTextAction(
 		Shortcuts::Command command,
 		bool shortcut) {
 	using C = Shortcuts::Command;
 	if (!isVisible() || !hasSelectedText() || _selectedTextSelection.empty()) {
 		return nullptr;
+	}
+	if (command == C::EditSelectedMessage) {
+		const auto item = selectedEditMessage();
+		if (!item || !_widget->canEditSelectedMessage(item)) {
+			return nullptr;
+		}
+		const auto id = item->fullId();
+		const auto sourceId = _selectedTextItem->fullId();
+		const auto selection = getSelectedTextRange(item);
+		const auto text = getSelectedText();
+		const auto generation = _selectedTextGeneration;
+		const auto weak = QPointer<HistoryInner>(this);
+		const auto valid = [=] {
+			const auto current = selectedEditMessage();
+			return current && current->fullId() == id
+				&& session().data().message(id) == current
+				&& _selectedTextItem->fullId() == sourceId
+				&& session().data().message(sourceId) == _selectedTextItem
+				&& getSelectedTextRange(current) == selection
+				&& getSelectedText().rich == text.rich && getSelectedText().tags == text.tags;
+		};
+		return [=] {
+			if (!weak || generation != _selectedTextGeneration || !valid()) {
+				return false;
+			}
+			const auto current = session().data().message(id);
+			if (!current || !_widget->canEditSelectedMessage(current)) {
+				return false;
+			}
+			const auto action = ChatHelpers::MakeSelectedTextAction(
+				this,
+				_selectedTextGeneration,
+				valid,
+				[=] { clearTextSelection(); _widget->updateTopBarSelection(); },
+				shortcut);
+			_widget->editMessage(current, selection, action);
+			return *action.result == ChatHelpers::SelectedTextResult::Accepted;
+		};
 	}
 	const auto item = _selectedTextItem;
 	const auto text = getSelectedText();
@@ -3071,7 +3129,11 @@ void HistoryInner::showContextMenu(QContextMenuEvent *e, bool showFromTouch) {
 			: nullptr;
 		if (editItem) {
 			const auto editItemId = editItem->fullId();
-			_menu->addAction(tr::lng_context_edit_msg(tr::now), [=] {
+			const auto label = tr::lng_context_edit_msg(tr::now);
+			const auto hint = selectedEditMessage() == editItem
+				&& selectedTextAction(Shortcuts::Command::EditSelectedMessage);
+			_menu->addAction(hint ? Shortcuts::WithBindingHint(
+				label, Shortcuts::Command::EditSelectedMessage) : label, [=] {
 				if (const auto item = session->data().message(editItemId)) {
 					const auto selection = getSelectedTextRange(item);
 					if (!selection.empty()) {

@@ -268,6 +268,16 @@ ScheduledWidget::ScheduledWidget(
 		_inner->setEmptyInfoWidget(std::move(emptyInfo));
 	}
 	setupComposeControls();
+	_inner->setEditSelectedMessageCallback(crl::guard(this, [=](FullMsgId id) {
+		return !_forumTopic && _composeControls->canEditSelectedMessage(id);
+	}), crl::guard(this, [=](
+			FullMsgId id,
+			TextSelection selection,
+			ChatHelpers::SelectedTextAction action) {
+		if (!_forumTopic) {
+			_composeControls->editMessage(id, selection, action);
+		}
+	}));
 	Window::SetupSwipeBackSection(this, _scroll, _inner);
 }
 

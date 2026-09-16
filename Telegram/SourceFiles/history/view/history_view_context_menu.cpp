@@ -979,7 +979,11 @@ bool AddEditMessageAction(
 	}
 	const auto owner = &item->history()->owner();
 	const auto itemId = item->fullId();
-	menu->addAction(tr::lng_context_edit_msg(tr::now), [=] {
+	const auto label = tr::lng_context_edit_msg(tr::now);
+	const auto hint = list->selectedEditMessage() == item
+		&& list->selectedTextAction(Shortcuts::Command::EditSelectedMessage);
+	menu->addAction(hint ? Shortcuts::WithBindingHint(
+		label, Shortcuts::Command::EditSelectedMessage) : label, [=] {
 		const auto item = owner->message(itemId);
 		if (!item) {
 			return;

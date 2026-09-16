@@ -593,6 +593,10 @@ public:
 		TextSelectType type) const;
 	[[nodiscard]] virtual TextSelection selectionForEdit(
 		const MessageSelection &selection) const;
+	[[nodiscard]] virtual bool allowsSelectedTextEdit(
+			const MessageSelection &selection) const {
+		return false;
+	}
 	[[nodiscard]] virtual bool selectionContains(
 		const MessageSelection &selection,
 		const TextState &state) const;

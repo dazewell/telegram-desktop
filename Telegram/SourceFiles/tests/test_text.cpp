@@ -13,6 +13,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "chat_helpers/selected_text_action.h"
 #include "chat_helpers/message_field_tag_policy.h"
 #include "core/shortcuts_contextual.h"
+#include "history/history_selected_text_edit.h"
 #include "ui/effects/animations.h"
 #include "ui/ui_utility.h"
 #include "ui/style/style_core.h"
@@ -721,6 +722,64 @@ int selectedTextShortcutsTest() {
 			return tag.offset >= 5 && tag.id.contains(foreign);
 		}), u"only incoming foreign mention removed"_q);
 	}
+	report += u"SUITE selected-edit-dispatch\n"_q;
+	{
+		using Command = Shortcuts::Command;
+		check(Shortcuts::IsContextual(Command::EditSelectedMessage),
+			u"edit is contextual"_q);
+		check(Shortcuts::ValidBinding(QKeySequence(u"E"_q), Command::EditSelectedMessage),
+			u"edit single stroke valid"_q);
+		check(!Shortcuts::ValidBinding(QKeySequence(u"E, E"_q), Command::EditSelectedMessage),
+			u"edit multiple strokes rejected"_q);
+		auto window = QWidget();
+		auto owner = QWidget(&window);
+		auto composer = QWidget(&window);
+		owner.setFocusPolicy(Qt::StrongFocus);
+		composer.setFocusPolicy(Qt::StrongFocus);
+		window.show();
+		App::setActiveWindow(&window);
+		owner.setFocus();
+		auto dispatcher = Shortcuts::ContextualDispatcher();
+		auto available = false;
+		auto accepted = true;
+		auto executions = 0;
+		const auto dispatch = [&](QWidget *target, QEvent::Type type, bool repeat = false) {
+			auto event = QKeyEvent(type, Qt::Key_E, Qt::NoModifier, u"e"_q, repeat);
+			return dispatcher.handle(target, &event, false,
+				[](const QKeySequence &keys) {
+					return keys == QKeySequence(u"E"_q)
+						? std::vector<Command>{ Command::EditSelectedMessage }
+						: std::vector<Command>();
+				}, [&](not_null<Shortcuts::ContextualRequest*> request) {
+					if (available && request->owner == &owner) {
+						request->execute = [&] {
+							++executions;
+							if (accepted) composer.setFocus();
+							return accepted;
+						};
+					}
+				});
+		};
+		check(!dispatch(&owner, QEvent::ShortcutOverride), u"unavailable edit override falls through"_q);
+		check(!dispatch(&owner, QEvent::KeyPress) && executions == 0,
+			u"unavailable edit press falls through"_q);
+		available = true;
+		check(dispatch(&owner, QEvent::ShortcutOverride) && executions == 0,
+			u"edit override only queries"_q);
+		check(dispatch(&owner, QEvent::KeyPress) && executions == 1 && composer.hasFocus(),
+			u"edit dispatch transfers focus"_q);
+		check(dispatch(&composer, QEvent::KeyPress, true) && executions == 1,
+			u"edit held repeat suppressed in composer"_q);
+		check(dispatch(&composer, QEvent::KeyRelease), u"edit physical release consumed"_q);
+		check(!dispatch(&composer, QEvent::KeyPress), u"composer edit key falls through"_q);
+		owner.setFocus();
+		accepted = false;
+		check(dispatch(&owner, QEvent::KeyPress) && executions == 2 && owner.hasFocus(),
+			u"late edit rejection retains focus and consumes key"_q);
+		check(dispatch(&owner, QEvent::KeyPress, true) && executions == 2,
+			u"late edit rejection suppresses repeat"_q);
+		check(dispatch(&owner, QEvent::KeyRelease), u"rejected edit release consumed"_q);
+	}
 	report += u"SUITE held-key\n"_q;
 	{
 		auto window = QWidget();
@@ -772,6 +831,217 @@ int selectedTextShortcutsTest() {
 		auto destroyed = make();
 		owner.reset();
 		check(!destroyed.isValid(), u"destroyed owner invalid"_q);
+	}
+	report += u"SUITE selected-edit-origin\n"_q;
+	{
+		using HistoryView::IsOriginalTextSelectionForEdit;
+		const auto body = TextSelection(1, 4);
+		check(IsOriginalTextSelectionForEdit(body, 12, 0, 12, true),
+			u"edit original body range accepted"_q);
+		check(!IsOriginalTextSelectionForEdit(body, 12, 0, 12, false),
+			u"edit translated or replaced body rejected even with equal lengths"_q);
+		check(!IsOriginalTextSelectionForEdit(body, 12, 0, 0, true),
+			u"edit nonbody range rejected when original body is hidden"_q);
+		check(!IsOriginalTextSelectionForEdit(body, 12, 0, 2, true),
+			u"edit factcheck range fitting original but outside visible body rejected"_q);
+		check(!IsOriginalTextSelectionForEdit(body, 12, 6, 12, true),
+			u"edit leading media range fitting original rejected"_q);
+		const auto shifted = TextSelection(7, 10);
+		check(!IsOriginalTextSelectionForEdit(shifted, 12, 6, 12, true),
+			u"edit shifted body rejected without native offset conversion"_q);
+		const auto trailing = TextSelection(12, 15);
+		check(!IsOriginalTextSelectionForEdit(trailing, 12, 0, 12, true),
+			u"edit trailing factcheck or media region rejected"_q);
+		const auto crossing = TextSelection(10, 15);
+		check(!IsOriginalTextSelectionForEdit(crossing, 12, 0, 12, true),
+			u"edit range crossing body boundary rejected"_q);
+		const auto original = u"body \U0001F600 caption"_q;
+		const auto length = uint16(original.size());
+		const auto caption = TextSelection(0, length);
+		check(IsOriginalTextSelectionForEdit(caption, length, 0, length, true),
+			u"edit full original caption accepts UTF16 native range"_q);
+		const auto surrogate = TextSelection(5, 7);
+		check(IsOriginalTextSelectionForEdit(surrogate, length, 0, length, true),
+			u"edit UTF16 emoji range accepted"_q);
+		const auto longBody = TextSelection(0, 10000);
+		check(IsOriginalTextSelectionForEdit(longBody, 10000, 0, 10000, true),
+			u"edit full text independent of quote length cap"_q);
+		check(!IsOriginalTextSelectionForEdit({}, 12, 0, 12, true),
+			u"edit empty native range for empty or nonflat selection rejected"_q);
+		check(!IsOriginalTextSelectionForEdit(FullSelection, 65535, 0, 65535, true),
+			u"edit whole or multi message sentinel rejected"_q);
+		check(!IsOriginalTextSelectionForEdit(TextSelection(4, 1), 12, 0, 12, true),
+			u"edit malformed descending native range rejected"_q);
+	}
+	report += u"SUITE selected-edit-render-blocks\n"_q;
+	{
+		const auto original = u"ordinary body"_q;
+		auto text = Ui::Text::String(st::defaultTextStyle, original);
+		const auto selection = TextSelection(0, uint16(original.size()));
+		const auto eligible = [&] {
+			return HistoryView::IsOriginalTextSelectionForEdit(
+				selection,
+				original.size(),
+				0,
+				HistoryView::OriginalTextLengthForEdit(text),
+				true);
+		};
+		check(!text.hasSkipBlock() && eligible(),
+			u"edit real body without timestamp eligible"_q);
+		check(text.updateSkipBlock(scale(36), scale(14))
+			&& text.hasSkipBlock() && text.length() == original.size() + 1,
+			u"edit real body timestamp adds one layout position"_q);
+		check(text.toString() == original,
+			u"edit real body timestamp extraction preserves original"_q);
+		check(eligible(), u"edit real body with timestamp eligible"_q);
+	}
+	{
+		using HistoryView::IsOriginalTextSelectionForEdit;
+		using HistoryView::OriginalTextLengthForEdit;
+		const auto exercise = [&](const QString &original,
+				const QString &label,
+				bool addedNewline) {
+			auto text = Ui::Text::String(st::defaultTextStyle, original);
+			const auto length = uint16(original.size());
+			const auto selection = TextSelection(0, length);
+			const auto eligible = [&](TextSelection range,
+					int offset = 0,
+					bool originalShown = true) {
+				return IsOriginalTextSelectionForEdit(
+					range,
+					length,
+					offset,
+					OriginalTextLengthForEdit(text),
+					originalShown);
+			};
+			const auto verify = [&](bool passed, const QString &detail) {
+				check(passed, u"edit render "_q + label + ' ' + detail);
+			};
+			verify(!text.hasSkipBlock() && eligible(selection),
+				u"zero layout additions eligible"_q);
+			verify(!text.updateSkipBlock(0, 0) && eligible(selection),
+				u"disabled skip keeps native body"_q);
+			verify(text.updateSkipBlock(scale(36), scale(14))
+				&& text.hasSkipBlock()
+				&& text.length() == length + (addedNewline ? 2 : 1),
+				u"timestamp creates expected layout positions"_q);
+			verify(OriginalTextLengthForEdit(text) == length
+				&& text.toString(selection) == original
+				&& eligible(selection),
+				u"metadata body bounds preserve full original native range"_q);
+			verify(!eligible(TextSelection(length, uint16(text.length()))),
+				u"timestamp and added newline are not editable"_q);
+			verify(!eligible(TextSelection(length - 1, length + 1)),
+				u"crossing layout boundary rejected"_q);
+			verify(!eligible(TextSelection(length + 1, length + 4)),
+				u"trailing factcheck or nonbody range rejected"_q);
+			verify(!eligible(selection, 0, false),
+				u"equal-length translation or replacement rejected"_q);
+			verify(!eligible(TextSelection(1, 4), 6),
+				u"shifted caption or leading nonbody offset rejected"_q);
+			verify(!eligible({}) && !eligible(FullSelection),
+				u"empty nonflat or whole native output rejected"_q);
+			verify(!text.updateSkipBlock(scale(36), scale(14))
+				&& eligible(selection),
+				u"same timestamp size leaves body bounds unchanged"_q);
+			verify(text.updateSkipBlock(scale(52), scale(18))
+				&& text.length() == length + (addedNewline ? 2 : 1)
+				&& eligible(selection),
+				u"second timestamp size preserves native range"_q);
+			verify(text.removeSkipBlock() && !text.hasSkipBlock()
+				&& text.length() == length && eligible(selection),
+				u"removeSkipBlock restores original body bounds"_q);
+			verify(text.updateSkipBlock(scale(36), scale(14))
+				&& text.updateSkipBlock(0, 0)
+				&& !text.hasSkipBlock() && eligible(selection),
+				u"disabled timestamp clears layout additions"_q);
+		};
+		exercise(u"ordinary body"_q, u"body"_q, false);
+		exercise(u"below-media caption"_q, u"caption fixture"_q, false);
+		exercise(u"same \U0001F600 same_"_q, u"UTF16 repeated body with literal underscore"_q, false);
+		exercise(u"\u05D0\u05D1\u05D2"_q, u"RTL body with newline and skip"_q, true);
+		const auto original = u"same \U0001F600 same_"_q;
+		auto text = Ui::Text::String(st::defaultTextStyle, original);
+		const auto eligible = [&](TextSelection selection) {
+			return IsOriginalTextSelectionForEdit(
+				selection,
+				original.size(),
+				0,
+				OriginalTextLengthForEdit(text),
+				true);
+		};
+		const auto underscore = TextSelection(12, 13);
+		check(eligible(underscore) && text.toString(underscore) == u"_"_q,
+			u"edit literal trailing underscore without skip remains body"_q);
+		text.updateSkipBlock(scale(36), scale(14));
+		check(eligible(underscore) && text.toString(underscore) == u"_"_q,
+			u"edit literal trailing underscore before skip remains body"_q);
+		const auto emoji = TextSelection(5, 7);
+		check(eligible(emoji) && text.toString(emoji) == u"\U0001F600"_q,
+			u"edit real emoji preserves two UTF16 native positions"_q);
+		const auto repeated = TextSelection(8, 12);
+		check(eligible(repeated) && text.toString(repeated) == u"same"_q,
+			u"edit second repeated substring preserves native offset"_q);
+		for (const auto &transformed : {
+			u" leading body"_q,
+			u"body"_q + QChar(0xDC00) + u"text"_q,
+			u"heart \u2764"_q }) {
+			auto rendered = Ui::Text::String(st::defaultTextStyle, transformed);
+			check(!rendered.modifications().empty()
+				&& OriginalTextLengthForEdit(rendered) == -1,
+				u"edit parser offset transformation without skip fails closed"_q);
+			rendered.updateSkipBlock(scale(36), scale(14));
+			check(OriginalTextLengthForEdit(rendered) == -1
+				&& !IsOriginalTextSelectionForEdit(
+					TextSelection(0, 4),
+					transformed.size(),
+					0,
+					OriginalTextLengthForEdit(rendered),
+					true),
+				u"edit parser offset transformation with skip fails closed"_q);
+		}
+		auto balanced = Ui::Text::String(st::defaultTextStyle, u" leading body"_q);
+		balanced.updateSkipBlock(scale(36), scale(14));
+		check(balanced.length() == QString(u" leading body").size()
+			&& OriginalTextLengthForEdit(balanced) == -1,
+			u"edit removed prefix plus timestamp cannot bypass equal raw length"_q);
+	}
+	report += u"SUITE selected-edit-acceptance\n"_q;
+	{
+		auto owner = std::make_unique<QWidget>();
+		owner->show();
+		auto generation = uint64(0);
+		auto editing = false;
+		auto sourceValid = true;
+		auto cleared = 0;
+		const auto make = [&] {
+			return ChatHelpers::MakeSelectedTextAction(owner.get(), generation,
+				[&] { return sourceValid; }, [&] { ++cleared; ++generation; }, true);
+		};
+		check(!editing, u"edit pre-entry available"_q);
+		const auto action = make();
+		editing = true;
+		check(action.isValid(), u"entering edit does not invalidate source action"_q);
+		action.accept();
+		check(cleared == 1 && *action.result == ChatHelpers::SelectedTextResult::Accepted,
+			u"edit source accepted after destination becomes editing"_q);
+		check(!action.isValid() && *action.result == ChatHelpers::SelectedTextResult::Accepted,
+			u"accepted edit result survives clear generation change"_q);
+		action.accept();
+		check(cleared == 1, u"edit acceptance clears once"_q);
+		const auto rejected = make();
+		sourceValid = false;
+		rejected.accept();
+		check(cleared == 1 && *rejected.result == ChatHelpers::SelectedTextResult::Rejected,
+			u"invalid edit source leaves highlight"_q);
+		sourceValid = true;
+		const auto stale = make();
+		const auto newer = make();
+		stale.accept();
+		check(cleared == 1, u"superseded edit leaves newer selection"_q);
+		owner.reset();
+		newer.accept();
+		check(cleared == 1, u"deleted edit owner cannot clear"_q);
 	}
 	report += u"SUITE selection-hidden-parent\n"_q;
 	{

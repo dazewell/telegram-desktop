@@ -19,6 +19,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/view/history_view_cursor_state.h"
 #include "history/history_item_components.h"
 #include "history/history_item_helpers.h"
+#include "history/history_selected_text_edit.h"
 #include "history/view/media/history_view_media_generic.h"
 #include "history/view/media/history_view_web_page.h"
 #include "history/view/media/history_view_suggest_decision.h"
@@ -5266,6 +5267,24 @@ TextSelection Message::selectionForEdit(
 	return selection.isFlat()
 		? selection.flatRangeForEdit()
 		: TextSelection();
+}
+
+bool Message::allowsSelectedTextEdit(
+		const MessageSelection &selection) const {
+	const auto item = textItem();
+	if (!item || !hasVisibleText() || hasRichPage()
+		|| !data()->computeUnavailableReason().isEmpty()) {
+		return false;
+	}
+	const auto &original = item->originalText();
+	const auto &summary = data()->summaryEntry();
+	return IsOriginalTextSelectionForEdit(
+		selection.flatSelection(),
+		original.text.size(),
+		invertMedia() ? visibleMediaTextLength() : 0,
+		OriginalTextLengthForEdit(text()),
+		(&item->translatedText() == &original)
+			&& (!summary.shown || summary.result.empty()));
 }
 
 bool Message::selectionContains(

@@ -160,6 +160,7 @@ public:
 		const QVector<MTPMessage> &messages);
 
 	[[nodiscard]] TextForMimeData getSelectedText() const;
+	[[nodiscard]] HistoryItem *selectedEditMessage() const;
 	[[nodiscard]] Fn<bool()> selectedTextAction(
 		Shortcuts::Command command,
 		bool shortcut = false);

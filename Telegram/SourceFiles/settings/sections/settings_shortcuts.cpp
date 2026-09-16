@@ -111,6 +111,7 @@ struct Labeled {
 		{ C::QuoteSelectedText, tr::lng_context_quote_and_reply() },
 		{ C::CiteSelectedText, tr::lng_shortcuts_cite_selected() },
 		{ C::TranslateSelectedText, tr::lng_context_translate_selected() },
+		{ C::EditSelectedMessage, tr::lng_shortcuts_edit_selected() },
 		separator,
 		{ C::JustSendMessage, tr::lng_shortcuts_just_send() },
 		{ C::SendSilentMessage, tr::lng_shortcuts_silent_send() },
@@ -603,7 +604,7 @@ struct SetupShortcutsResult {
 		entry.wrap->setDuration(0);
 		entry.inner = entry.wrap->entity();
 		fill(entry);
-		if (entry.command == S::Command::TranslateSelectedText) {
+		if (entry.command == S::Command::EditSelectedMessage) {
 			const auto note = content->add(
 				object_ptr<Ui::SlideWrap<Ui::VerticalLayout>>(
 					content,
