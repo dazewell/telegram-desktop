@@ -873,6 +873,100 @@ int selectedTextShortcutsTest() {
 		check(!IsOriginalTextSelectionForEdit(TextSelection(4, 1), 12, 0, 12, true),
 			u"edit malformed descending native range rejected"_q);
 	}
+	report += u"SUITE selected-edit-prepared-text\n"_q;
+	{
+		using HistoryView::IsEditPreparedTextSelection;
+		const auto prepared = u"support body"_q;
+		const auto original = prepared + u"\n#tsf123"_q;
+		const auto retainedEnd = uint16(prepared.size());
+		const auto originalEnd = uint16(original.size());
+		check(IsEditPreparedTextSelection(
+			TextSelection(0, retainedEnd), original, prepared),
+			u"edit prepared support prefix exact end accepted"_q);
+		check(IsEditPreparedTextSelection(
+			TextSelection(8, retainedEnd), original, prepared),
+			u"edit prepared support prefix partial range accepted"_q);
+		check(!IsEditPreparedTextSelection(
+			TextSelection(0, retainedEnd + 1), original, prepared),
+			u"edit prepared range including removed newline rejected"_q);
+		check(!IsEditPreparedTextSelection(
+			TextSelection(retainedEnd, retainedEnd + 1), original, prepared),
+			u"edit prepared removed newline alone rejected"_q);
+		check(!IsEditPreparedTextSelection(
+			TextSelection(retainedEnd + 1, originalEnd), original, prepared),
+			u"edit prepared removed support suffix alone rejected"_q);
+		check(!IsEditPreparedTextSelection(
+			TextSelection(retainedEnd - 1, originalEnd), original, prepared),
+			u"edit prepared range crossing removed support suffix rejected"_q);
+		check(!IsEditPreparedTextSelection(
+			TextSelection(0, originalEnd), original, prepared),
+			u"edit prepared whole original with removed suffix rejected"_q);
+		check(!IsEditPreparedTextSelection(
+			TextSelection(0, 7), u"#tsf123", u""),
+			u"edit prepared all trimmed support text rejected"_q);
+		check(!IsEditPreparedTextSelection(
+			TextSelection(0, 1), original, {}),
+			u"edit prepared null destination rejected"_q);
+		check(!IsEditPreparedTextSelection(
+			TextSelection(0, 1), {}, prepared),
+			u"edit prepared null original rejected"_q);
+		check(!IsEditPreparedTextSelection(
+			TextSelection(0, 1), u"", prepared),
+			u"edit prepared empty original rejected"_q);
+		check(!IsEditPreparedTextSelection({}, original, prepared),
+			u"edit prepared empty native range rejected"_q);
+		check(!IsEditPreparedTextSelection(
+			TextSelection(4, 4), original, prepared),
+			u"edit prepared collapsed native range rejected"_q);
+		check(!IsEditPreparedTextSelection(
+			TextSelection(4, 1), original, prepared),
+			u"edit prepared reversed native range rejected"_q);
+		check(!IsEditPreparedTextSelection(FullSelection, original, prepared),
+			u"edit prepared whole message sentinel rejected"_q);
+		check(!IsEditPreparedTextSelection(
+			TextSelection(0, originalEnd + 1), original, original + u"x"_q),
+			u"edit prepared range beyond original but within destination rejected"_q);
+		check(!IsEditPreparedTextSelection(
+			TextSelection(0, originalEnd + 1), original, original),
+			u"edit prepared range beyond both texts rejected"_q);
+		const auto ordinary = u"same \U0001F600 same_"_q;
+		const auto ordinaryEnd = uint16(ordinary.size());
+		check(IsEditPreparedTextSelection(
+			TextSelection(0, ordinaryEnd), ordinary, ordinary),
+			u"edit prepared unchanged ordinary full text accepted"_q);
+		const auto emojiRange = TextSelection(5, 7);
+		check(IsEditPreparedTextSelection(emojiRange, ordinary, ordinary)
+			&& ordinary.mid(emojiRange.from, emojiRange.to - emojiRange.from)
+				== u"\U0001F600"_q,
+			u"edit prepared emoji retains two UTF16 endpoints"_q);
+		const auto repeatedRange = TextSelection(8, 12);
+		check(IsEditPreparedTextSelection(repeatedRange, ordinary, ordinary)
+			&& ordinary.mid(
+				repeatedRange.from,
+				repeatedRange.to - repeatedRange.from) == u"same"_q,
+			u"edit prepared repeated substring retains second occurrence"_q);
+		check(IsEditPreparedTextSelection(
+			repeatedRange, ordinary + u"\n#tsf123"_q, ordinary),
+			u"edit prepared support trim preserves UTF16 repeated range"_q);
+		check(!IsEditPreparedTextSelection(
+			repeatedRange, ordinary, u"Same \U0001F600 same_"),
+			u"edit prepared same length change before selection rejected"_q);
+		check(!IsEditPreparedTextSelection(
+			repeatedRange, ordinary, u"same \U0001F600 tame_"),
+			u"edit prepared same length change inside selection rejected"_q);
+		check(!IsEditPreparedTextSelection(
+			repeatedRange, ordinary, u"same \U0001F600 samE_"),
+			u"edit prepared change at final selected position rejected"_q);
+		check(IsEditPreparedTextSelection(
+			repeatedRange, ordinary, u"same \U0001F600 same!"),
+			u"edit prepared same length change after selection accepted"_q);
+		check(IsEditPreparedTextSelection(
+			repeatedRange, ordinary, ordinary + u"extra"_q),
+			u"edit prepared appended content after selection accepted"_q);
+		check(!IsEditPreparedTextSelection(
+			repeatedRange, ordinary, u"x"_q + ordinary),
+			u"edit prepared inserted prefix rejects shifted repeated range"_q);
+	}
 	report += u"SUITE selected-edit-render-blocks\n"_q;
 	{
 		const auto original = u"ordinary body"_q;

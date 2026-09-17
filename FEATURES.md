@@ -53,6 +53,11 @@ Body bounds exclude the timestamp skip block and its optional layout newline usi
 the rendered text's metadata and extraction API. Literal trailing underscores stay
 editable; timestamp positions do not. Offset-changing render transformations fail
 closed rather than being clamped or mapped into the original message.
+The prepared edit text must also preserve every UTF-16 position through the end
+of the selection. In support mode, selections within the retained body remain
+eligible, but those reaching into a removed trailing support hashtag or its
+removed newline are rejected without clearing the source selection. Preparation
+changes strictly after the selection do not disable it.
 Rich-page/article and to-do editors, active
 media editing, recording, blocked/hidden composers, and scheduled-topic lists are
 excluded. No translated-text offset conversion or substring search is performed.

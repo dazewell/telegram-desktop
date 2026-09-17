@@ -104,7 +104,7 @@ Flow: native owner resolution in
 [HistoryInner::selectedEditMessage](../../Telegram/SourceFiles/history/history_inner_widget.cpp#L2752)
 and [ListWidget::selectedEditMessage](../../Telegram/SourceFiles/history/view/history_view_list_widget.cpp#L5920)
 uses the view text owner and
-[Message::allowsSelectedTextEdit](../../Telegram/SourceFiles/history/view/history_view_message.cpp#L5272),
+[Message::allowsSelectedTextEdit](../../Telegram/SourceFiles/history/view/history_view_message.cpp#L5273),
 then the existing
 [legacy range lookup](../../Telegram/SourceFiles/history/history_inner_widget.cpp#L1339)
 or [list range lookup](../../Telegram/SourceFiles/history/view/history_view_list_widget.cpp#L3607).
@@ -126,12 +126,25 @@ resolves media itemForText and chooses displayed summary/original/translated tex
 [GroupedMedia::itemForText](../../Telegram/SourceFiles/history/view/media/history_view_media_grouped.cpp#L104)
 resolves grid-album captions; column-media hides the direct body and is rejected.
 
-Origin evidence is the existing [Message::textState](../../Telegram/SourceFiles/history/view/history_view_message.cpp#L3898):
+Prepared-text boundary established: 2026-09-17. After the original/display guard,
+the message retains an owning result from
+[PrepareEditText](../../Telegram/SourceFiles/chat_helpers/message_field.cpp#L374)
+and calls [IsEditPreparedTextSelection](../../Telegram/SourceFiles/history/history_selected_text_edit.h#L51).
+The native range must fit both texts and their UTF-16 prefixes through its end
+must match. Support preparation uses
+[StripSupportHashtag](../../Telegram/SourceFiles/chat_helpers/message_field.cpp#L337):
+retained-prefix selections remain eligible, while a removed newline or suffix
+cannot enter Edit. Changes strictly after the selection remain allowed. The
+[finite tests](../../Telegram/SourceFiles/tests/test_text.cpp#L876)
+exercise the production predicate with explicit original/prepared fixtures,
+not the support-session regex integration.
+
+Origin evidence is the existing [Message::textState](../../Telegram/SourceFiles/history/view/history_view_message.cpp#L3899):
 factcheck/log-entry offsets start after visible body plus media text, and inverted
 media shifts body offsets by its selection length. The same owner's
-[visible lengths](../../Telegram/SourceFiles/history/view/history_view_message.cpp#L7172)
+[visible lengths](../../Telegram/SourceFiles/history/view/history_view_message.cpp#L7180)
 still establish media offsets, but raw body length includes timestamp layout text.
-[refreshInfoSkipBlock](../../Telegram/SourceFiles/history/view/history_view_message.cpp#L7189)
+[refreshInfoSkipBlock](../../Telegram/SourceFiles/history/view/history_view_message.cpp#L7197)
 attaches the timestamp through
 [String::updateSkipBlock](../../Telegram/lib_ui/ui/text/text.cpp#L919), which appends
 a skip position and sometimes a layout newline. E instead uses
@@ -174,7 +187,7 @@ post-entry acceptance, superseding, and owner destruction. The
 [production origin-predicate tests](../../Telegram/SourceFiles/tests/test_text.cpp#L835)
 exercise native range/owner metadata for translated and wrong-region rejection,
 including in-bounds impostors, body/caption/UTF-16/full-text acceptance, and invalid
-ranges. The [real render-block regressions](../../Telegram/SourceFiles/tests/test_text.cpp#L876)
+ranges. The [real render-block regressions](../../Telegram/SourceFiles/tests/test_text.cpp#L970)
 use styled Ui::Text::String body/caption fixtures with updateSkipBlock, both sizes,
 removal/disabled skip, a literal trailing underscore, native UTF-16/repeated-text
 ranges, and the RTL two-position suffix. They invoke the same production bounds

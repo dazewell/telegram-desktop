@@ -12,6 +12,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/options.h"
 #include "base/qt/qt_key_modifiers.h"
 #include "base/unixtime.h"
+#include "chat_helpers/message_field.h"
 #include "core/application.h"
 #include "core/click_handler_types.h" // ClickHandlerContext
 #include "core/ui_integration.h"
@@ -5278,13 +5279,20 @@ bool Message::allowsSelectedTextEdit(
 	}
 	const auto &original = item->originalText();
 	const auto &summary = data()->summaryEntry();
-	return IsOriginalTextSelectionForEdit(
+	if (!IsOriginalTextSelectionForEdit(
 		selection.flatSelection(),
 		original.text.size(),
 		invertMedia() ? visibleMediaTextLength() : 0,
 		OriginalTextLengthForEdit(text()),
 		(&item->translatedText() == &original)
-			&& (!summary.shown || summary.result.empty()));
+			&& (!summary.shown || summary.result.empty()))) {
+		return false;
+	}
+	const auto prepared = PrepareEditText(item);
+	return IsEditPreparedTextSelection(
+		selection.flatSelection(),
+		original.text,
+		prepared.text);
 }
 
 bool Message::selectionContains(

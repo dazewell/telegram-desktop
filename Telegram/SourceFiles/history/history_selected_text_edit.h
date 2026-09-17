@@ -48,4 +48,15 @@ namespace HistoryView {
 		&& (selection.to <= textLength);
 }
 
+[[nodiscard]] inline bool IsEditPreparedTextSelection(
+		TextSelection selection,
+		QStringView original,
+		QStringView prepared) {
+	return (selection != FullSelection)
+		&& (selection.from < selection.to)
+		&& (selection.to <= original.size())
+		&& (selection.to <= prepared.size())
+		&& (original.left(selection.to) == prepared.left(selection.to));
+}
+
 } // namespace HistoryView
