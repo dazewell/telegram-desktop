@@ -136,6 +136,7 @@ const auto CommandByName = base::flat_map<QString, Command>{
 	{ u"quote_selected_text"_q           , Command::QuoteSelectedText },
 	{ u"cite_selected_text"_q            , Command::CiteSelectedText },
 	{ u"translate_selected_text"_q       , Command::TranslateSelectedText },
+	{ u"edit_selected_text"_q            , Command::EditSelectedMessage },
 
 	{ u"record_voice"_q                  , Command::RecordVoice },
 
@@ -566,6 +567,7 @@ void Manager::fillDefaults() {
 	set(u"q"_q                       , Command::QuoteSelectedText);
 	set(u"c"_q                       , Command::CiteSelectedText);
 	set(u"t"_q                       , Command::TranslateSelectedText);
+	set(u"e"_q                       , Command::EditSelectedMessage);
 
 	set(u"ctrl+r"_q                  , Command::RecordVoice);
 

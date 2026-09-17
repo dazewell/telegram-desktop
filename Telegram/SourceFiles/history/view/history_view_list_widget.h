@@ -470,6 +470,10 @@ public:
 	[[nodiscard]] Fn<bool()> selectedTextAction(
 		Shortcuts::Command command,
 		bool shortcut = false);
+	[[nodiscard]] HistoryItem *selectedEditMessage() const;
+	void setEditSelectedMessageCallback(
+		Fn<bool(FullMsgId)> available,
+		Fn<void(FullMsgId, TextSelection, ChatHelpers::SelectedTextAction)> callback);
 	void setCiteSelectedTextCallback(
 		Fn<bool()> available,
 		Fn<bool(const TextForMimeData &)> callback);
@@ -1109,6 +1113,8 @@ private:
 	Fn<void(QString)> _insertTextCallback;
 	Fn<bool()> _citeSelectedTextAvailable;
 	Fn<bool(const TextForMimeData &)> _citeSelectedTextCallback;
+	Fn<bool(FullMsgId)> _editSelectedMessageAvailable;
+	Fn<void(FullMsgId, TextSelection, ChatHelpers::SelectedTextAction)> _editSelectedMessageCallback;
 	rpl::event_stream<not_null<QKeyEvent*>> _scrollKeyEvents;
 
 	[[nodiscard]] ElementOverlayHost &ensureOverlayHost();

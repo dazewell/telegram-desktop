@@ -5740,9 +5740,28 @@ void ComposeControls::updateHeight() {
 	}
 }
 
+bool ComposeControls::canEditSelectedMessage(FullMsgId id) const {
+	const auto item = session().data().message(id);
+	const auto media = item ? item->media() : nullptr;
+	return item && _history && item->history() == _history
+		&& draftKey(DraftType::Edit) != Data::DraftKey::None()
+		&& !isEditingMessage() && !isRecording() && !_voiceRecordBar->isActive()
+		&& fieldForMention() && _field->isEnabled()
+		&& !item->isSending() && !item->hasFailed() && !item->isEditingMedia()
+		&& item->allowsEdit(base::unixtime::now()) && !item->richPage()
+		&& !Iv::Editor::HasEditWindowFor(_session, id)
+		&& (!media || media->webpage() || media->allowsEditCaption())
+		&& (!media || !media->todolist());
+}
+
 void ComposeControls::editMessage(
 		FullMsgId id,
-		const TextSelection &selection) {
+		const TextSelection &selection,
+		ChatHelpers::SelectedTextAction action) {
+	if (action.result && (selection.empty()
+		|| !action.isValid() || !canEditSelectedMessage(id))) {
+		return;
+	}
 	const auto item = session().data().message(id);
 	if (!item) {
 		return;
@@ -5757,6 +5776,9 @@ void ComposeControls::editMessage(
 		SelectTextInFieldWithMargins(_field, selection);
 	}
 	saveDraftWithTextNow();
+	if (action.result) {
+		action.accept();
+	}
 	focus();
 }
 

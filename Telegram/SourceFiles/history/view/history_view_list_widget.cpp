@@ -5910,6 +5910,40 @@ void ListWidget::setCiteSelectedTextCallback(
 	_citeSelectedTextCallback = std::move(callback);
 }
 
+void ListWidget::setEditSelectedMessageCallback(
+		Fn<bool(FullMsgId)> available,
+		Fn<void(FullMsgId, TextSelection, ChatHelpers::SelectedTextAction)> callback) {
+	_editSelectedMessageAvailable = std::move(available);
+	_editSelectedMessageCallback = std::move(callback);
+}
+
+HistoryItem *ListWidget::selectedEditMessage() const {
+	if (!isVisible() || !controllerOrNull() || !hasSelectedText()
+		|| _selectedTextSelection.empty()
+		|| (_context != Context::History && _context != Context::Replies
+			&& _context != Context::Monoforum)) {
+		return nullptr;
+	}
+	const auto source = _selectedTextItem;
+	const auto view = viewForItem(source);
+	if (!view || source->isSending() || source->hasFailed() || source->isEditingMedia()) {
+		return nullptr;
+	}
+	const auto item = view->textItem();
+	if (!item || !item->allowsEdit(base::unixtime::now())
+		|| !view->allowsSelectedTextEdit(_selectedTextSelection)
+		|| item->isSending() || item->hasFailed() || item->isEditingMedia()
+		|| getSelectedTextRange(item).empty()) {
+		return nullptr;
+	}
+	if (const auto channel = item->history()->peer->asChannel()) {
+		if (!channel->isMegagroup() && !channel->canEditMessages()) {
+			return nullptr;
+		}
+	}
+	return item;
+}
+
 Fn<bool()> ListWidget::selectedTextAction(
 		Shortcuts::Command command,
 		bool shortcut) {
@@ -5919,6 +5953,43 @@ Fn<bool()> ListWidget::selectedTextAction(
 		|| (_context != Context::History && _context != Context::Replies
 			&& _context != Context::Monoforum)) {
 		return nullptr;
+	}
+	if (command == C::EditSelectedMessage) {
+		const auto item = selectedEditMessage();
+		if (!item || !_editSelectedMessageAvailable || !_editSelectedMessageCallback
+			|| !_editSelectedMessageAvailable(item->fullId())) {
+			return nullptr;
+		}
+		const auto id = item->fullId();
+		const auto sourceId = _selectedTextItem->fullId();
+		const auto selection = getSelectedTextRange(item);
+		const auto text = getSelectedText();
+		const auto generation = _selectedTextGeneration;
+		const auto weak = QPointer<ListWidget>(this);
+		const auto valid = [=] {
+			const auto current = selectedEditMessage();
+			return current && current->fullId() == id
+				&& session().data().message(id) == current
+				&& _selectedTextItem->fullId() == sourceId
+				&& session().data().message(sourceId) == _selectedTextItem
+				&& getSelectedTextRange(current) == selection
+				&& getSelectedText().rich == text.rich && getSelectedText().tags == text.tags;
+		};
+		return [=] {
+			if (!weak || generation != _selectedTextGeneration || !valid()
+				|| !_editSelectedMessageAvailable || !_editSelectedMessageCallback
+				|| !_editSelectedMessageAvailable(id)) {
+				return false;
+			}
+			const auto action = ChatHelpers::MakeSelectedTextAction(
+				this,
+				_selectedTextGeneration,
+				valid,
+				[=] { clearTextSelection(); },
+				shortcut);
+			_editSelectedMessageCallback(id, selection, action);
+			return *action.result == ChatHelpers::SelectedTextResult::Accepted;
+		};
 	}
 	const auto item = _selectedTextItem;
 	const auto view = viewForItem(item);

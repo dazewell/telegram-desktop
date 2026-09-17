@@ -233,9 +233,11 @@ public:
 		ChatHelpers::SelectedTextAction action = {});
 	[[nodiscard]] bool canCiteSelectedText() const;
 	bool citeSelectedText(const TextForMimeData &text);
+	[[nodiscard]] bool canEditSelectedMessage(not_null<HistoryItem*> item) const;
 	void editMessage(
 		not_null<HistoryItem*> item,
-		const TextSelection &selection);
+		const TextSelection &selection,
+		ChatHelpers::SelectedTextAction action = {});
 
 	void fillSenderUserpicMenu(
 		not_null<Ui::PopupMenu*> menu,
