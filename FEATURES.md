@@ -11,6 +11,26 @@ point. Do not add speculative or unverified entries.
 
 No historical features were backfilled during the workflow bootstrap.
 
+## Default Scheduled Message Delay
+
+Settings > Chat Settings > Default schedule time offers exactly 42 choices:
+5 through 60 minutes in 5-minute steps, 2 through 12 hours, 1 through 7 days,
+and 1 through 12 months. The default is 10 minutes. The setting applies
+globally to the desktop profile rather than per chat, and a selection takes
+effect immediately.
+
+The stored settings remain compatibility identifiers in seconds: minutes and
+hours use exact elapsed seconds, months 1 through 11 use 43,200 minutes each,
+and 12 months uses 525,600 minutes. Unsupported stored values resolve to the
+10-minute default. When a default target timestamp is produced, Minutes and
+Hours are exact elapsed durations from the current instant; Days and Months use
+local calendar arithmetic, preserving the selected local wall-clock time across
+ordinary daylight-saving changes whenever that local time exists.
+
+Principal entry points: [settings UI](Telegram/SourceFiles/settings/sections/settings_chat.cpp),
+[stored setting](Telegram/SourceFiles/core/core_settings.cpp), and
+[schedule consumer](Telegram/SourceFiles/history/view/history_view_schedule_box.cpp).
+
 ## Selected Message Text Shortcuts
 
 - **Q: Quote & Reply** uses the existing selected-quote eligibility and length

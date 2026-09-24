@@ -564,6 +564,8 @@ PRIVATE
     core/core_settings.h
     core/core_settings_proxy.cpp
     core/core_settings_proxy.h
+    core/default_schedule_time.cpp
+    core/default_schedule_time.h
     core/crash_report_window.cpp
     core/crash_report_window.h
     core/crash_reports.cpp
