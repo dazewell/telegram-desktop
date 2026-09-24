@@ -8,6 +8,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/default_schedule_time.h"
 
 #include "base/assertion.h"
+// rpl/rpl.h must precede base/unixtime.h: that lib_base header declares
+// rpl::producer<> without including it itself.
 #include "rpl/rpl.h"
 #include "base/unixtime.h"
 
