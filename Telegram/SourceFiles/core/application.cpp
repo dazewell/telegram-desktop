@@ -371,6 +371,9 @@ void Application::run() {
 	}, _lifetime);
 
 	DEBUG_LOG(("Application Info: inited..."));
+	LOG(("Qt version: %1 (compiled with %2)").arg(
+		QString::fromLatin1(qVersion()),
+		QString::fromLatin1(QT_VERSION_STR)));
 
 	DEBUG_LOG(("Application Info: starting app..."));
 
@@ -1220,8 +1223,12 @@ void Application::checkStartUrls() {
 		return;
 	}
 	if (!Core::App().passcodeLocked()) {
-		cRefStartUrls() = ranges::views::all(
-			cRefStartUrls()
+		// WHY: tg://resolve?acc= switches the account, which shows the
+		// new main widget and re-enters here while we still iterate,
+		// so take the list out and merge whatever was added meanwhile.
+		const auto urls = base::take(cRefStartUrls());
+		auto left = ranges::views::all(
+			urls
 		) | ranges::views::filter([&](const QUrl &url) {
 			if (url.scheme() == u"tonsite"_q) {
 				iv().showTonSite(url.toString(), {});
@@ -1232,27 +1239,24 @@ void Application::checkStartUrls() {
 			}
 			return true;
 		}) | ranges::to<QList<QUrl>>;
+		left.append(base::take(cRefStartUrls()));
+		cRefStartUrls() = std::move(left);
 	}
 	if (!cRefStartUrls().isEmpty()
 		&& _lastActivePrimaryWindow
 		&& !_lastActivePrimaryWindow->locked()) {
-		auto interprets = QStringList();
 		auto paths = QStringList();
 		cRefStartUrls() = ranges::views::all(
 			cRefStartUrls()
 		) | ranges::views::filter([&](const QUrl &url) {
-			if (url.scheme() == u"interpret"_q) {
-				interprets.append(url.path());
-				return false;
-			} else if (url.isLocalFile()) {
+			if (url.isLocalFile()) {
 				paths.append(url.toLocalFile());
 				return false;
 			}
 			return true;
 		}) | ranges::to<QList<QUrl>>;
-		if (!interprets.isEmpty() || !paths.isEmpty()) {
+		if (!paths.isEmpty()) {
 			_lastActivePrimaryWindow->widget()->handleStartFiles(
-				std::move(interprets),
 				std::move(paths));
 		}
 	}
@@ -1495,7 +1499,7 @@ Window::Controller *Application::separateWindowFor(
 	return nullptr;
 }
 
-Window::Controller *Application::ensureSeparateWindowFor(
+not_null<Window::Controller*> Application::ensureSeparateWindowFor(
 		Window::SeparateId id,
 		MsgId showAtMsgId) {
 	const auto activate = [&](not_null<Window::Controller*> window) {
@@ -1513,6 +1517,8 @@ Window::Controller *Application::ensureSeparateWindowFor(
 		}
 		return activate(existing);
 	}
+
+	Assert(Window::CanShowSeparateWindow(id));
 
 	const auto result = _windows.emplace(
 		id,
