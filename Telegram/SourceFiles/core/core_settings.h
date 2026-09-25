@@ -1061,12 +1061,8 @@ void setMediaGridZoomStep(int value) {
 	_mediaGridZoomStep = value;
 }
 
-[[nodiscard]] TimeId defaultScheduleTime() const {
-	return _defaultScheduleTime;
-}
-void setDefaultScheduleTime(TimeId value) {
-	_defaultScheduleTime = value;
-}
+[[nodiscard]] TimeId defaultScheduleTime() const;
+void setDefaultScheduleTime(TimeId value);
 
 	template <typename Type, typename Other>
 	void writePref(std::string_view key, Other &&value) {
@@ -1258,4 +1254,3 @@ TimeId _defaultScheduleTime = 600; // 10 minutes in seconds
 };
 
 } // namespace Core
-

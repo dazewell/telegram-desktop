@@ -29,6 +29,28 @@ set_target_properties(test_contact_time_zone PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
+add_executable(test_default_schedule_time)
+init_target(test_default_schedule_time "(tests)")
+
+target_include_directories(test_default_schedule_time PRIVATE ${src_loc})
+
+nice_target_sources(test_default_schedule_time ${src_loc}
+PRIVATE
+    core/default_schedule_time.cpp
+    core/default_schedule_time.h
+    tests/test_default_schedule_time.cpp
+)
+
+target_link_libraries(test_default_schedule_time
+PRIVATE
+    desktop-app::lib_base
+    desktop-app::external_qt
+)
+
+set_target_properties(test_default_schedule_time PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+
 add_executable(test_text WIN32)
 init_target(test_text "(tests)")
 
@@ -64,7 +86,7 @@ PRIVATE
 
 set_target_properties(test_text PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-add_dependencies(Telegram test_contact_time_zone test_text)
+add_dependencies(Telegram test_contact_time_zone test_default_schedule_time test_text)
 
 target_prepare_qrc(test_text)
 

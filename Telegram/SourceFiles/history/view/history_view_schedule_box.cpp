@@ -11,6 +11,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "chat_helpers/compose/compose_show.h"
 #include "core/application.h"
 #include "core/core_settings.h"
+#include "core/default_schedule_time.h"
 #include "data/components/scheduled_messages.h"
 #include "data/data_document.h"
 #include "data/data_media_types.h"
@@ -295,7 +296,10 @@ ScheduleBoxStyleArgs::ScheduleBoxStyleArgs()
 }
 
 TimeId DefaultScheduleTime() {
-	return base::unixtime::now() + Core::App().settings().defaultScheduleTime();
+	const auto now = base::unixtime::now();
+	return Core::DefaultScheduleTimestampFrom(
+		now,
+		Core::App().settings().defaultScheduleTime());
 }
 
 bool CanScheduleUntilOnline(not_null<PeerData*> peer) {
@@ -344,6 +348,8 @@ void ScheduleBox(
 	const auto history = details.barePeerId
 		? session->data().historyLoaded(PeerId(details.barePeerId))
 		: nullptr;
+	const auto now = base::unixtime::now();
+	const auto max = Core::DefaultScheduleMaxTimestampFrom(now);
 	auto descriptor = Ui::ChooseDateTimeBox(box, {
 		.title = (details.type == SendMenu::Type::Reminder
 			? tr::lng_remind_title()
@@ -351,6 +357,7 @@ void ScheduleBox(
 		.submit = tr::lng_schedule_button(),
 		.done = [=](TimeId result) { submit(with(result)); },
 		.time = time,
+		.max = [=] { return max; },
 		.style = style.chooseDateTimeArgs,
 		.dynamicImageForDate = (history
 			? ScheduledImageForDate(history, MsgId(details.bareTopicRootId))

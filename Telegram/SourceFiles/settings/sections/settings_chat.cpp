@@ -68,6 +68,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/file_utilities.h"
 #include "core/application.h"
 #include "core/core_settings.h"
+#include "core/default_schedule_time.h"
 #include "data/data_session.h"
 #include "data/data_cloud_themes.h"
 #include "data/data_file_origin.h"
@@ -1819,66 +1820,65 @@ pullToNext->checkedChanges(
 
 Ui::AddSkip(inner, st::settingsCheckboxesSkip);
 
-	// Default schedule time dropdown
-	const auto scheduleValues = std::make_shared<std::vector<TimeId>>(std::vector<TimeId>{
-		300,    // 5 minutes
-		600,    // 10 minutes (default)
-		900,    // 15 minutes
-		1800,   // 30 minutes
-		3600,   // 1 hour
-		7200,   // 2 hours
-		14400,  // 4 hours
-		28800,  // 8 hours
-		86400,  // 1 day
-		172800, // 2 days
-		259200, // 3 days
-		604800, // 7 days
-	});
-
-	const auto formatScheduleTime = [](TimeId seconds, bool showDefault = false) -> QString {
-		QString result;
-		if (seconds < 60) {
-			result = QString::number(seconds) + u" seconds"_q;
-		} else if (seconds < 3600) {
-			const auto minutes = seconds / 60;
-			result = QString::number(minutes) + (minutes == 1 ? u" minute"_q : u" minutes"_q);
-		} else if (seconds < 86400) {
-			const auto hours = seconds / 3600;
-			result = QString::number(hours) + (hours == 1 ? u" hour"_q : u" hours"_q);
-		} else {
-			const auto days = seconds / 86400;
-			result = QString::number(days) + (days == 1 ? u" day"_q : u" days"_q);
-		}
-		if (showDefault && seconds == 600) {
+	const auto &scheduleOptions = Core::DefaultScheduleTimeOptions();
+	const auto formatScheduleTime = [](
+			const Core::ScheduleTimeOption &option,
+			bool showDefault = false) {
+		auto result = [&] {
+			switch (option.unit) {
+			case Core::ScheduleTimeUnit::Minutes:
+				return tr::lng_minutes(tr::now, lt_count, option.count);
+			case Core::ScheduleTimeUnit::Hours:
+				return tr::lng_hours(tr::now, lt_count, option.count);
+			case Core::ScheduleTimeUnit::Days:
+				return tr::lng_days(tr::now, lt_count, option.count);
+			case Core::ScheduleTimeUnit::Months:
+				return tr::lng_months(tr::now, lt_count, option.count);
+			}
+			Unexpected("Schedule time unit.");
+		}();
+		if (showDefault && option.seconds == 600) {
 			result += u" (default)"_q;
 		}
 		return result;
 	};
 
-	const auto currentValue = inner->lifetime().make_state<rpl::variable<TimeId>>(
-		Core::App().settings().defaultScheduleTime());
+	const auto current = Core::App().settings().defaultScheduleTime();
+	const auto currentOption = ranges::find(
+		scheduleOptions,
+		current,
+		&Core::ScheduleTimeOption::seconds);
+	Expects(currentOption != scheduleOptions.end());
+	const auto currentValue = inner->lifetime().make_state<
+		rpl::variable<TimeId>>(currentOption->seconds);
 
 	const auto scheduleButton = AddButtonWithLabel(
 		inner,
 		tr::lng_settings_default_schedule_time(),
 		currentValue->value() | rpl::map([=](TimeId seconds) {
-			return formatScheduleTime(seconds);
+			const auto option = ranges::find(
+				scheduleOptions,
+				seconds,
+				&Core::ScheduleTimeOption::seconds);
+			Expects(option != scheduleOptions.end());
+			return formatScheduleTime(*option);
 		}),
 		st::settingsButton,
 		{ &st::menuIconSchedule });
 
 	scheduleButton->addClickHandler([=, show = controller->uiShow()] {
 		auto list = std::vector<QString>();
-		for (const auto value : *scheduleValues) {
-			list.push_back(formatScheduleTime(value, true));
+		for (const auto &option : scheduleOptions) {
+			list.push_back(formatScheduleTime(option, true));
 		}
 		show->showBox(Box([=](not_null<Ui::GenericBox*> box) {
 			const auto save = [=](int index) {
-				if (index >= 0 && index < int(scheduleValues->size())) {
-					const auto newValue = (*scheduleValues)[index];
-					Core::App().settings().setDefaultScheduleTime(newValue);
+				if (index >= 0 && index < int(scheduleOptions.size())) {
+					const auto option = scheduleOptions[index];
+					Core::App().settings().setDefaultScheduleTime(
+						option.seconds);
 					Core::App().saveSettingsDelayed();
-					*currentValue = newValue;
+					*currentValue = option.seconds;
 					box->closeBox();
 				}
 			};
@@ -1887,12 +1887,12 @@ Ui::AddSkip(inner, st::settingsCheckboxesSkip);
 				.options = list,
 				.initialSelection = [&] {
 					const auto current = Core::App().settings().defaultScheduleTime();
-					for (auto i = 0; i < int(scheduleValues->size()); ++i) {
-						if ((*scheduleValues)[i] == current) {
+					for (auto i = 0; i < int(scheduleOptions.size()); ++i) {
+						if (scheduleOptions[i].seconds == current) {
 							return i;
 						}
 					}
-					return 1; // Default to 10 minutes
+					Unexpected("Unsupported default schedule time.");
 				}(),
 				.callback = save,
 			});
