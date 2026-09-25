@@ -1,8 +1,9 @@
 <#
 .SYNOPSIS
-	Local-only helper: rebase the current branch onto `source/dev`, then
-	reconfigure (and optionally rebuild the Qt 6 / third-party libraries) so the
-	Visual Studio solution is regenerated against Qt 6.11.1.
+	Local-only helper: integrate `source/dev` into the current branch (merge by
+	default), refresh stale Qt 6 / third-party library stages, then reconfigure
+	(and optionally build) so the Visual Studio solution is regenerated against
+	the pinned Qt 6 version.
 
 .DESCRIPTION
 	Telegram Desktop's build scripts (Telegram\build\qt_version.py) OVERRIDE the
@@ -17,22 +18,40 @@
 	cmake/external/qt/package.cmake does `set(qt_requested $ENV{QT} ... FORCE)`,
 	producing:
 
-		Configured Qt version 6.11.1 does not match requested version 6.9.0.
+		Configured Qt version <pinned> does not match requested version 6.9.0.
 
 	So this script pins `QT` for the whole session and clears the stale `QTDIR`.
 
 	Typical flow after a new merge from upstream:
-		.\tools\rebuild-qt6.ps1                 # sync + configure (fast)
+		.\tools\rebuild-qt6.ps1                 # sync + refresh stale libs + configure
 		.\tools\rebuild-qt6.ps1 -Build          # also compile a Release exe
-		.\tools\rebuild-qt6.ps1 -Prepare        # also rebuild Qt/libs (slow!)
+		.\tools\rebuild-qt6.ps1 -SkipPrepare    # skip the library refresh
 
-	The Qt/library rebuild (-Prepare) compiles Qt from source and can take
-	several hours. You normally only need it when the pinned Qt version or the
-	third-party libraries actually change.
+	Every run executes Telegram\build\prepare\win.bat qt6 silent. prepare.py
+	keeps a cache key per stage and only rebuilds stages that are missing or
+	stale (up-to-date stages print SKIPPING), so this is quick when nothing
+	changed. Upstream regularly adds or bumps stages, and configure fails on a
+	missing library until they are built. A change to the pinned Qt version or
+	its patches makes the Qt stage stale and recompiles Qt from source, which
+	can take several hours.
+
+	With -Strategy merge the merge runs with --no-commit so fork-owned paths can
+	be cleaned inside the merge commit itself. The fork tracks nothing under
+	.agents/, .claude/ and .grok/ and keeps its own AGENTS.md, so: files upstream
+	adds there are removed, modify/delete conflicts there keep the deletion, and
+	an AGENTS.md conflict keeps the fork's version. If any other path conflicts,
+	nothing is resolved and the merge is left in progress for you. A
+	fast-forward cannot be held by --no-commit; if one brings files into those
+	directories they are removed in a follow-up commit. -Strategy rebase stops
+	on any conflict.
 
 .PARAMETER Prepare
-	Also run Telegram\build\prepare\win.bat qt6 (rebuilds Qt 6 + libraries).
-	Slow (multi-hour). Skip it for ordinary merges that don't bump Qt.
+	Accepted for backward compatibility; the stale-only library prepare now runs
+	by default. Cannot be combined with -SkipPrepare.
+
+.PARAMETER SkipPrepare
+	Skip Telegram\build\prepare\win.bat qt6 silent. Only safe when you know no
+	prepare stage (Qt, patches, libraries) changed since the last prepare.
 
 .PARAMETER SkipRebase
 	Skip the fetch + integrate step and only reconfigure/prepare.
@@ -79,6 +98,7 @@
 [CmdletBinding()]
 param(
 	[switch]$Prepare,
+	[switch]$SkipPrepare,
 	[switch]$SkipRebase,
 	[switch]$SkipSubmodules,
 	[switch]$Build,
@@ -93,6 +113,10 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
+if ($Prepare -and $SkipPrepare) {
+	throw "-Prepare and -SkipPrepare cannot be combined. Prepare runs by default; pass only -SkipPrepare to skip it."
+}
 
 # Resolve the repository root from git rather than from this script's own
 # location, so the script keeps working if it is moved or invoked from
@@ -162,10 +186,73 @@ function Invoke-Native($file, [string[]]$arguments, $workingDir) {
 	try {
 		& $file @arguments
 		if ($LASTEXITCODE -ne 0) {
-			throw "$file $($arguments -join ' ') failed with exit code $LASTEXITCODE"
+			$shown = $arguments -replace '(TDESKTOP_API_(?:ID|HASH))=.*', '$1=***'
+			throw "$file $($shown -join ' ') failed with exit code $LASTEXITCODE"
 		}
 	} finally {
 		Pop-Location
+	}
+}
+
+function Get-GitLines([string]$repoRoot, [string[]]$arguments) {
+	$lines = & git -C $repoRoot -c core.quotePath=false @arguments
+	if ($LASTEXITCODE -ne 0) {
+		throw "git $($arguments -join ' ') failed with exit code $LASTEXITCODE"
+	}
+	return @($lines | Where-Object { $_ })
+}
+
+# The fork replaced upstream's agent workflow (commit 67dfbe3355): it tracks
+# nothing under .agents/, .claude/, .grok/ and keeps its own AGENTS.md.
+function Test-ForkOwnedPath([string]$path) {
+	return ($path -ceq 'AGENTS.md') -or ($path -cmatch '^\.(agents|claude|grok)/')
+}
+
+# Merge $upstream with --no-commit so upstream changes to fork-owned paths are
+# dropped inside the merge commit. Conflicts are resolved automatically only
+# when every unmerged path is fork-owned; otherwise the merge is left as-is.
+function Invoke-SourceMerge([string]$repoRoot, [string]$upstream) {
+	$ownedDirs = @('.agents', '.claude', '.grok')
+	$before = (& git -C $repoRoot rev-parse HEAD).Trim()
+	$mergeError = $null
+	try {
+		Invoke-Native 'git' @('-C', $repoRoot, 'merge', $upstream, '--no-commit') $repoRoot
+	} catch {
+		$mergeError = $_
+	}
+	& git -C $repoRoot rev-parse -q --verify MERGE_HEAD | Out-Null
+	$merging = ($LASTEXITCODE -eq 0)
+
+	if ($mergeError) {
+		$unmerged = @(Get-GitLines $repoRoot @('diff', '--name-only', '--diff-filter=U'))
+		$foreign = @($unmerged | Where-Object { -not (Test-ForkOwnedPath $_) })
+		if (-not $merging -or $unmerged.Count -eq 0 -or $foreign.Count -gt 0) {
+			$list = ''
+			if ($foreign.Count -gt 0) {
+				$list = "`nConflicts outside fork-owned paths:`n  " + ($foreign -join "`n  ")
+			}
+			throw "Merge failed, likely a conflict. Resolve it, run 'git commit', then re-run with -SkipRebase. To back out: git merge --abort$list`n$mergeError"
+		}
+		Write-Host "Auto-resolving fork-owned conflicts:`n  $($unmerged -join "`n  ")"
+		if ($unmerged -ccontains 'AGENTS.md') {
+			Invoke-Native 'git' @('-C', $repoRoot, 'checkout', '--ours', '--', 'AGENTS.md') $repoRoot
+			Invoke-Native 'git' @('-C', $repoRoot, 'add', '--', 'AGENTS.md') $repoRoot
+		}
+	} elseif (-not $merging) {
+		if ((& git -C $repoRoot rev-parse HEAD).Trim() -eq $before) {
+			return
+		}
+	}
+
+	$dropped = @(Get-GitLines $repoRoot (@('ls-files', '--') + $ownedDirs) | Select-Object -Unique)
+	if ($dropped.Count -gt 0) {
+		Write-Host "Dropping upstream files under fork-owned paths:`n  $($dropped -join "`n  ")"
+		Invoke-Native 'git' (@('-C', $repoRoot, 'rm', '-r', '-q', '-f', '--ignore-unmatch', '--') + $ownedDirs) $repoRoot
+	}
+	if ($merging) {
+		Invoke-Native 'git' @('-C', $repoRoot, 'commit', '--no-edit') $repoRoot
+	} elseif ($dropped.Count -gt 0) {
+		Invoke-Native 'git' @('-C', $repoRoot, 'commit', '-q', '-m', 'Drop upstream agent workflow files') $repoRoot
 	}
 }
 
@@ -231,11 +318,7 @@ if (-not $SkipRebase) {
 
 	Invoke-Native 'git' @('-C', $RepoRoot, 'fetch', 'source') $RepoRoot
 	if ($Strategy -eq 'merge') {
-		try {
-			Invoke-Native 'git' @('-C', $RepoRoot, 'merge', 'source/dev', '--no-edit') $RepoRoot
-		} catch {
-			throw "Merge failed, likely a conflict. Resolve it, run 'git commit', then re-run with -SkipRebase. To back out: git merge --abort`n$_"
-		}
+		Invoke-SourceMerge $RepoRoot 'source/dev'
 	} else {
 		try {
 			Invoke-Native 'git' @('-C', $RepoRoot, 'rebase', 'source/dev') $RepoRoot
@@ -268,15 +351,15 @@ Import-VsDevEnv -targetArch $Arch -vcvarsVer $VcVarsVer
 # system module path so child powershell.exe uses its own modules.
 $env:PSModulePath = Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\Modules'
 
-# --- 3. (Optional) rebuild Qt 6 + libraries -----------------------------------
-if ($Prepare) {
-	Write-Step "Rebuilding Qt 6 + third-party libraries (this can take hours)"
+# --- 3. Refresh stale Qt 6 + library stages ------------------------------------
+if (-not $SkipPrepare) {
+	Write-Step "Refreshing stale Qt 6 + third-party library stages (up-to-date stages are skipped; a Qt change can take hours)"
 	# 'silent' auto-rebuilds stale stages instead of blocking on the interactive
 	# "(r)ebuild, (a)ll, (s)kip, (p)rint, (q)uit?" prompt (there is no stdin here).
 	$winBat = Join-Path $RepoRoot 'Telegram\build\prepare\win.bat'
 	Invoke-Native $winBat @('qt6', 'silent') $BuildPath
 } else {
-	Write-Step "Skipping library prepare (pass -Prepare to rebuild Qt/libs)"
+	Write-Step "Skipping library prepare (-SkipPrepare)"
 }
 
 # --- 4. Reconfigure the solution against Qt 6 ---------------------------------
