@@ -50,6 +50,9 @@ private:
 	[[nodiscard]] float64 lookupPlaybackRate() const;
 	void applyPlayerTrack(AudioMsgId::Type audioType);
 	void syncPlayerStateToControls();
+	void syncControls();
+	void applyVideoState();
+	[[nodiscard]] bool videoActive() const;
 
 	const std::unique_ptr<base::Platform::SystemMediaControls> _controls;
 
@@ -61,9 +64,11 @@ private:
 	bool _inited = false;
 	SystemMediaControlsVideoDelegate *_videoDelegate = nullptr;
 	VideoState _videoState;
+	QImage _videoThumbnail;
 
 	rpl::lifetime _lifetimeDownload;
 	rpl::lifetime _lifetime;
+
 };
 
 } // namespace Media

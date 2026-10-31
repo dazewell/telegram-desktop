@@ -906,6 +906,12 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_settings_destroy_title" = "Delete my account";
 "lng_settings_version_info" = "Version and updates";
 "lng_settings_system_integration" = "System integration";
+"lng_settings_media_keys_scope" = "Media Keys work for";
+"lng_settings_media_keys_all" = "All";
+"lng_settings_media_keys_messages" = "Only Messages";
+"lng_settings_media_keys_content" = "Only Content";
+"lng_settings_media_keys_disabled" = "Disabled";
+"lng_settings_media_keys_about" = "Messages include voice and video messages. Content includes music, audio files, videos and stories.";
 "lng_settings_performance" = "Performance";
 "lng_settings_enable_hwaccel" = "Hardware accelerated video decoding";
 "lng_settings_enable_opengl" = "Enable OpenGL rendering for media";

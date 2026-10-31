@@ -1058,7 +1058,8 @@ bool HandlePossibleChatSwitch(not_null<QKeyEvent*> event) {
 }
 
 void ToggleMediaShortcuts(bool toggled) {
-	Data.toggleMedia(toggled);
+	const auto player = Media::Player::instance();
+	Data.toggleMedia(toggled && player->mediaKeysType().has_value());
 }
 
 void ToggleSupportShortcuts(bool toggled) {

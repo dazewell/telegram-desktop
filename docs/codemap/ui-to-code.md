@@ -198,3 +198,23 @@ test_text does not link
 SelectTextInFieldWithMargins or the real history/composer owners. Full application
 compilation and source reuse do not prove real-chat range, focus, draft, caption,
 or navigation behavior; those targeted runtime checks remain unrun.
+
+## Media Key Scope
+
+Established: 2026-10-30. Re-verify after upstream changes.
+
+Surface: Settings > Advanced > System Integration > Media Keys work for.
+Entry: [BuildSystemIntegrationSection](../../Telegram/SourceFiles/settings/sections/settings_advanced.cpp#L481)
+adds the single-choice setting and search entry. The global preference is
+appended after local passcode length in
+[Core::Settings](../../Telegram/SourceFiles/core/core_settings.cpp#L535).
+
+Flow: scope changes refresh eligible system targets in
+[SystemMediaControlsManager](../../Telegram/SourceFiles/media/system_media_controls_manager.cpp#L292)
+and shortcut enabling in
+[Instance::setupShortcuts](../../Telegram/SourceFiles/media/player/media_player_instance.cpp#L1463).
+Voice includes round video messages; the overlay explicitly supplies its
+message/content classification to the system-controls sink.
+
+Verification: traced the selector, append-only writer/guarded reader, player
+shortcut dispatch, and overlay sink in the current source.

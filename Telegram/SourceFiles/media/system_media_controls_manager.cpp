@@ -50,7 +50,8 @@ constexpr auto kSkipMs = crl::time(15 * 1000);
 	const auto player = instance();
 	using Type = AudioMsgId::Type;
 	for (const auto type : { Type::Voice, Type::Song }) {
-		if (player->current(type)
+		if (Core::App().settings().mediaKeysAllowed(type == Type::Voice)
+			&& player->current(type)
 			&& !IsStoppedOrStopping(player->getState(type).state)) {
 			return type;
 		}
@@ -66,8 +67,8 @@ bool SystemMediaControlsManager::Supported() {
 
 float64 SystemMediaControlsManager::lookupPlaybackRate() const {
 	const auto mediaPlayer = Media::Player::instance();
-	const auto type = mediaPlayer->getActiveType();
-	const auto current = mediaPlayer->current(type);
+	const auto type = ActivePlayerType();
+	const auto current = type ? mediaPlayer->current(*type) : AudioMsgId();
 	if (!current || !current.changeablePlaybackSpeed()) {
 		return 1.;
 	}
@@ -81,8 +82,6 @@ float64 SystemMediaControlsManager::lookupPlaybackRate() const {
 
 void SystemMediaControlsManager::applyPlayerTrack(AudioMsgId::Type audioType) {
 	const auto mediaPlayer = Media::Player::instance();
-	_lifetimeDownload.destroy();
-
 	const auto current = mediaPlayer->current(audioType);
 	if (!current) {
 		return;
@@ -92,6 +91,9 @@ void SystemMediaControlsManager::applyPlayerTrack(AudioMsgId::Type audioType) {
 		&& (_lastAudioMsgId.type() == current.type())) {
 		return;
 	}
+	_lifetimeDownload.destroy();
+	_streamed = nullptr;
+	_cachedMediaView = nullptr;
 	const auto document = current.audio();
 
 	const auto &[title, performer] = (audioType
@@ -189,7 +191,9 @@ void SystemMediaControlsManager::syncPlayerStateToControls() {
 	using namespace Media::Player;
 	const auto mediaPlayer = Media::Player::instance();
 	const auto type = ActivePlayerType();
-	if (!type) {
+	if (!type || Core::App().passcodeLocked()) {
+		_lifetimeDownload.destroy();
+		_lastAudioMsgId = AudioMsgId();
 		_cachedMediaView = nullptr;
 		_streamed = nullptr;
 		_controls->setEnabled(false);
@@ -207,9 +211,26 @@ void SystemMediaControlsManager::syncPlayerStateToControls() {
 		: IsPausedOrPausing(state.state)
 		? PlaybackStatus::Paused
 		: PlaybackStatus::Playing);
-	_lastAudioMsgId = AudioMsgId();
 	applyPlayerTrack(*type);
+	if (_controls->seekingSupported()) {
+		_controls->setPosition(state.position);
+		_controls->setPlaybackRate(lookupPlaybackRate());
+	}
 	_controls->updateDisplay();
+}
+
+bool SystemMediaControlsManager::videoActive() const {
+	return _videoDelegate
+		&& !Core::App().passcodeLocked()
+		&& Core::App().settings().mediaKeysAllowed(_videoState.message);
+}
+
+void SystemMediaControlsManager::syncControls() {
+	if (videoActive()) {
+		applyVideoState();
+	} else {
+		syncPlayerStateToControls();
+	}
 }
 
 SystemMediaControlsManager::SystemMediaControlsManager()
@@ -235,113 +256,46 @@ SystemMediaControlsManager::SystemMediaControlsManager()
 	});
 
 	mediaPlayer->updatedNotifier(
-	) | trackFilter | rpl::map([=](const TrackState &state) {
-		using namespace Media::Player;
-		if (_streamed) {
-			const auto &player = _streamed->player();
-			if (player.buffering() || !player.playing()) {
-				return PlaybackStatus::Paused;
-			}
+	) | trackFilter | rpl::on_next([=](const TrackState &) {
+		if (!videoActive()) {
+			syncPlayerStateToControls();
 		}
-		if (IsStoppedOrStopping(state.state)) {
-			return PlaybackStatus::Stopped;
-		} else if (IsPausedOrPausing(state.state)) {
-			return PlaybackStatus::Paused;
-		}
-		return PlaybackStatus::Playing;
-	}) | rpl::distinct_until_changed(
-	) | rpl::on_next([=](PlaybackStatus status) {
-		if (_videoDelegate) {
-			return;
-		}
-		if (_controls->seekingSupported()) {
-			const auto type = mediaPlayer->getActiveType();
-			_controls->setPosition(mediaPlayer->getState(type).position);
-		}
-		_controls->setPlaybackStatus(status);
 	}, _lifetime);
 
-	rpl::merge(
-		mediaPlayer->stops(AudioMsgId::Type::Song) | rpl::map_to(false),
-		mediaPlayer->startsPlay(AudioMsgId::Type::Song) | rpl::map_to(true),
-		mediaPlayer->stops(AudioMsgId::Type::Voice) | rpl::map_to(false),
-		mediaPlayer->startsPlay(AudioMsgId::Type::Voice) | rpl::map_to(true)
-	) | rpl::distinct_until_changed() | rpl::on_next([=](bool audio) {
-		if (_videoDelegate) {
-			return;
-		}
-		const auto type = mediaPlayer->getActiveType();
-		_controls->setEnabled(audio);
-		if (audio) {
-			_controls->setIsNextEnabled(mediaPlayer->nextAvailable(type));
-			_controls->setIsPreviousEnabled(
-				mediaPlayer->previousAvailable(type));
-			_controls->setIsPlayPauseEnabled(true);
-			_controls->setIsStopEnabled(true);
-			_controls->setPlaybackStatus(PlaybackStatus::Playing);
-			_controls->updateDisplay();
-		} else {
-			_cachedMediaView = nullptr;
-			_streamed = nullptr;
-			_controls->clearMetadata();
-		}
-		_lifetimeDownload.destroy();
-	}, _lifetime);
-
-	// _streamed and _cachedMediaView hold session-owned objects (the
-	// big file cache Database, the mtproto loader, DocumentData), so
-	// they must be dropped on every stop, even while a video delegate
-	// is active or when distinct_until_changed() swallows the event:
-	// on logout the player calls stopAndClear() while the session is
-	// still alive, and destroying them later would touch freed memory.
+	// These objects reference session-owned data and must be released on
+	// every stop, including while a video delegate owns the controls.
 	rpl::merge(
 		mediaPlayer->stops(AudioMsgId::Type::Song),
 		mediaPlayer->stops(AudioMsgId::Type::Voice)
 	) | rpl::on_next([=] {
+		_lifetimeDownload.destroy();
 		_cachedMediaView = nullptr;
 		_streamed = nullptr;
-	}, _lifetime);
-
-	auto trackChanged = mediaPlayer->trackChanged(
-	) | rpl::filter([=](AudioMsgId::Type audioType) {
-		return (audioType == AudioMsgId::Type::Song)
-			|| (audioType == AudioMsgId::Type::Voice);
-	});
-
-	auto unlocked = Core::App().passcodeLockChanges(
-	) | rpl::filter([=](bool locked) {
-		return !locked && ActivePlayerType().has_value();
-	}) | rpl::map([=] {
-		return *ActivePlayerType();
-	}) | rpl::before_next([=] {
-		if (_videoDelegate) {
-			return;
-		}
-		_controls->setEnabled(true);
-		_controls->updateDisplay();
-	});
-
-	rpl::merge(
-		std::move(trackChanged),
-		std::move(unlocked)
-	) | rpl::on_next([=](AudioMsgId::Type audioType) {
-		if (_videoDelegate) {
-			return;
-		}
-		applyPlayerTrack(audioType);
+		_lastAudioMsgId = AudioMsgId();
+		syncControls();
 	}, _lifetime);
 
 	rpl::merge(
-		mediaPlayer->playlistChanges(AudioMsgId::Type::Song)
-			| rpl::map_to(AudioMsgId::Type::Song),
-		mediaPlayer->playlistChanges(AudioMsgId::Type::Voice)
-			| rpl::map_to(AudioMsgId::Type::Voice)
-	) | rpl::on_next([=](AudioMsgId::Type type) {
-		if (_videoDelegate) {
-			return;
+		mediaPlayer->startsPlay(AudioMsgId::Type::Song) | rpl::to_empty,
+		mediaPlayer->startsPlay(AudioMsgId::Type::Voice) | rpl::to_empty,
+		mediaPlayer->trackChanged() | rpl::to_empty,
+		mediaPlayer->playlistChanges(AudioMsgId::Type::Song) | rpl::to_empty,
+		mediaPlayer->playlistChanges(AudioMsgId::Type::Voice) | rpl::to_empty
+	) | rpl::on_next([=] {
+		if (!videoActive()) {
+			syncPlayerStateToControls();
 		}
-		_controls->setIsNextEnabled(mediaPlayer->nextAvailable(type));
-		_controls->setIsPreviousEnabled(mediaPlayer->previousAvailable(type));
+	}, _lifetime);
+
+	rpl::merge(
+		Core::App().settings().mediaKeysScopeValue() | rpl::to_empty,
+		Core::App().passcodeLockChanges() | rpl::to_empty
+	) | rpl::on_next([=] {
+		_lifetimeDownload.destroy();
+		_streamed = nullptr;
+		_cachedMediaView = nullptr;
+		_lastAudioMsgId = AudioMsgId();
+		syncControls();
 	}, _lifetime);
 
 	using Media::RepeatMode;
@@ -349,7 +303,7 @@ SystemMediaControlsManager::SystemMediaControlsManager()
 
 	Core::App().settings().playerRepeatModeValue(
 	) | rpl::on_next([=](RepeatMode mode) {
-		if (_videoDelegate) {
+		if (videoActive()) {
 			return;
 		}
 		_controls->setLoopStatus(RepeatModeToLoopStatus(mode));
@@ -360,7 +314,7 @@ SystemMediaControlsManager::SystemMediaControlsManager()
 		if (mode != OrderMode::Shuffle) {
 			_lastOrderMode = mode;
 		}
-		if (_videoDelegate) {
+		if (videoActive()) {
 			return;
 		}
 		_controls->setShuffle(mode == OrderMode::Shuffle);
@@ -370,7 +324,7 @@ SystemMediaControlsManager::SystemMediaControlsManager()
 		Core::App().settings().voicePlaybackSpeedChanges() | rpl::to_empty,
 		Core::App().settings().audioPlaybackSpeedChanges() | rpl::to_empty
 	) | rpl::on_next([=] {
-		if (_videoDelegate) {
+		if (videoActive() || !ActivePlayerType()) {
 			return;
 		}
 		_controls->setPlaybackRate(lookupPlaybackRate());
@@ -378,7 +332,11 @@ SystemMediaControlsManager::SystemMediaControlsManager()
 
 	_controls->commandRequests(
 	) | rpl::on_next([=](Command command) {
-		if (_videoDelegate) {
+		if (Core::App().passcodeLocked()
+			|| (!videoActive() && !ActivePlayerType())) {
+			return;
+		}
+		if (videoActive()) {
 			switch (command) {
 			case Command::PlayPause: _videoDelegate->smtcPlayPause(); break;
 			case Command::Play: _videoDelegate->smtcPlay(); break;
@@ -406,7 +364,7 @@ SystemMediaControlsManager::SystemMediaControlsManager()
 			}
 			return;
 		}
-		const auto type = mediaPlayer->getActiveType();
+		const auto type = *ActivePlayerType();
 		switch (command) {
 		case Command::PlayPause: mediaPlayer->playPause(type); break;
 		case Command::Play: mediaPlayer->play(type); break;
@@ -468,12 +426,14 @@ SystemMediaControlsManager::SystemMediaControlsManager()
 			mediaPlayer->seekingChanges(AudioMsgId::Type::Voice)
 		) | rpl::filter([](Media::Player::Instance::Seeking seeking) {
 			return (seeking == Media::Player::Instance::Seeking::Finish);
+		}) | rpl::filter([=] {
+			return !videoActive() && ActivePlayerType().has_value();
 		}) | rpl::map([=] {
-			const auto type = mediaPlayer->getActiveType();
+			const auto type = *ActivePlayerType();
 			return mediaPlayer->getState(type).position;
 		}) | rpl::distinct_until_changed(
 		) | rpl::on_next([=](int position) {
-			if (_videoDelegate) {
+			if (videoActive()) {
 				return;
 			}
 			_controls->setPosition(position);
@@ -482,32 +442,33 @@ SystemMediaControlsManager::SystemMediaControlsManager()
 
 		_controls->seekRequests(
 		) | rpl::on_next([=](float64 progress) {
-			if (_videoDelegate) {
+			if (Core::App().passcodeLocked()
+				|| (!videoActive() && !ActivePlayerType())) {
+				return;
+			}
+			if (videoActive()) {
 				_videoDelegate->smtcSeek(
 					crl::time(progress * _videoState.duration));
 				return;
 			}
-			const auto type = mediaPlayer->getActiveType();
+			const auto type = *ActivePlayerType();
 			mediaPlayer->finishSeeking(type, progress);
 		}, _lifetime);
 
 		_controls->updatePositionRequests(
 		) | rpl::on_next([=] {
-			if (_videoDelegate) {
+			if (Core::App().passcodeLocked()
+				|| (!videoActive() && !ActivePlayerType())) {
+				return;
+			}
+			if (videoActive()) {
 				_controls->setPosition(_videoState.position);
 				return;
 			}
-			const auto type = mediaPlayer->getActiveType();
+			const auto type = *ActivePlayerType();
 			_controls->setPosition(mediaPlayer->getState(type).position);
 		}, _lifetime);
 	}
-
-	Core::App().passcodeLockValue(
-	) | rpl::filter([=](bool locked) {
-		return locked && Core::App().maybePrimarySession();
-	}) | rpl::on_next([=] {
-		_controls->setEnabled(false);
-	}, _lifetime);
 
 	if (_controls->volumeSupported()) {
 		rpl::single(
@@ -515,14 +476,19 @@ SystemMediaControlsManager::SystemMediaControlsManager()
 		) | rpl::then(
 			Core::App().settings().songVolumeChanges()
 		) | rpl::on_next([=](float64 volume) {
-			if (_videoDelegate) {
+			if (videoActive()) {
 				return;
 			}
 			_controls->setVolume(volume);
 		}, _lifetime);
 
 		_controls->volumeChangeRequests(
-		) | rpl::on_next([](float64 volume) {
+		) | rpl::on_next([=](float64 volume) {
+			if (Core::App().passcodeLocked()
+				|| videoActive()
+				|| !ActivePlayerType()) {
+				return;
+			}
 			Player::mixer()->setSongVolume(volume);
 			if (volume > 0) {
 				Core::App().settings().setRememberedSongVolume(volume);
@@ -540,26 +506,38 @@ void SystemMediaControlsManager::videoStart(
 	if (!_inited) {
 		return;
 	}
-	using PlaybackStatus
-		= base::Platform::SystemMediaControls::PlaybackStatus;
 	_videoDelegate = delegate;
 	_videoState = state;
+	_videoThumbnail = QImage();
+	syncControls();
+}
+
+void SystemMediaControlsManager::applyVideoState() {
+	using PlaybackStatus
+		= base::Platform::SystemMediaControls::PlaybackStatus;
+	_lastAudioMsgId = AudioMsgId();
+	_streamed = nullptr;
+	_cachedMediaView = nullptr;
 	_lifetimeDownload.destroy();
 	_controls->setEnabled(true);
 	_controls->setIsPlayPauseEnabled(true);
 	_controls->setIsStopEnabled(true);
-	_controls->setIsNextEnabled(state.nextAvailable);
-	_controls->setIsPreviousEnabled(state.previousAvailable);
-	_controls->setTitle(state.title);
-	_controls->setArtist(state.artist);
-	_controls->clearThumbnail();
+	_controls->setIsNextEnabled(_videoState.nextAvailable);
+	_controls->setIsPreviousEnabled(_videoState.previousAvailable);
+	_controls->setTitle(_videoState.title);
+	_controls->setArtist(_videoState.artist);
+	if (_videoThumbnail.isNull()) {
+		_controls->clearThumbnail();
+	} else {
+		_controls->setThumbnail(_videoThumbnail);
+	}
 	if (_controls->seekingSupported()) {
-		_controls->setDuration(state.duration);
-		_controls->setPosition(state.position);
+		_controls->setDuration(_videoState.duration);
+		_controls->setPosition(_videoState.position);
 		_controls->setPlaybackRate(
 			Core::App().settings().videoPlaybackSpeed());
 	}
-	_controls->setPlaybackStatus(state.playing
+	_controls->setPlaybackStatus(_videoState.playing
 		? PlaybackStatus::Playing
 		: PlaybackStatus::Paused);
 	_controls->updateDisplay();
@@ -567,6 +545,15 @@ void SystemMediaControlsManager::videoStart(
 
 void SystemMediaControlsManager::videoUpdate(VideoState state) {
 	if (!_inited || !_videoDelegate) {
+		return;
+	}
+	const auto wasActive = videoActive();
+	if (!wasActive || state.message != _videoState.message) {
+		_videoState = state;
+		if (wasActive || videoActive()) {
+			_lastAudioMsgId = AudioMsgId();
+			syncControls();
+		}
 		return;
 	}
 	using PlaybackStatus
@@ -612,6 +599,10 @@ void SystemMediaControlsManager::videoSetThumbnail(const QImage &thumbnail) {
 	if (!_inited || !_videoDelegate) {
 		return;
 	}
+	_videoThumbnail = thumbnail;
+	if (!videoActive()) {
+		return;
+	}
 	if (thumbnail.isNull()) {
 		_controls->clearThumbnail();
 	} else {
@@ -627,7 +618,9 @@ void SystemMediaControlsManager::videoFinish(
 	}
 	_videoDelegate = nullptr;
 	_videoState = VideoState();
-	syncPlayerStateToControls();
+	_videoThumbnail = QImage();
+	_lastAudioMsgId = AudioMsgId();
+	syncControls();
 }
 
 SystemMediaControlsManager::~SystemMediaControlsManager() = default;

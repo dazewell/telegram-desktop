@@ -476,6 +476,36 @@ void BuildSystemIntegrationSection(SectionBuilder &builder) {
 	});
 
 	using WorkMode = Core::Settings::WorkMode;
+	const auto mediaKeysOptions = std::vector<QString>{
+		tr::lng_settings_media_keys_all(tr::now),
+		tr::lng_settings_media_keys_messages(tr::now),
+		tr::lng_settings_media_keys_content(tr::now),
+		tr::lng_settings_media_keys_disabled(tr::now),
+	};
+	builder.addButton({
+		.id = u"advanced/media_keys_scope"_q,
+		.title = tr::lng_settings_media_keys_scope(),
+		.st = &st::settingsButtonNoIcon,
+		.label = settings->mediaKeysScopeValue()
+			| rpl::map([=](Core::MediaKeysScope scope) {
+				return mediaKeysOptions[int(scope)];
+			}),
+		.onClick = [=] {
+			controller->show(Box([=](not_null<Ui::GenericBox*> box) {
+				SingleChoiceBox(box, {
+					.title = tr::lng_settings_media_keys_scope(),
+					.options = mediaKeysOptions,
+					.initialSelection = int(settings->mediaKeysScope()),
+					.callback = [=](int index) {
+						settings->setMediaKeysScope(Core::MediaKeysScope(index));
+						Core::App().saveSettingsDelayed();
+					},
+				});
+			}));
+		},
+		.keywords = { u"media"_q, u"keys"_q, u"playback"_q, u"audio"_q, u"video"_q },
+	});
+	builder.addDividerText(tr::lng_settings_media_keys_about());
 
 	if (Platform::TrayIconSupported()) {
 		const auto trayEnabled = [=] {

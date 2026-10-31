@@ -37,6 +37,13 @@ enum class StickedTooltip;
 
 namespace Core {
 
+enum class MediaKeysScope {
+	All,
+	Messages,
+	Content,
+	Disabled,
+};
+
 inline constexpr auto kScreenReaderModeDisabledKey
 	= "screen-reader-mode-disabled"_cs;
 
@@ -848,6 +855,22 @@ public:
 	void setPlayerRepeatMode(Media::RepeatMode mode) {
 		_playerRepeatMode = mode;
 	}
+	void setMediaKeysScope(MediaKeysScope scope) {
+		_mediaKeysScope = scope;
+	}
+	[[nodiscard]] MediaKeysScope mediaKeysScope() const {
+		return _mediaKeysScope.current();
+	}
+	[[nodiscard]] rpl::producer<MediaKeysScope> mediaKeysScopeValue() const {
+		return _mediaKeysScope.value();
+	}
+	[[nodiscard]] bool mediaKeysAllowed(bool message) const {
+		const auto scope = mediaKeysScope();
+		return (scope == MediaKeysScope::All)
+			|| (scope == (message
+				? MediaKeysScope::Messages
+				: MediaKeysScope::Content));
+	}
 	[[nodiscard]] Media::RepeatMode playerRepeatMode() const {
 		return _playerRepeatMode.current();
 	}
@@ -1221,6 +1244,7 @@ private:
 	bool _systemUnlockEnabled = false;
 	bool _quickUnlockEnabled = false;
 	int _localPasscodeLength = 0;
+	rpl::variable<MediaKeysScope> _mediaKeysScope = MediaKeysScope::All;
 	std::optional<bool> _weatherInCelsius;
 	QByteArray _tonsiteStorageToken;
 	rpl::variable<int> _ivZoom = 0;

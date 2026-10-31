@@ -87,6 +87,7 @@ public:
 	bool previous(AudioMsgId::Type type);
 
 	AudioMsgId::Type getActiveType() const;
+	[[nodiscard]] std::optional<AudioMsgId::Type> mediaKeysType() const;
 
 	void play() {
 		play(getActiveType());

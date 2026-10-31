@@ -240,6 +240,20 @@ AudioMsgId::Type Instance::getActiveType() const {
 	return AudioMsgId::Type::Song;
 }
 
+std::optional<AudioMsgId::Type> Instance::mediaKeysType() const {
+	using Type = AudioMsgId::Type;
+	const auto &settings = Core::App().settings();
+	if (settings.mediaKeysScope() == Core::MediaKeysScope::All) {
+		return getActiveType();
+	}
+	for (const auto type : { Type::Voice, Type::Song }) {
+		if (settings.mediaKeysAllowed(type == Type::Voice) && current(type)) {
+			return type;
+		}
+	}
+	return std::nullopt;
+}
+
 void Instance::handleSongUpdate(const AudioMsgId &audioId) {
 	emitUpdate(audioId.type(), [&](const AudioMsgId &playing) {
 		return (audioId == playing);
@@ -1447,31 +1461,67 @@ void Instance::emitUpdate(AudioMsgId::Type type, CheckCallback check) {
 }
 
 void Instance::setupShortcuts() {
+	rpl::merge(
+		Core::App().settings().mediaKeysScopeValue()
+			| rpl::skip(1) | rpl::to_empty,
+		updatedNotifier() | rpl::to_empty
+	) | rpl::on_next([] {
+		Shortcuts::ToggleMediaShortcuts(true);
+	}, _lifetime);
+
 	Shortcuts::Requests(
 	) | rpl::on_next([=](not_null<Shortcuts::Request*> request) {
+		const auto type = mediaKeysType();
+		if (!type) {
+			return;
+		}
 		using Command = Shortcuts::Command;
 		request->check(Command::MediaPlay) && request->handle([=] {
-			playPause();
+			if (!Core::App().settings().mediaKeysAllowed(
+					*type == AudioMsgId::Type::Voice)) {
+				return false;
+			}
+			playPause(*type);
 			return true;
 		});
 		request->check(Command::MediaPause) && request->handle([=] {
-			pause();
+			if (!Core::App().settings().mediaKeysAllowed(
+					*type == AudioMsgId::Type::Voice)) {
+				return false;
+			}
+			pause(*type);
 			return true;
 		});
 		request->check(Command::MediaPlayPause) && request->handle([=] {
-			playPause();
+			if (!Core::App().settings().mediaKeysAllowed(
+					*type == AudioMsgId::Type::Voice)) {
+				return false;
+			}
+			playPause(*type);
 			return true;
 		});
 		request->check(Command::MediaStop) && request->handle([=] {
-			stop();
+			if (!Core::App().settings().mediaKeysAllowed(
+					*type == AudioMsgId::Type::Voice)) {
+				return false;
+			}
+			stop(*type);
 			return true;
 		});
 		request->check(Command::MediaPrevious) && request->handle([=] {
-			previous();
+			if (!Core::App().settings().mediaKeysAllowed(
+					*type == AudioMsgId::Type::Voice)) {
+				return false;
+			}
+			previous(*type);
 			return true;
 		});
 		request->check(Command::MediaNext) && request->handle([=] {
-			next();
+			if (!Core::App().settings().mediaKeysAllowed(
+					*type == AudioMsgId::Type::Voice)) {
+				return false;
+			}
+			next(*type);
 			return true;
 		});
 	}, _lifetime);
