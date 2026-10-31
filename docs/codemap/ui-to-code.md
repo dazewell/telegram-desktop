@@ -201,7 +201,7 @@ or navigation behavior; those targeted runtime checks remain unrun.
 
 ## Media Key Scope
 
-Established: 2026-10-30. Re-verify after upstream changes.
+Established: 2026-10-30; affected anchors re-verified 2026-10-31. Re-verify after upstream changes.
 
 Surface: Settings > Advanced > System Integration > Media Keys work for.
 Entry: [BuildSystemIntegrationSection](../../Telegram/SourceFiles/settings/sections/settings_advanced.cpp#L481)
@@ -210,7 +210,7 @@ appended after local passcode length in
 [Core::Settings](../../Telegram/SourceFiles/core/core_settings.cpp#L535).
 
 Flow: scope changes refresh eligible system targets in
-[SystemMediaControlsManager](../../Telegram/SourceFiles/media/system_media_controls_manager.cpp#L292)
+[SystemMediaControlsManager](../../Telegram/SourceFiles/media/system_media_controls_manager.cpp#L400)
 and shortcut enabling in
 [Instance::setupShortcuts](../../Telegram/SourceFiles/media/player/media_player_instance.cpp#L1463).
 Voice includes round video messages; the overlay explicitly supplies its

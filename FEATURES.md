@@ -151,6 +151,9 @@ Changes apply immediately to keyboard media shortcuts and system media controls
 without interrupting playback. Excluded media does not claim system controls;
 an eligible player can still receive commands while an excluded video is open.
 Ordinary in-app playback controls remain available.
+Closing the player keeps media shortcuts disabled across scope changes.
+Naturally completed eligible tracks remain replayable through system controls
+until explicitly stopped or excluded by the selected scope.
 
 Principal entry points: [settings UI](Telegram/SourceFiles/settings/sections/settings_advanced.cpp),
 [stored setting](Telegram/SourceFiles/core/core_settings.cpp),

@@ -1466,7 +1466,7 @@ void Instance::setupShortcuts() {
 			| rpl::skip(1) | rpl::to_empty,
 		updatedNotifier() | rpl::to_empty
 	) | rpl::on_next([] {
-		Shortcuts::ToggleMediaShortcuts(true);
+		Shortcuts::RefreshMediaShortcuts();
 	}, _lifetime);
 
 	Shortcuts::Requests(
