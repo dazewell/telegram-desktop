@@ -55,11 +55,17 @@ jobs:
         arch: [x64_x86, x64, arm64]
         qt: ["", qt6]
         generator: ["", "Ninja Multi-Config"]
+        configuration: [Debug]
         exclude:
           - arch: arm64
             qt: ""
           - arch: x64_x86
             qt: qt6
+        include:
+          - arch: x64
+            qt: ""
+            generator: ""
+            configuration: Release
 
     env:
       UPLOAD_ARTIFACT: "true"
@@ -149,8 +155,8 @@ jobs:
             !${{ env.LibrariesPath }}\[qQ]t[_-]*
             ${{ env.LibrariesPath }}\cache_keys\*
             !${{ env.LibrariesPath }}\cache_keys\[qQ]t[_-]*
-          key: ${{ runner.OS }}-${{ matrix.arch }}-libs-v2-${{ env.CACHE_KEY }}
-          restore-keys: ${{ runner.OS }}-${{ matrix.arch }}-libs-v2-
+          key: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.configuration == 'Release' && 'libs-v2rel' || 'libs-v2' }}-${{ env.CACHE_KEY }}
+          restore-keys: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.configuration == 'Release' && 'libs-v2rel' || 'libs-v2' }}-
 
       - name: Qt cache.
         id: cache-qt
@@ -159,12 +165,18 @@ jobs:
           path: |
             ${{ env.LibrariesPath }}\[qQ]t[_-]*
             ${{ env.LibrariesPath }}\cache_keys\[qQ]t[_-]*
-          key: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.qt || 'qt' }}-${{ env.CACHE_KEY }}
-          restore-keys: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.qt || 'qt' }}-
+          key: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.configuration == 'Release' && 'qtrel' || matrix.qt || 'qt' }}-${{ env.CACHE_KEY }}
+          restore-keys: ${{ runner.OS }}-${{ matrix.arch }}-${{ matrix.configuration == 'Release' && 'qtrel' || matrix.qt || 'qt' }}-
 
-      - name: Libraries.
+      - name: Libraries (Debug).
+        if: matrix.configuration == 'Debug'
         run: |
           %TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat skip-release silent ${{ matrix.qt }}
+
+      - name: Libraries (Release).
+        if: matrix.configuration == 'Release'
+        run: |
+          %TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat silent
 
       - name: Read configuration matrix.
         shell: bash
@@ -193,6 +205,10 @@ jobs:
             ARTIFACT_NAME="${ARTIFACT_NAME} ${{ matrix.generator }}"
           fi
           echo "TDESKTOP_BUILD_GENERATOR=$GENERATOR" >> $GITHUB_ENV
+
+          if [ "${{ matrix.configuration }}" != "Debug" ]; then
+            ARTIFACT_NAME="${ARTIFACT_NAME} ${{ matrix.configuration }}"
+          fi
 
           [ -n "$GENERATOR" ] && ARCH=""
           echo "TDESKTOP_BUILD_ARCH=$ARCH" >> $GITHUB_ENV
@@ -228,19 +244,19 @@ jobs:
           %TDESKTOP_BUILD_ARCH% ^
           ${{ matrix.qt }} ^
           %TDESKTOP_BUILD_API% ^
-          -D CMAKE_CONFIGURATION_TYPES=Debug ^
+          -D CMAKE_CONFIGURATION_TYPES=${{ matrix.configuration }} ^
           -D CMAKE_COMPILE_WARNING_AS_ERROR=ON ^
           -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= ^
           -D DESKTOP_APP_DISABLE_AUTOUPDATE=OFF ^
           -D DESKTOP_APP_DISABLE_CRASH_REPORTS=OFF ^
           %TDESKTOP_BUILD_DEFINE%
 
-          cmake --build ..\out --config Debug --parallel
+          cmake --build ..\out --config ${{ matrix.configuration }} --parallel
 
       - name: Move artifact.
         if: (env.UPLOAD_ARTIFACT == 'true') || (github.ref == 'refs/heads/nightly')
         run: |
-          set OUT=%TBUILD%\%REPO_NAME%\out\Debug
+          set OUT=%TBUILD%\%REPO_NAME%\out\${{ matrix.configuration }}
           mkdir artifact
           move %OUT%\Telegram.exe artifact/
           move %OUT%\Updater.exe artifact/
