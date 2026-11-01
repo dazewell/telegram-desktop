@@ -47,11 +47,24 @@ public:
 		not_null<SystemMediaControlsVideoDelegate*> delegate) override;
 
 private:
+	struct PlayerState;
+
 	[[nodiscard]] float64 lookupPlaybackRate() const;
+	[[nodiscard]] std::optional<AudioMsgId::Type> activePlayerType() const;
+	[[nodiscard]] Player::TrackState playerTrackState(AudioMsgId::Type type) const;
 	void applyPlayerTrack(AudioMsgId::Type audioType);
+	void clearPlayerTrack();
+	void updatePlayerState();
+	void updatePlayerPlaybackStatus(
+		AudioMsgId::Type type,
+		bool updatePosition = true);
 	void syncPlayerStateToControls();
+	void syncControls();
+	void applyVideoState();
+	[[nodiscard]] bool videoActive() const;
 
 	const std::unique_ptr<base::Platform::SystemMediaControls> _controls;
+	const std::unique_ptr<PlayerState> _playerState;
 
 	std::shared_ptr<Data::DocumentMedia> _cachedMediaView;
 	Ui::PeerUserpicView _cachedUserpicView;
@@ -61,9 +74,11 @@ private:
 	bool _inited = false;
 	SystemMediaControlsVideoDelegate *_videoDelegate = nullptr;
 	VideoState _videoState;
+	QImage _videoThumbnail;
 
 	rpl::lifetime _lifetimeDownload;
 	rpl::lifetime _lifetime;
+
 };
 
 } // namespace Media

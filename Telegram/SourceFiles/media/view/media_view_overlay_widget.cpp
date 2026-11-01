@@ -6114,6 +6114,7 @@ void OverlayWidget::refreshSystemMediaControls() {
 		.playing = (!player.paused() && !player.finished()),
 		.nextAvailable = _rightNavVisible,
 		.previousAvailable = _leftNavVisible,
+		.message = _document && _document->isVideoMessage(),
 	};
 	if (_smtcDocument != _document) {
 		_smtcDocument = _document;

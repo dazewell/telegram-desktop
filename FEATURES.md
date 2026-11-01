@@ -138,3 +138,24 @@ Principal entry points: [contextual dispatcher](Telegram/SourceFiles/core/shortc
 [legacy selection actions](Telegram/SourceFiles/history/history_inner_widget.cpp),
 [section selection actions](Telegram/SourceFiles/history/view/history_view_list_widget.cpp),
 and [Cite insertion](Telegram/SourceFiles/chat_helpers/selected_text_cite.h).
+
+## Media Key Scope
+
+Settings > Advanced > System Integration > Media Keys work for selects All
+(the default), Only Messages, Only Content, or Disabled. Messages are voice
+notes and round video messages; Content includes music, audio files, ordinary
+videos and stories, including files shared in chats. The preference applies
+across accounts in the desktop profile and persists across restarts.
+
+Changes apply immediately to keyboard media shortcuts and system media controls
+without interrupting playback. Excluded media does not claim system controls;
+an eligible player can still receive commands while an excluded video is open.
+Ordinary in-app playback controls remain available.
+Closing the player keeps media shortcuts disabled across scope changes.
+Naturally completed eligible tracks remain replayable through system controls
+until explicitly stopped or excluded by the selected scope.
+
+Principal entry points: [settings UI](Telegram/SourceFiles/settings/sections/settings_advanced.cpp),
+[stored setting](Telegram/SourceFiles/core/core_settings.cpp),
+[player shortcuts](Telegram/SourceFiles/media/player/media_player_instance.cpp), and
+[system media controls](Telegram/SourceFiles/media/system_media_controls_manager.cpp).

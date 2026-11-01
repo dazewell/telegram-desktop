@@ -187,6 +187,7 @@ public:
 	[[nodiscard]] std::vector<Command> lookup(
 		not_null<QObject*> object) const;
 	void toggleMedia(bool toggled);
+	void refreshMedia();
 	void toggleSupport(bool toggled);
 	void listen(not_null<QWidget*> widget);
 	[[nodiscard]] bool handles(const QKeySequence &sequence) const;
@@ -231,6 +232,7 @@ private:
 
 	base::flat_set<QAction*> _mediaShortcuts;
 	base::flat_set<QAction*> _supportShortcuts;
+	bool _mediaRequested = false;
 
 };
 
@@ -312,6 +314,7 @@ void Manager::clear() {
 	_commandByObject.clear();
 	_mediaShortcuts.clear();
 	_supportShortcuts.clear();
+	_mediaRequested = false;
 }
 
 const QStringList &Manager::errors() const {
@@ -377,8 +380,15 @@ std::vector<Command> Manager::lookup(not_null<QObject*> object) const {
 }
 
 void Manager::toggleMedia(bool toggled) {
+	_mediaRequested = toggled;
+	refreshMedia();
+}
+
+void Manager::refreshMedia() {
+	const auto enabled = _mediaRequested
+		&& Media::Player::instance()->mediaKeysType().has_value();
 	for (const auto shortcut : _mediaShortcuts) {
-		shortcut->setEnabled(toggled);
+		shortcut->setEnabled(enabled);
 	}
 }
 
@@ -1059,6 +1069,10 @@ bool HandlePossibleChatSwitch(not_null<QKeyEvent*> event) {
 
 void ToggleMediaShortcuts(bool toggled) {
 	Data.toggleMedia(toggled);
+}
+
+void RefreshMediaShortcuts() {
+	Data.refreshMedia();
 }
 
 void ToggleSupportShortcuts(bool toggled) {

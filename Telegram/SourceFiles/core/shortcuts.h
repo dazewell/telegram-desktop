@@ -178,6 +178,7 @@ struct ChatSwitchRequest {
 // applications also use them. They are enabled only when
 // the in-app player is active and disabled back after.
 void ToggleMediaShortcuts(bool toggled);
+void RefreshMediaShortcuts();
 
 // Support shortcuts are not enabled by default, because they
 // have some conflicts with default input shortcuts, like Ctrl+Delete.

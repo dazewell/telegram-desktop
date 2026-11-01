@@ -349,7 +349,8 @@ QByteArray Settings::serialize() const {
 		+ sizeof(qint32) // _chatFiltersTabsMode
 		+ sizeof(qint32) // _defaultScheduleTime
 		+ sizeof(qint32) // _quickUnlockEnabled
-		+ sizeof(qint32); // _localPasscodeLength
+		+ sizeof(qint32) // _localPasscodeLength
+		+ sizeof(qint32); // _mediaKeysScope
 
 	auto result = QByteArray();
 	result.reserve(size);
@@ -532,6 +533,7 @@ QByteArray Settings::serialize() const {
 		stream << qint32(_defaultScheduleTime);
 		stream << qint32(_quickUnlockEnabled ? 1 : 0);
 		stream << qint32(_localPasscodeLength);
+		stream << qint32(_mediaKeysScope.current());
 	}
 
 	Ensures(result.size() == size);
@@ -1080,6 +1082,16 @@ void Settings::addFromSerialized(const QByteArray &serialized) {
 		stream >> localPasscodeLength;
 		if (stream.status() == QDataStream::Ok) {
 			_localPasscodeLength = localPasscodeLength;
+		}
+	}
+	_mediaKeysScope = MediaKeysScope::All;
+	if (!stream.atEnd()) {
+		auto mediaKeysScope = qint32();
+		stream >> mediaKeysScope;
+		if (stream.status() == QDataStream::Ok
+			&& mediaKeysScope >= int(MediaKeysScope::All)
+			&& mediaKeysScope <= int(MediaKeysScope::Disabled)) {
+			_mediaKeysScope = MediaKeysScope(mediaKeysScope);
 		}
 	}
 	if (stream.status() != QDataStream::Ok) {
